@@ -12,15 +12,11 @@ https://www.bilibili.com/video/BV1S4411E7LY?spm_id_from=333.788.videopod.episode
 2. 配置flutter国内镜像
    参考链接：https://docs.flutter.cn/community/china/
 3. 检查flutter是否安装成功，如果输出关于安装的检测信息的话说明配置成功了。
-   '''
-   flutter doctor
-   '''
+   'flutter doctor'
 
 ## 在VS code 上运行flutter
 1. 在extension中安装dart、flutter、Awesome Flutter Snippets插件
 3. 运行代码
-'''
-flutter run -d all
-'''
+'flutter run -d all'
 
 
