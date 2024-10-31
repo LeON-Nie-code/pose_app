@@ -1,2 +1,3 @@
 # pose_app
-software construction lab
+
+#安装Flutter SDK
