@@ -1,5 +1,3 @@
-
-//还没有进行设计美化，只是一个设计的框架，字体、图标等的细节到时候修改
 import 'package:flutter/material.dart';
 
 class RegisterAccount extends StatefulWidget {
@@ -20,7 +18,7 @@ class _RegisterAccountState extends State<RegisterAccount> {
     final double fieldWidth = MediaQuery.of(context).size.width * 0.8;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFCF8), // 背景颜色
+      backgroundColor: const Color(0xFFFFFCF8),
       body: Center(
         child: SingleChildScrollView(
           child: Container(
@@ -52,8 +50,8 @@ class _RegisterAccountState extends State<RegisterAccount> {
                 // 邮箱输入框
                 _buildTextField(
                   controller: emailController,
-                  hintText: '邮箱',
-                  icon: Icons.email,
+                  hintText: ' 手机号',
+                  iconPath: 'assets/icons/phone.png', // 使用自定义图标
                   width: fieldWidth,
                 ),
                 const SizedBox(height: 10),
@@ -62,7 +60,7 @@ class _RegisterAccountState extends State<RegisterAccount> {
                 _buildTextField(
                   controller: usernameController,
                   hintText: '用户名',
-                  icon: Icons.person,
+                  iconPath: 'assets/icons/userIcon.png', // 使用自定义图标
                   width: fieldWidth,
                 ),
                 const SizedBox(height: 10),
@@ -71,7 +69,7 @@ class _RegisterAccountState extends State<RegisterAccount> {
                 _buildTextField(
                   controller: passwordController,
                   hintText: '密码',
-                  icon: Icons.lock,
+                  iconPath: 'assets/icons/lock.png', // 使用自定义图标
                   obscureText: true,
                   width: fieldWidth,
                 ),
@@ -88,7 +86,7 @@ class _RegisterAccountState extends State<RegisterAccount> {
                         child: _buildTextField(
                           controller: codeController,
                           hintText: '验证码',
-                          icon: Icons.code,
+                          iconPath: 'assets/icons/get.png', // 使用自定义图标
                         ),
                       ),
                       const SizedBox(width: 10), // 间距
@@ -162,7 +160,7 @@ class _RegisterAccountState extends State<RegisterAccount> {
   Widget _buildTextField({
     required TextEditingController controller,
     required String hintText,
-    required IconData icon,
+    required String iconPath,
     bool obscureText = false,
     double? width,
   }) {
@@ -172,7 +170,10 @@ class _RegisterAccountState extends State<RegisterAccount> {
         controller: controller,
         obscureText: obscureText,
         decoration: InputDecoration(
-          prefixIcon: Icon(icon, color: Colors.grey),
+          prefixIcon: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Image.asset(iconPath, width: 24, height: 24),
+          ),
           hintText: hintText,
           filled: true,
           fillColor: Colors.grey.shade100,

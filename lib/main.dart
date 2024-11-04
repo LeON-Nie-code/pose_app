@@ -1,7 +1,8 @@
-// lib/main.dart
 import 'package:flutter/material.dart';
 import 'userAccount/login.dart'; 
-import 'userAccount/register.dart'; 
+import 'userAccount/register.dart';
+import 'userAccount/reset_password.dart';
+import 'homepage/homepage.dart';  
 
 void main() {
   runApp(const MyApp());
@@ -22,6 +23,8 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const LoginPage(), // 登录页面
         '/register': (context) => const RegisterAccount(), // 注册页面
+        '/resetPassword': (context) => const ResetPasswordPage(), // 重置密码页面
+        '/home': (context) => const HomePage(), // 主页页面
       },
     );
   }
