@@ -40,6 +40,75 @@ class HomePage extends StatelessWidget{
                       children: [
                         //中间框架的的开头标题以及探索功能位于lib/component/header.dart
                         Header(),
+
+                        SizedBox(
+                          height: SizeConfig.blockSizeVertical! * 4
+                        ),
+                        SizedBox(
+                          width: SizeConfig.screenWidth,
+                          child: Wrap(
+                            runSpacing: 20.0,
+                            spacing: 20.0,
+                            alignment: WrapAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                constraints: BoxConstraints(minWidth: 150.0),
+                                padding: EdgeInsets.only(top: 20.0, left: 20.0, bottom: 20.0, right: 40.0),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                  color: AppColors.white,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(height: SizeConfig.blockSizeVertical! * 2,),
+                                    PrimaryText(text: "专注排行榜", fontWeight: FontWeight.w700, size: 18.0,),
+                                    PrimaryText(text: "1名/20", color: AppColors.secondary,size: 16.0,)
+                                  ],
+                                ),
+
+                              ),
+                              Container(
+                                constraints: BoxConstraints(minWidth: 150.0),
+                                padding: EdgeInsets.only(top: 20.0, left: 20.0, bottom: 20.0, right: 40.0),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                  color: AppColors.white,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(height: SizeConfig.blockSizeVertical! * 2,),
+                                    PrimaryText(text: "专注排行榜", fontWeight: FontWeight.w700, size: 18.0,),
+                                    PrimaryText(text: "1名/20", color: AppColors.secondary,size: 16.0,)
+                                  ],
+                                ),
+
+                              ),
+                              Container(
+                                constraints: BoxConstraints(minWidth: 150.0),
+                                padding: EdgeInsets.only(top: 20.0, left: 20.0, bottom: 20.0, right: 40.0),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                  color: AppColors.white,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(height: SizeConfig.blockSizeVertical! * 2,),
+                                    PrimaryText(text: "专注排行榜", fontWeight: FontWeight.w700, size: 18.0,),
+                                    PrimaryText(text: "1名/20", color: AppColors.secondary,size: 16.0,)
+                                  ],
+                                ),
+
+                              ),
+
+                            
+                              
+                            ],
+                          ),
+                        ),
+
                       ],
                     ),
 
