@@ -1,3 +1,5 @@
+//本次软件中经常用到的颜色
+
 import 'package:flutter/material.dart';
 import 'package:pose_app/style/colors.dart';
 
