@@ -35,10 +35,14 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  flutter_svg: ^0.22.0
+  fl_chart: ^0.35.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -64,11 +68,7 @@ flutter:
   #   - images/a_dot_ham.jpeg
 
   assets:
-    - assets/icons/userIcon.png
-    - assets/icons/lock.png
-    - assets/icons/phone.png
-    - assets/icons/get.png
-    - assets/icons/email.png
+    - assets/icons/
     
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -82,6 +82,13 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: fonts/Poppins-Regular.ttf
+        - asset: fonts/Poppins-Medium.ttf
+        - asset: fonts/Poppins-SemiBold.ttf
+        - asset: fonts/Poppins-Bold.ttf
   # fonts:
   #   - family: Schyler
   #     fonts:
