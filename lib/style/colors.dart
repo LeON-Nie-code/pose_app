@@ -11,6 +11,9 @@ class AppColors {
   static const barBg = Color(0xffe3e3ee);
   static const beige = Color(0xffFEFCF8);
   static const deppBeige = Color(0xffFCECDD);
+  static const warmOrange = Color(0xFFD08727);
+  static const barcolor = Color(0xFFF9F2E1);
+
 
 
 }

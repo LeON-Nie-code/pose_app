@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pose_app/homepage/component/appBarActionItems.dart';
+import 'package:pose_app/homepage/component/barChartComponent.dart';
 import 'package:pose_app/homepage/component/header.dart';
 import 'package:pose_app/homepage/component/rankingList.dart';
 import 'package:pose_app/homepage/component/sidemenu.dart';
@@ -106,12 +107,39 @@ class HomePage extends StatelessWidget{
                                 ),
                               ],
                             ),
-
+                            PrimaryText(
+                              text: 'Past 15 Days',
+                              size: 16,
+                              color: AppColors.secondary,
+                              ),
                       
-                            
                           ],
-                        )
+                        ),
 
+                        //  数据统计
+                        SizedBox(
+                          height: SizeConfig.blockSizeVertical! * 3,
+        
+                        ),
+                        Container(
+                          
+                            // constraints: BoxConstraints(minWidth: 150.0),
+                            padding: EdgeInsets.only(top: 20.0, left: 20.0, bottom: 20.0, right: 40.0),
+                            decoration: BoxDecoration(
+                             borderRadius: BorderRadius.circular(20.0),
+                             color: AppColors.white,
+                             boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.2),
+                                spreadRadius: 2,
+                                blurRadius: 5,
+                                offset: Offset(0,3),
+                              )
+                             ]
+                             ),
+                             height: 300,
+                             child: BarChartComponent(),
+                        ),
                       ],
                     ),
 
