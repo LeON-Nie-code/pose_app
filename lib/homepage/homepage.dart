@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pose_app/homepage/component/appBarActionItems.dart';
 import 'package:pose_app/homepage/component/header.dart';
+import 'package:pose_app/homepage/component/rankingList.dart';
 import 'package:pose_app/homepage/component/sidemenu.dart';
 import 'package:pose_app/homepage/component/startToStudyDetail.dart';
 import 'package:pose_app/config/size_config.dart';
@@ -51,63 +52,65 @@ class HomePage extends StatelessWidget{
                             spacing: 20.0,
                             alignment: WrapAlignment.spaceBetween,
                             children: [
-                              Container(
-                                constraints: BoxConstraints(minWidth: 150.0),
-                                padding: EdgeInsets.only(top: 20.0, left: 20.0, bottom: 20.0, right: 40.0),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20.0),
-                                  color: AppColors.white,
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(height: SizeConfig.blockSizeVertical! * 2,),
-                                    PrimaryText(text: "专注排行榜", fontWeight: FontWeight.w700, size: 18.0,),
-                                    PrimaryText(text: "1名/20", color: AppColors.secondary,size: 16.0,)
-                                  ],
-                                ),
+                              //详细的位于lib/homepage/component/rankingList.dart中
+                              //专注排行榜框架，
+                              rankingList(
 
+                                icon:'assets/icons/ranking.svg',
+                                label: '专注排行榜',
+                                amount: '1名/20',
                               ),
-                              Container(
-                                constraints: BoxConstraints(minWidth: 150.0),
-                                padding: EdgeInsets.only(top: 20.0, left: 20.0, bottom: 20.0, right: 40.0),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20.0),
-                                  color: AppColors.white,
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(height: SizeConfig.blockSizeVertical! * 2,),
-                                    PrimaryText(text: "专注排行榜", fontWeight: FontWeight.w700, size: 18.0,),
-                                    PrimaryText(text: "1名/20", color: AppColors.secondary,size: 16.0,)
-                                  ],
-                                ),
+                              //在线好友
+                              rankingList(
 
+                                icon:'assets/icons/online.svg',
+                                label: '好友在线',
+                                amount: '用户1',
                               ),
-                              Container(
-                                constraints: BoxConstraints(minWidth: 150.0),
-                                padding: EdgeInsets.only(top: 20.0, left: 20.0, bottom: 20.0, right: 40.0),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20.0),
-                                  color: AppColors.white,
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(height: SizeConfig.blockSizeVertical! * 2,),
-                                    PrimaryText(text: "专注排行榜", fontWeight: FontWeight.w700, size: 18.0,),
-                                    PrimaryText(text: "1名/20", color: AppColors.secondary,size: 16.0,)
-                                  ],
-                                ),
+                              
+                              //今日代办
+                              rankingList(
 
+                                icon:'assets/icons/todolist.svg',
+                                label: '今日代办',
+                                amount: '任务1',
+                                
                               ),
-
-                            
+                              
                               
                             ],
                           ),
                         ),
+                        //”数据统计“标题 
+                        SizedBox(
+                          height: SizeConfig.blockSizeVertical! * 4,
+
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                PrimaryText(
+                                  text: 'xx月xx日 - xx月xx',
+                                  size: 16,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.secondary,
+                                  ),
+                                PrimaryText(
+                                text: '数据统计',
+                                size: 30,
+                                fontWeight: FontWeight.w800,
+                                ),
+                              ],
+                            ),
+
+                      
+                            
+                          ],
+                        )
 
                       ],
                     ),
@@ -142,7 +145,4 @@ class HomePage extends StatelessWidget{
     );
   }
 }
-
-
-
 
