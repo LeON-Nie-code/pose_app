@@ -1,15 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:webview_windows/webview_windows.dart'; 
 import 'package:pose_app/homepage/component/recordListOfUsers.dart';
 import 'package:pose_app/config/size_config.dart';
 import 'package:pose_app/data.dart';
 import 'package:pose_app/style/colors.dart';
 import 'package:pose_app/style/style.dart';
 
-class StartToStudyDetail extends StatelessWidget {
-  const StartToStudyDetail({
-    super.key,
-  });
+class StartToStudyDetail extends StatefulWidget {
+  const StartToStudyDetail({super.key});
+
+  @override
+  _StartToStudyDetailState createState() => _StartToStudyDetailState();
+}
+
+class _StartToStudyDetailState extends State<StartToStudyDetail> {
+  final WebviewController webviewController = WebviewController();
+
+  @override
+  void initState() {
+    super.initState();
+    initializeWebView();
+  }
+
+  Future<void> initializeWebView() async {
+    // 初始化 WebView 控制器并设置需要加载的 URL 或本地文件
+    await webviewController.initialize();
+    webviewController.loadUrl('https://www.example.com'); // 可以替换为实际 URL 或本地文件路径
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,15 +35,13 @@ class StartToStudyDetail extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(
-          height: SizeConfig.blockSizeVertical! * 15, // 按钮上方的间距
+          height: SizeConfig.blockSizeVertical! * 10,
         ),
-        
-        // 按钮组件
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.black,
-            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            backgroundColor: Colors.white, 
+            foregroundColor: Colors.black, 
+            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             textStyle: TextStyle(fontSize: 20),
           ),
           onPressed: () {
@@ -40,6 +56,9 @@ class StartToStudyDetail extends StatelessWidget {
                   child: SizedBox(
                     width: 900,
                     height: 700,
+                    child: webviewController.value.isInitialized
+                        ? Webview(webviewController)
+                        : Center(child: CircularProgressIndicator()), // 确保 WebView 初始化完成后显示
                   ),
                 );
               },
@@ -47,13 +66,11 @@ class StartToStudyDetail extends StatelessWidget {
           },
           child: Text("开始"),
         ),
-        
-        // 按钮下方的间距
         SizedBox(
-          height: SizeConfig.blockSizeVertical! * 15, // 调整此值来增加下方的间距
+          height: SizeConfig.blockSizeVertical! * 10,
         ),
         
-        // 个人专注部分的记录列表
+        // 个人专注部分的记录等内容...
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -86,7 +103,7 @@ class StartToStudyDetail extends StatelessWidget {
           ),
         ),
 
-        // 集体专注记录
+        // 集体专注
         SizedBox(
           height: SizeConfig.blockSizeVertical! * 5,
         ),
@@ -124,5 +141,11 @@ class StartToStudyDetail extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    webviewController.dispose(); // 销毁 WebView 控制器
+    super.dispose();
   }
 }

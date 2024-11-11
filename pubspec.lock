@@ -264,6 +264,14 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "14.2.5"
+  webview_windows:
+    dependency: "direct main"
+    description:
+      name: webview_windows
+      sha256: "17c4f901b77d233dbb065cd2965e8e5f0010d2bf387bf161fe5078c85f3112a7"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.0.9"
   xml:
     dependency: transitive
     description:
