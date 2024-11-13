@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:pose_app/homepage/component/VideoDialog.dart';
 import 'package:pose_app/homepage/component/recordListOfUsers.dart';
 import 'package:pose_app/config/size_config.dart';
 import 'package:pose_app/data.dart';
@@ -19,7 +20,7 @@ class StartToStudyDetail extends StatelessWidget {
         SizedBox(
           height: SizeConfig.blockSizeVertical! * 15, // 按钮上方的间距
         ),
-        
+
         // 按钮组件
         ElevatedButton(
           style: ElevatedButton.styleFrom(
@@ -32,27 +33,18 @@ class StartToStudyDetail extends StatelessWidget {
             showDialog(
               context: context,
               builder: (BuildContext context) {
-                return Dialog(
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: SizedBox(
-                    width: 900,
-                    height: 700,
-                  ),
-                );
+                return VideoDialog();
               },
             );
           },
           child: Text("开始"),
         ),
-        
+
         // 按钮下方的间距
         SizedBox(
           height: SizeConfig.blockSizeVertical! * 15, // 调整此值来增加下方的间距
         ),
-        
+
         // 个人专注部分的记录列表
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,11 +62,11 @@ class StartToStudyDetail extends StatelessWidget {
             ),
           ],
         ),
-        
+
         SizedBox(
           height: SizeConfig.blockSizeVertical! * 2,
         ),
-        
+
         Column(
           children: List.generate(
             recentActivities.length,
@@ -107,11 +99,11 @@ class StartToStudyDetail extends StatelessWidget {
             ),
           ],
         ),
-      
+
         SizedBox(
           height: SizeConfig.blockSizeVertical! * 2,
         ),
-        
+
         Column(
           children: List.generate(
             upcomingPayments.length,
