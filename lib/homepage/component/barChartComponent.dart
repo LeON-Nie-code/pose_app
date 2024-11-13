@@ -28,41 +28,79 @@ class BarChartComponent extends StatelessWidget {
           } else{
             return '';
           }
-        })),
+        }),
+        bottomTitles: SideTitles(
+          showTitles: true, getTextStyles: (value) => const TextStyle(
+            color: Colors.grey, fontSize: 12
+          ),getTitles: (value) {
+            
+            if(value == 0){
+            return 'MON';
+          } else if (value == 1){
+            return 'TUE';
+          }else if (value == 2){
+            return 'WED';
+          }else if (value == 3){
+            return 'THU';
+          }else if (value == 4){
+            return 'FRI';
+          }else if (value == 5){
+            return 'SAT';
+          }else if (value == 6){
+            return 'SUN';
+          }else{
+            return'';
+          }
+          },
+
+        )
+        ),
         barGroups: [
           //目前只是例子
           BarChartGroupData(x: 0,
           barRods: [
             BarChartRodData(y: 1, colors: [AppColors.warmOrange], borderRadius: BorderRadius.circular(0), 
             width: 40, backDrawRodData: BackgroundBarChartRodData(y:9, show: true, colors: [AppColors.barcolor]),),
+          ],),
 
+          BarChartGroupData(x: 1,
+          barRods: [
+            BarChartRodData(y: 4, colors: [AppColors.warmOrange], borderRadius: BorderRadius.circular(0), 
+            width: 40, backDrawRodData: BackgroundBarChartRodData(y:9, show: true, colors: [AppColors.barcolor]),),
+          ],),
+
+          BarChartGroupData(x: 2,
+          barRods: [
             BarChartRodData(y: 5, colors: [AppColors.warmOrange], borderRadius: BorderRadius.circular(0), 
             width: 40, backDrawRodData: BackgroundBarChartRodData(y:9, show: true, colors: [AppColors.barcolor]),),
+          ],),
 
-            BarChartRodData(y: 3, colors: [AppColors.warmOrange], borderRadius: BorderRadius.circular(0), 
-            width: 40, backDrawRodData: BackgroundBarChartRodData(y:9, show: true, colors: [AppColors.barcolor]),),
-
-            BarChartRodData(y: 8, colors: [AppColors.warmOrange], borderRadius: BorderRadius.circular(0), 
-            width: 40, backDrawRodData: BackgroundBarChartRodData(y:9, show: true, colors: [AppColors.barcolor]),),
-            
+          BarChartGroupData(x: 3,
+          barRods: [
             BarChartRodData(y: 7, colors: [AppColors.warmOrange], borderRadius: BorderRadius.circular(0), 
             width: 40, backDrawRodData: BackgroundBarChartRodData(y:9, show: true, colors: [AppColors.barcolor]),),
+          ],),
 
-            BarChartRodData(y: 8, colors: [AppColors.warmOrange], borderRadius: BorderRadius.circular(0), 
-            width: 40, backDrawRodData: BackgroundBarChartRodData(y:9, show: true, colors: [AppColors.barcolor]),),
-
-            BarChartRodData(y: 2, colors: [AppColors.warmOrange], borderRadius: BorderRadius.circular(0), 
-            width: 40, backDrawRodData: BackgroundBarChartRodData(y:9, show: true, colors: [AppColors.barcolor]),),
-
-            BarChartRodData(y: 9, colors: [AppColors.warmOrange], borderRadius: BorderRadius.circular(0), 
-            width: 40, backDrawRodData: BackgroundBarChartRodData(y:9, show: true, colors: [AppColors.barcolor]),),
-
-            BarChartRodData(y: 6, colors: [AppColors.warmOrange], borderRadius: BorderRadius.circular(0), 
-            width: 40, backDrawRodData: BackgroundBarChartRodData(y:9, show: true, colors: [AppColors.barcolor]),),
-
+          BarChartGroupData(x: 4,
+          barRods: [
             BarChartRodData(y: 1, colors: [AppColors.warmOrange], borderRadius: BorderRadius.circular(0), 
             width: 40, backDrawRodData: BackgroundBarChartRodData(y:9, show: true, colors: [AppColors.barcolor]),),
           ],),
+
+          BarChartGroupData(x: 5,
+          barRods: [
+            BarChartRodData(y: 9, colors: [AppColors.warmOrange], borderRadius: BorderRadius.circular(0), 
+            width: 40, backDrawRodData: BackgroundBarChartRodData(y:9, show: true, colors: [AppColors.barcolor]),),
+          ],),
+
+          BarChartGroupData(x: 6,
+          barRods: [
+            BarChartRodData(y: 2, colors: [AppColors.warmOrange], borderRadius: BorderRadius.circular(0), 
+            width: 40, backDrawRodData: BackgroundBarChartRodData(y:9, show: true, colors: [AppColors.barcolor]),),
+          ],),
+
+          
+          
         ]
       ),
       swapAnimationDuration: Duration(microseconds: 150),
@@ -70,3 +108,6 @@ class BarChartComponent extends StatelessWidget {
     );
   }
 }
+
+
+

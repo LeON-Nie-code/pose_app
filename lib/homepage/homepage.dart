@@ -125,7 +125,7 @@ class HomePage extends StatelessWidget{
                               ],
                             ),
                             PrimaryText(
-                              text: 'Past 10 Days',
+                              text: 'Past 7 Days',
                               size: 16,
                               color: AppColors.secondary,
                               ),
