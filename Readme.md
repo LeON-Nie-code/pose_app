@@ -1,0 +1,3 @@
+# pose_app
+
+这是一项使用media_pipe对坐姿进行检测的Windows桌面APP
