@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+const defaultPadding = 16.0;
+
 class SizeConfig {
   static MediaQueryData? _mediaQueryData;
   static double? screenWidth;

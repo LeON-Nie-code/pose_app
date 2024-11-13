@@ -2,6 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:pose_app/data.dart';
+import 'package:pose_app/homepage/component/rankingListTable.dart';
+import 'package:pose_app/rankingData.dart';
 import 'package:pose_app/homepage/component/appBarActionItems.dart';
 import 'package:pose_app/homepage/component/barChartComponent.dart';
 import 'package:pose_app/homepage/component/header.dart';
@@ -60,6 +63,8 @@ class HomePage extends StatelessWidget{
                                 icon:'assets/icons/ranking.svg',
                                 label: '专注排行榜',
                                 amount: '1名/20',
+                                // 
+                                dialogContent: rankingListTable(),
                               ),
                               //在线好友
                               rankingList(
@@ -67,6 +72,12 @@ class HomePage extends StatelessWidget{
                                 icon:'assets/icons/online.svg',
                                 label: '好友在线',
                                 amount: '用户1',
+                                dialogContent: Center(
+                                  child: Text(
+                                    '是否好友在线',
+                                    style: TextStyle(fontSize: 18),
+                                  ),
+                                ),
                               ),
                               
                               //今日代办
@@ -75,6 +86,12 @@ class HomePage extends StatelessWidget{
                                 icon:'assets/icons/todolist.svg',
                                 label: '今日代办',
                                 amount: '任务1',
+                                dialogContent: Center(
+                                  child: Text(
+                                    'Todo列表',
+                                    style: TextStyle(fontSize: 18),
+                                  ),
+                                ),
                                 
                               ),
                               
@@ -108,7 +125,7 @@ class HomePage extends StatelessWidget{
                               ],
                             ),
                             PrimaryText(
-                              text: 'Past 15 Days',
+                              text: 'Past 10 Days',
                               size: 16,
                               color: AppColors.secondary,
                               ),
@@ -173,4 +190,5 @@ class HomePage extends StatelessWidget{
     );
   }
 }
+
 
