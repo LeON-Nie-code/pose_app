@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pose_app/homepage/component/VideoDialog.dart';
 import 'package:pose_app/homepage/component/recordListOfUsers.dart';
+import 'package:pose_app/homepage/component/WebViewDialog.dart';
 import 'package:pose_app/config/size_config.dart';
 import 'package:pose_app/data.dart';
 import 'package:pose_app/style/colors.dart';
@@ -33,7 +34,10 @@ class StartToStudyDetail extends StatelessWidget {
             showDialog(
               context: context,
               builder: (BuildContext context) {
-                return VideoDialog();
+                // return VideoDialog();
+                String videoUrl = 'http://127.0.0.1:5000/video_feed';
+                return VideoWebViewDialog(
+                    videoUrl: videoUrl); // 使用命名参数 videoUrl
               },
             );
           },
