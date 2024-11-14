@@ -5,9 +5,12 @@ from flask_cors import CORS
 import threading
 import math
 from detect.utils import all_detection
+from flasgger import Swagger  # 导入 flasgger
 
 app = Flask(__name__)
 CORS(app)
+swagger = Swagger(app)  # 初始化 Swagger
+
 current_camera_index = 0  # 默认摄像头索引
 cap = None  # 视频捕捉对象
 video_thread = None  # 视频流线程
@@ -40,11 +43,35 @@ def get_available_cameras():
 
 @app.route('/cameras', methods=['GET'])
 def list_cameras():
+    """
+    Get list of available cameras.
+    ---
+    responses:
+      200:
+        description: List of available camera indices.
+        examples:
+          application/json: [0, 1, 2]
+    """
     cameras = get_available_cameras()
     return jsonify(cameras)
 
 @app.route('/select_camera', methods=['POST'])
 def select_camera():
+    """
+    Select the camera to stream video.
+    ---
+    parameters:
+      - name: index
+        in: body
+        type: integer
+        required: true
+        description: Index of the camera to select.
+    responses:
+      200:
+        description: Status of camera selection.
+        examples:
+          application/json: {"status": "success", "camera_index": 1}
+    """
     global current_camera_index, cap, video_thread
 
     # 关闭当前摄像头
@@ -173,7 +200,19 @@ def generate_video_feed():
 
 @app.route('/video_feed')
 def video_feed():
+    """
+    Stream video feed from the selected camera.
+    ---
+    responses:
+      200:
+        description: Stream video frames in JPEG format.
+        content:
+          multipart/x-mixed-replace:
+            schema:
+              type: string
+              format: byte
+    """
     return Response(generate_video_feed(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
