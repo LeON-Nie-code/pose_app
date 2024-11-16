@@ -28,3 +28,13 @@ class LoginMsg:
             and password_pattern.fullmatch(self.password)
         ):
             raise ValueError('Invalid arguments')
+
+
+class LogoutMsg:
+    def __init__(self, raw: dict):
+        self.username = raw['username']
+
+        if not (
+            username_pattern.fullmatch(self.username)
+        ):
+            raise ValueError('Invalid arguments')
