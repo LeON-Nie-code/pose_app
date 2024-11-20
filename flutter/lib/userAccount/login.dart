@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:pose_app/homepage/homepage.dart' as homepage; 
+import 'package:pose_app/homepage/homepage.dart' as homepage;
+
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -26,6 +29,24 @@ class _LoginPageState extends State<LoginPage> {
         loginStateHintText = "用户名或密码不能为空";
       });
       return;
+    }
+
+    // TODO 改写网络接口
+    http.Response resp = await http.post(
+      Uri.parse('http://localhost:8000/user/login/'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'username': username,
+        'password': password,
+      })
+    );
+    if (resp.statusCode != 200) {
+      setState(() {
+        isLoginFailed = true;
+        loginStateHintText = "登录失败";
+      });
     }
 
     // 模拟登录成功后的操作

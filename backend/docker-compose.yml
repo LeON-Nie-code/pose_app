@@ -1,0 +1,15 @@
+version: '2.29'
+name: social_backend
+
+services:
+  social:
+    build: .
+    restart: always
+
+    expose:
+      - 8080
+    command: ["bash", "-c", "
+      python manage.py makemigrations
+      && python manage.py migrate
+      && gunicorn -w4 -b 0.0.0.0:8080 --log-level-debug pose_remote.wsgi
+      "]

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 class RegisterAccount extends StatefulWidget {
   const RegisterAccount({Key? key}) : super(key: key);
 
@@ -118,8 +121,23 @@ class _RegisterAccountState extends State<RegisterAccount> {
                 SizedBox(
                   width: fieldWidth,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       // 处理注册逻辑
+                      //  TODO 改写网络接口
+                      http.Response resp = await http.post(
+                        Uri.parse('http://localhost:8000/user/register/'),
+                          headers: <String, String>{
+                            'Content-Type': 'application/json; charset=UTF-8',
+                          },
+                          body: jsonEncode(<String, String>{
+                            'username': usernameController.text,
+                            'password': passwordController.text,
+                            'mobile': emailController.text,
+                          })
+                      );
+                      if (resp.statusCode != 200) {
+                        return;
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size(double.infinity, 50),
