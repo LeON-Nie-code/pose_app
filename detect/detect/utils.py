@@ -56,3 +56,69 @@ def all_detection(nose_x, nose_y,                               # 鼻子（0点�
     else:
         tmp = 'normal'
     return tmp
+
+
+def all_detection_new(landmarks, width, height):
+    """Analyze pose landmarks and determine posture conditions."""
+    # Extract key points
+    left_ear = landmarks[mp_pose.PoseLandmark.LEFT_EAR]
+    right_ear = landmarks[mp_pose.PoseLandmark.RIGHT_EAR]
+    left_eye_inner = landmarks[mp_pose.PoseLandmark.LEFT_EYE_INNER]
+    left_eye_outer = landmarks[mp_pose.PoseLandmark.LEFT_EYE_OUTER]
+    right_eye_inner = landmarks[mp_pose.PoseLandmark.RIGHT_EYE_INNER]
+    right_eye_outer = landmarks[mp_pose.PoseLandmark.RIGHT_EYE_OUTER]
+    nose = landmarks[mp_pose.PoseLandmark.NOSE]
+    left_eye = landmarks[mp_pose.PoseLandmark.LEFT_EYE]
+    right_eye = landmarks[mp_pose.PoseLandmark.RIGHT_EYE]
+    left_shoulder = landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER]
+    right_shoulder = landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER]
+    left_mouth = landmarks[mp_pose.PoseLandmark.MOUTH_LEFT]
+    right_mouth = landmarks[mp_pose.PoseLandmark.MOUTH_RIGHT]
+
+    # Compute relevant distances and angles for posture analysis
+    left_ear_x, left_ear_y = int(left_ear.x * width), int(left_ear.y * height)
+    right_ear_x, right_ear_y = int(right_ear.x * width), int(right_ear.y * height)
+    nose_x, nose_y = int(nose.x * width), int(nose.y * height)
+    left_eye_x, left_eye_y = int(left_eye.x * width), int(left_eye.y * height)
+    right_eye_x, right_eye_y = int(right_eye.x * width), int(right_eye.y * height)
+    left_eye_inner_x, left_eye_inner_y = int(left_eye_inner.x * width), int(left_eye_inner.y * height)
+    right_eye_inner_x, right_eye_inner_y = int(right_eye_inner.x * width), int(right_eye_inner.y * height)
+    left_eye_outer_x, left_eye_outer_y = int(left_eye_outer.x * width), int(left_eye_outer.y * height)
+    right_eye_outer_x, right_eye_outer_y = int(right_eye_outer.x * width), int(right_eye_outer.y * height)
+    left_shoulder_x, left_shoulder_y = int(left_shoulder.x * width), int(left_shoulder.y * height)
+    right_shoulder_x, right_shoulder_y = int(right_shoulder.x * width), int(right_shoulder.y * height)
+    left_mouth_x, left_mouth_y = int(left_mouth.x * width), int(left_mouth.y * height)
+    right_mouth_x, right_mouth_y = int(right_mouth.x * width), int(right_mouth.y * height)
+
+    left_shoulder_x_norm, left_shoulder_y_norm = left_shoulder.x, left_shoulder.y
+    right_shoulder_x_norm, right_shoulder_y_norm = right_shoulder.x, right_shoulder.y
+
+    waitou_inclination = findAngle(left_ear_x, left_ear_y, right_ear_x, right_ear_y) 
+    ditou_inclination = findAngle(left_mouth_x, left_mouth_y, left_shoulder_x, left_shoulder_y)
+    gaodijian_inclination = findAngle(left_shoulder_x, left_shoulder_y, right_shoulder_x, right_shoulder_y)
+    yangtou_inclination = findAngle(nose_x, nose_y, left_ear_x, left_ear_y)
+    if waitou_inclination < 80:
+        tmp = 'left tilt'
+    elif waitou_inclination > 100:
+        tmp = 'right tilt'
+    elif (left_shoulder_y_norm + right_shoulder_y_norm) > 1.5:
+        tmp = 'lying on the table'
+    elif ditou_inclination < 115:
+        tmp = 'bow'
+    elif left_ear_x < right_eye_inner_x:
+        tmp = 'left face'
+    elif right_ear_x > left_eye_inner_x:
+        tmp = 'right face'
+    elif gaodijian_inclination > 100:
+        tmp = 'high shoulder'
+    elif gaodijian_inclination < 80:
+        tmp = 'low shoulder'
+    elif (left_mouth_y or right_mouth_y) > (left_shoulder_y or right_shoulder_y):
+        tmp = 'supporting the table'
+    elif yangtou_inclination > 90:
+        tmp = 'looking up'
+    else:
+        tmp = 'normal'
+    return tmp
+
+
