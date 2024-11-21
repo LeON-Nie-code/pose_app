@@ -54,3 +54,12 @@
 在服务器端使用Django代理服务，来完成用户数据的管理。
 
 ## 使用方法
+
+
+## 理论指导
+
+使用电脑的坐姿 
+
+1. https://www.uclahealth.org/safety/ergonomics/office-ergonomics/good-posture
+2. https://ergonomictrends.com/proper-sitting-posture-computer-experts/
+

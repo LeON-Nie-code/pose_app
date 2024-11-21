@@ -165,7 +165,11 @@ def generate_video_feed():
 
                     # Draw circles around the eyes
                     cv2.circle(image, left_eye_coords, 5, (255, 0, 0), -1)  # Blue dot for left eye
-                    cv2.circle(image, right_eye_coords, 5, (0, 0, 255), -1)  # Red dot for right eye
+                    cv2.circle(image, right_eye_coords, 5, (255, 0, 0), -1)  # Red dot for right eye
+
+                    # Eye gaze detection (checking if eyes are in the center of the screen)
+                    eye_status = check_eye_position(left_eye_coords, right_eye_coords, w, h)
+                    cv2.putText(image, eye_status, (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
             # Encode the frame as JPEG
             _, jpeg = cv2.imencode('.jpg', image)
@@ -176,6 +180,32 @@ def generate_video_feed():
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
     cap.release()
+
+def check_eye_position(left_eye_coords, right_eye_coords, frame_width, frame_height):
+    """Check if the eyes are within the center of the screen."""
+    # Determine the screen center
+    screen_center_x, screen_center_y = frame_width // 2, frame_height // 2
+
+    # Check if both eyes are near the screen center (a simple heuristic)
+    eye_distance = math.sqrt((left_eye_coords[0] - right_eye_coords[0]) ** 2 +
+                             (left_eye_coords[1] - right_eye_coords[1]) ** 2)
+    
+    # Define a threshold for how far the eyes can be from the center to be considered "looking at the screen"
+    max_eye_offset = frame_width * 0.3  # 30% of screen width
+
+    # Check if the distance from the center is within the allowed offset
+    if abs(left_eye_coords[0] - screen_center_x) < max_eye_offset and abs(right_eye_coords[0] - screen_center_x) < max_eye_offset:
+        eye_status = "Looking at screen"
+        eye_color = (0, 255, 0)  # Green for looking at screen
+    else:
+        eye_status = "Not looking at screen"
+        eye_color = (0, 0, 255)  # Red for not looking at screen
+
+    return eye_status
+
+    # Display the eye status on the frame
+    # cv2.putText(frame, eye_status, (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, eye_color, 2)
+
 
 def detect_posture(landmarks, width, height):
     """Analyze pose landmarks and determine posture conditions."""
@@ -233,6 +263,12 @@ def video_feed():
     """
     Stream video feed from the selected camera.
     ---
+    parameters:
+      - name: index
+        in: query
+        type: integer
+        required: false
+        description: Index of the camera to use for video streaming (defaults to 0).
     responses:
       200:
         description: Stream video frames in JPEG format.
@@ -242,6 +278,19 @@ def video_feed():
               type: string
               format: byte
     """
+    # Get the camera index from the query parameters, default to 0
+    camera_index = request.args.get('index', default=0, type=int)
+
+    # Stop and release the current camera
+    global cap
+    if cap:
+        cap.release()
+
+    # Set the new camera index
+    global current_camera_index
+    current_camera_index = camera_index
+
+    # Start streaming video from the selected camera
     return Response(generate_video_feed(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/posture_times', methods=['GET'])
