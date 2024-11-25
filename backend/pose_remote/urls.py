@@ -16,11 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework_swagger.views import get_swagger_view
-
-usage = get_swagger_view(title='“社交后端” API')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/', include('user.urls')),
-    path('api/', usage),
+    path('updates/', include('updates.urls')),
 ]

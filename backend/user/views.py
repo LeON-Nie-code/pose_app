@@ -39,38 +39,14 @@ def login(request):
 
     user = auth.authenticate(username=data.username, password=data.password)
     if user is None:
-        return HttpResponse('Authentication failed', status=HTTPStatus.OK)
+        return HttpResponse('Authentication failed', status=HTTPStatus.BAD_REQUEST)
 
-    auth.login(request, user)
+    if not user.is_active:
+        auth.login(request, user)
     return HttpResponse('Succeed', status=HTTPStatus.OK)
 
 
 @login_required
 def logout(request):
     auth.logout(request)
-    return HttpResponse('Succeed', status=HTTPStatus.OK)
-
-
-@login_required
-def release_post(request):
-    data = json.loads(request.body)
-    content = data['content']
-
-    blog = models.Post(
-        content=content,
-        author=models.User.objects.get(username=request.user.username)
-    )
-    blog.save()
-    return JsonResponse({'pk': blog.pk})
-
-
-@login_required
-def make_comment(request):
-    data = json.loads(request.body)
-    content = data['content']
-    post_key = data['to']
-
-    comment = models.Comment(content=content, author=models.User.objects.get(username=request.user.username))
-    comment.save()
-    models.Post.objects.get(pk=post_key).comments.add(comment)
     return HttpResponse('Succeed', status=HTTPStatus.OK)

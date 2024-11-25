@@ -1,0 +1,184 @@
+openapi: 3.1.0
+info:
+  title: pose_app's social backend
+  description: |
+    Almost all APIs, except potential mediapipe inference delegation.
+    
+    Warning: Now backend uses django's built-in auth module, so client should maintain session information.
+    
+    I guess an Flutter HTTP client (https://pub.dev/documentation/http/latest/http/Client-class.html) should be enough.
+  version: '0.1'
+  contact:
+    name: THSS undergraduate
+    url: https://github.com/LeON-Nie-code/pose_app/wiki
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /user/register:
+    description: Register with necessary information, returns guiding.
+    post:
+      requestBody:
+        $ref: '#/components/requestBodies/account'
+      responses:
+        200:
+          description: Register succeed.
+        400:
+          description: Aware failures.
+          content:
+            text/plain:
+              schema:
+                type:
+                  - string
+              examples:
+                JSON:
+                  $ref: '#/components/examples/JsonFault'
+                Argument:
+                  $ref: '#/components/examples/ArgFault'
+
+  /user/recovery:
+    description: Reset forgotten password.
+    post:
+      requestBody:
+        $ref: '#/components/requestBodies/account'
+      responses:
+        200:
+          description: Register succeed.
+          links:
+            login:
+              operationRef: '#/paths/user/login'
+        400:
+          description: Aware failures.
+          content:
+            text/plain:
+              schema:
+                type:
+                  - string
+              examples:
+                JSON:
+                  $ref: '#/components/examples/JsonFault'
+                Argument:
+                  $ref: '#/components/examples/ArgFault'
+
+  /user/login:
+    description: User login with username and password, establish session (maybe save some token).
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type:
+                - object
+              properties:
+                username:
+                  type:
+                    - string
+                password:
+                  type:
+                    - string
+      responses:
+        200:
+          description: Login succeed, return necessary information.
+          content:
+            application/json:
+              schema:
+                type:
+                  - object
+        400:
+          description: Aware failures.
+          content:
+            text/plain:
+              schema:
+                type:
+                  - string
+
+  /user/logout:
+    description: Logout with session token, disable session.
+#    parameters:
+#      - $ref: '#/components/parameters/token'
+    post:
+      responses:
+        200:
+          description: Logout succeed.
+
+  /updates/post:
+    description: Logged in user post an update
+#    parameters:
+#      - $ref: '#/components/parameters/token'
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type:
+                - object
+              properties:
+                text:
+                  type:
+                    - string
+      responses:
+        200:
+          description: Post succeed, return key of the new post.
+          content:
+            application/json:
+              schema:
+                type:
+                  - object
+                properties:
+                  pk:
+                    type:
+                      - integer
+
+  /updates/comment:
+    description: Logged in user make comment to an update known to him/her.
+#    parameters:
+#      - $ref: '#/components/parameters/token'
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type:
+                - object
+              properties:
+                 text:
+                   type:
+                     - string
+
+components:
+  requestBodies:
+    account:
+      required: true
+      content:
+        application/json:
+          schema:
+            type:
+              - object
+            properties:
+              username:
+                type:
+                  - string
+              password:
+                type:
+                  - string
+              mobile:
+                type:
+                  - string
+  parameters:
+    token:
+      name: sessionid
+      description: The sessionid cookie of django's built-in auth service.
+      in: cookie
+      required: true
+      schema:
+        type:
+          - string
+  examples:
+    JsonFault:
+      description: Invalid structure or missing field.
+      value: Invalid JSON
+    ArgFault:
+      description: Arguments mismatch patterns.
+      value: Invalid arguments
