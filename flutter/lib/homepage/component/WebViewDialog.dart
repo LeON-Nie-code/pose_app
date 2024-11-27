@@ -40,12 +40,14 @@ class _VideoWebViewDialogState extends State<VideoWebViewDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      backgroundColor: Colors.white, // 设置背景颜色为白色
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
       child: Container(
-        width: 400,
-        height: 300,
+        color: Colors.white, // 设置背景颜色为白色 ?
+        width: 800,
+        height: 600,
         child: Column(
           children: [
             // 只有在 WebView 初始化后才显示
