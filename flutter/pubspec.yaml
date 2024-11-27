@@ -47,6 +47,8 @@ dependencies:
   fl_chart: ^0.35.0
   image_picker: ^1.1.2
   file_picker: ^8.1.4
+  dio: ^5.7.0
+  shared_preferences: ^2.3.3
 
 dev_dependencies:
   flutter_test:
