@@ -76,7 +76,8 @@ class _RegisterAccountState extends State<RegisterAccount> {
       });
 
       print("Sending POST request to /user/register");
-      print("Request body: { username: $username, password: $password, mobile: $email }");
+      print(
+          "Request body: { username: $username, password: $password, mobile: $email }");
 
       // 向后端发送请求
       final response = await Dio().post(
@@ -130,6 +131,7 @@ class _RegisterAccountState extends State<RegisterAccount> {
       body: Center(
         child: SingleChildScrollView(
           child: Container(
+            width: 500,
             padding: const EdgeInsets.all(16),
             margin: const EdgeInsets.symmetric(horizontal: 20),
             decoration: BoxDecoration(

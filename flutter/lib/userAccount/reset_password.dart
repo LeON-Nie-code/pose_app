@@ -70,6 +70,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       body: Center(
         child: SingleChildScrollView(
           child: Container(
+            width: 500,
             padding: const EdgeInsets.all(16),
             margin: const EdgeInsets.symmetric(horizontal: 20),
             decoration: BoxDecoration(
@@ -263,8 +264,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           hintText = newValue == '邮箱' ? '请输入邮箱' : '请输入手机号';
         });
       },
-      items: <String>['邮箱', '手机号']
-          .map<DropdownMenuItem<String>>((String value) {
+      items:
+          <String>['邮箱', '手机号'].map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
           child: Text(value),
