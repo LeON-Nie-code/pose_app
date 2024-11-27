@@ -4,7 +4,10 @@ import math as m
 # 度量函数
 # 计算两点之间的夹角。函数接收两个点 (x1, y1) 和 (x2, y2)，计算这两点形成的直线与水平线之间的角度（单位为度）。返回值为角度值。
 def findAngle(x1, y1, x2, y2):
-    theta = m.acos((y2 - y1) * (-y1) / (m.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2) * y1))
+    denominator = (m.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2) * y1)
+    if denominator == 0:
+        return 0
+    theta = m.acos((y2 - y1) * (-y1) / denominator)
     degree = int(180/m.pi)*theta
     return degree
 
@@ -39,7 +42,7 @@ def all_detection(nose_x, nose_y,                               # 鼻子（0点�
         tmp = 'right tilt'
     elif (left_shoulder_y_norm + right_shoulder_y_norm) > 1.6:
         tmp = 'lying down in the chair'
-    elif ditou_inclination < 115:
+    elif ditou_inclination < 130:
         tmp = 'bow'
     elif left_ear_x < right_eye_inner_x:
         tmp = 'left face'
