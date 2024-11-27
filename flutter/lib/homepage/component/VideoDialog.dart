@@ -63,7 +63,7 @@ class _VideoStreamState extends State<VideoStream> {
         _videoStream = response.stream.asyncMap((data) {
           _frameData.addAll(data);
           print("Received ${data.length} bytes of data");
-          print("data: $_frameData");
+          // print("data: $_frameData");
           int startIndex = _frameData.indexOf(0xffd8);
           int endIndex = _frameData.indexOf(0xffd9, startIndex);
           if (startIndex != -1 && endIndex != -1) {
