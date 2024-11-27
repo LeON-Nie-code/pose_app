@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:pose_app/style/colors.dart';
 
 class RegisterAccount extends StatefulWidget {
   const RegisterAccount({Key? key}) : super(key: key);
@@ -13,48 +14,106 @@ class _RegisterAccountState extends State<RegisterAccount> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool isLoading = false;
-  String errorMessage = '';
 
+  // 成功对话框
+  void showSuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('注册成功'),
+          content: const Text('欢迎使用！请前往登录页面'),
+          backgroundColor: AppColors.beige,
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // 关闭对话框
+                Navigator.pop(context); // 返回登录页面
+              },
+              child: const Text('返回登录'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // 失败对话框
+  void showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('注册失败'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // 关闭对话框
+              },
+              child: const Text('再试一次'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // 注册请求
   Future<void> _register() async {
-    final username = usernameController.text;
-    final password = passwordController.text;
-    final mobile = emailController.text;
+    final String email = emailController.text;
+    final String username = usernameController.text;
+    final String password = passwordController.text;
 
-    if (username.isEmpty || password.isEmpty || mobile.isEmpty) {
-      setState(() {
-        errorMessage = "手机号、用户名或密码不能为空";
-      });
+    if (email.isEmpty || username.isEmpty || password.isEmpty) {
+      showErrorDialog('手机号、用户名或密码不能为空！');
       return;
     }
 
     try {
       setState(() {
         isLoading = true;
-        errorMessage = '';
       });
 
+      print("Sending POST request to /user/register");
+      print("Request body: { username: $username, password: $password, mobile: $email }");
+
+      // 向后端发送请求
       final response = await Dio().post(
-        'http://118.89.124.30/user/register',
+        'http://118.89.124.30:8080/user/register',
         data: {
+          "mobile": email,
           "username": username,
           "password": password,
-          "mobile": mobile,
         },
+        options: Options(
+          headers: {"Content-Type": "application/json"},
+        ),
       );
 
+      print("Response status: ${response.statusCode}");
+      print("Response data: ${response.data}");
+
       if (response.statusCode == 200) {
-        setState(() {
-          errorMessage = '注册成功！请前往登录页面。';
-        });
+        if (response.data.containsKey("login")) {
+          showSuccessDialog(); // 注册成功
+        } else {
+          showErrorDialog("注册成功，但返回数据异常，请稍后再试！");
+        }
       } else {
-        setState(() {
-          errorMessage = '注册失败，请稍后重试。';
-        });
+        showErrorDialog(response.data["message"] ?? "注册失败，请稍后再试！");
+      }
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print("DioError response data: ${e.response?.data}");
+        showErrorDialog("注册失败！${e.response?.data['message'] ?? '未知错误'}");
+      } else {
+        print("DioError message: ${e.message}");
+        showErrorDialog("网络错误：${e.message}");
       }
     } catch (e) {
-      setState(() {
-        errorMessage = '网络错误：无法完成注册。';
-      });
+      print("Unexpected error: $e");
+      showErrorDialog("发生未知错误，请稍后再试！");
     } finally {
       setState(() {
         isLoading = false;
@@ -117,12 +176,6 @@ class _RegisterAccountState extends State<RegisterAccount> {
                   width: fieldWidth,
                 ),
                 const SizedBox(height: 20),
-                if (errorMessage.isNotEmpty)
-                  Text(
-                    errorMessage,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                const SizedBox(height: 10),
                 SizedBox(
                   width: fieldWidth,
                   child: ElevatedButton(
@@ -145,7 +198,6 @@ class _RegisterAccountState extends State<RegisterAccount> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // 返回登录按钮
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context); // 返回到登录页面
@@ -200,10 +252,6 @@ class _RegisterAccountState extends State<RegisterAccount> {
     );
   }
 }
-
-
-
-
 
 
 // import 'package:flutter/material.dart';

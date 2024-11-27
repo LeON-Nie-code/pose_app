@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:pose_app/homepage/homepage.dart' as homepage;
+import 'package:pose_app/style/colors.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -14,6 +15,32 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
   bool isLoading = false;
   String errorMessage = '';
+
+  // 显示登录成功弹框并自动跳转到主页
+  void _showLoginSuccessDialog(String username) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // 禁止手动关闭弹框
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('登录成功！'),
+          content: const Text('欢迎回来'),
+          backgroundColor: AppColors.beige,
+        );
+      },
+    );
+
+    // 2秒后关闭弹框并跳转到主页
+    Future.delayed(const Duration(seconds: 2), () {
+      Navigator.pop(context); // 关闭弹框
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => homepage.HomePage(username: username),
+        ),
+      );
+    });
+  }
 
   Future<void> _login() async {
     final username = usernameController.text;
@@ -33,18 +60,19 @@ class _LoginPageState extends State<LoginPage> {
       });
 
       final response = await Dio().post(
-        'http://118.89.124.30/user/login',
+        'http://118.89.124.30:8080/user/login',
         data: {
           "username": username,
           "password": password,
         },
+        options: Options(headers: {
+          "Content-Type": "application/json",
+        }),
       );
 
       if (response.statusCode == 200) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const homepage.HomePage()),
-        );
+        // 登录成功，显示弹框并跳转
+        _showLoginSuccessDialog(username);
       } else {
         setState(() {
           errorMessage = '登录失败，请检查用户名和密码。';
@@ -52,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
       }
     } catch (e) {
       setState(() {
-        errorMessage = '网络错误：无法完成登录。';
+        errorMessage = '登录失败，请检查用户名和密码。';
       });
     } finally {
       setState(() {
@@ -122,6 +150,13 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                 ),
               ),
+              const SizedBox(height: 10),
+              // 错误信息提示
+              if (errorMessage.isNotEmpty)
+                Text(
+                  errorMessage,
+                  style: const TextStyle(color: Colors.red),
+                ),
               const SizedBox(height: 10),
               // "忘记密码" 和 "新用户注册" 按钮
               SizedBox(
@@ -215,12 +250,16 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             IconButton(
               icon: Image.asset('assets/icons/email.png', width: 40, height: 40),
-              onPressed: () {},
+              onPressed: () {
+                // 邮件登录逻辑
+              },
             ),
             const SizedBox(width: 40),
             IconButton(
               icon: Image.asset('assets/icons/phone.png', width: 40, height: 40),
-              onPressed: () {},
+              onPressed: () {
+                // 手机登录逻辑
+              },
             ),
           ],
         ),
