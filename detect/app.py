@@ -134,13 +134,24 @@ def generate_video_feed():
                     if current_posture and posture_start_time:
                         elapsed_time = time.time() - posture_start_time
                         if current_posture not in posture_times:
+                            print(f"New posture detected: {current_posture}")
                             posture_times[current_posture] = 0
-                        posture_times[current_posture] += elapsed_time
+                        if elapsed_time > 1:
+                            print(f"Adding {elapsed_time} seconds to {current_posture}")
+                            posture_times[current_posture] += elapsed_time
                     current_posture = posture
+                    if current_posture not in posture_times:
+                        posture_times[current_posture] = 0
                     posture_start_time = time.time()
                 else:
                     if posture_start_time and time.time() - posture_start_time > 1:
-                        posture_times[current_posture] = time.time() - posture_start_time
+                        print(f"Adding 1 second to {current_posture}")
+                        posture_times[current_posture] += time.time() - posture_start_time
+                        posture_start_time = time.time()
+ 
+                        
+                
+                print(posture_times)
 
                 # Draw border around the frame based on posture
                 if posture == "normal":
@@ -156,6 +167,7 @@ def generate_video_feed():
 
             # Draw eye landmarks if face mesh is available
             if results_face.multi_face_landmarks:
+                h, w, _ = frame.shape
                 for face_landmarks in results_face.multi_face_landmarks:
                     # Draw the landmarks of the eyes
                     left_eye = face_landmarks.landmark[33]  # Left eye center
@@ -304,7 +316,12 @@ def get_posture_times():
         examples:
           application/json: {"normal": 45, "left tilt": 30, "right tilt": 20}
     """
-    return jsonify(posture_times)
+    totle_time = 0
+    for key in posture_times:
+        totle_time += posture_times[key]
+    posture_times_with_total = posture_times.copy()
+    posture_times_with_total["total"] = totle_time
+    return jsonify(posture_times_with_total)
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
