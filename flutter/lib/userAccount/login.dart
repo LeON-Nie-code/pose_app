@@ -97,6 +97,7 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: const Color(0xFFFFFCF8),
       body: Center(
         child: Container(
+          width: 500,
           padding: const EdgeInsets.all(16),
           margin: const EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
@@ -249,14 +250,16 @@ class _LoginPageState extends State<LoginPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             IconButton(
-              icon: Image.asset('assets/icons/email.png', width: 40, height: 40),
+              icon:
+                  Image.asset('assets/icons/email.png', width: 40, height: 40),
               onPressed: () {
                 // 邮件登录逻辑
               },
             ),
             const SizedBox(width: 40),
             IconButton(
-              icon: Image.asset('assets/icons/phone.png', width: 40, height: 40),
+              icon:
+                  Image.asset('assets/icons/phone.png', width: 40, height: 40),
               onPressed: () {
                 // 手机登录逻辑
               },
