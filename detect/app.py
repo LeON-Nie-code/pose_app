@@ -174,6 +174,8 @@ def generate_video_feed():
                     right_eye = face_landmarks.landmark[133]  # Right eye center
                     left_eye_coords = (int(left_eye.x * w), int(left_eye.y * h))
                     right_eye_coords = (int(right_eye.x * w), int(right_eye.y * h))
+                    
+                    
 
                     # Draw circles around the eyes
                     cv2.circle(image, left_eye_coords, 5, (255, 0, 0), -1)  # Blue dot for left eye
@@ -181,6 +183,18 @@ def generate_video_feed():
 
                     # Eye gaze detection (checking if eyes are in the center of the screen)
                     eye_status = check_eye_position(left_eye_coords, right_eye_coords, w, h)
+
+                    looking_at_screen = detect_eye_test(landmarks, w, h)
+                    if not looking_at_screen:
+                        eye_status = 'Not looking at screen'
+
+                    if posture == "bow" or posture == "looking up":
+                        eye_status = "Not looking at screen"
+
+                    # if posture == "normal" and eye_status == "Looking at screen":
+                    #     cv2.putText(image, "Good posture and eye gaze", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
+
                     cv2.putText(image, eye_status, (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
             # Encode the frame as JPEG
@@ -269,6 +283,44 @@ def detect_posture(landmarks, width, height):
                   right_shoulder_x_norm, right_shoulder_y_norm)
     # Posture check (e.g., head tilt or slouching)
     return results_detect
+
+
+def detect_eye_test(landmarks, width, height):
+    """Analyze pose landmarks and determine posture conditions."""
+    # Extract key points
+    left_ear = landmarks[mp_pose.PoseLandmark.LEFT_EAR]
+    right_ear = landmarks[mp_pose.PoseLandmark.RIGHT_EAR]
+    left_eye_inner = landmarks[mp_pose.PoseLandmark.LEFT_EYE_INNER]
+    left_eye_outer = landmarks[mp_pose.PoseLandmark.LEFT_EYE_OUTER]
+    right_eye_inner = landmarks[mp_pose.PoseLandmark.RIGHT_EYE_INNER]
+    right_eye_outer = landmarks[mp_pose.PoseLandmark.RIGHT_EYE_OUTER]
+    left_eye = landmarks[mp_pose.PoseLandmark.LEFT_EYE]
+    right_eye = landmarks[mp_pose.PoseLandmark.RIGHT_EYE]
+    
+
+    # Compute relevant distances and angles for posture analysis
+    left_ear_x, left_ear_y = int(left_ear.x * width), int(left_ear.y * height)
+    right_ear_x, right_ear_y = int(right_ear.x * width), int(right_ear.y * height)
+    left_eye_x, left_eye_y = int(left_eye.x * width), int(left_eye.y * height)
+    right_eye_x, right_eye_y = int(right_eye.x * width), int(right_eye.y * height)
+    left_eye_inner_x, left_eye_inner_y = int(left_eye_inner.x * width), int(left_eye_inner.y * height)
+    right_eye_inner_x, right_eye_inner_y = int(right_eye_inner.x * width), int(right_eye_inner.y * height)
+    left_eye_outer_x, left_eye_outer_y = int(left_eye_outer.x * width), int(left_eye_outer.y * height)
+    right_eye_outer_x, right_eye_outer_y = int(right_eye_outer.x * width), int(right_eye_outer.y * height)
+
+    eye_status = 'Looking at screen'
+    
+    if left_ear_x < right_eye_inner_x:
+        eye_status = 'left face'
+    elif right_ear_x > left_eye_inner_x:
+        eye_status = 'right face'
+    
+
+    if eye_status != 'Looking at screen':
+        return False
+    else:
+        return True
+        
 
 @app.route('/video_feed')
 def video_feed():
