@@ -41,7 +41,7 @@ def all_detection(nose_x, nose_y,                               # 鼻子（0点�
         tmp = 'left tilt'
     elif waitou_inclination > 100:
         tmp = 'right tilt'
-    elif (left_shoulder_y_norm + right_shoulder_y_norm) > 1.6:
+    elif (left_shoulder_y_norm + right_shoulder_y_norm) > 1.8:
         tmp = 'lying down in the chair'
     elif ditou_inclination_left < 125 and ditou_inclination_right < 125:
         tmp = 'bow'
