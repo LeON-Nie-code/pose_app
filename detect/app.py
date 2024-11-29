@@ -1,3 +1,4 @@
+import os
 import cv2
 from flask import Flask, jsonify, request, Response
 import mediapipe as mp
@@ -7,6 +8,27 @@ import math
 from detect.utils import all_detection
 from flasgger import Swagger  # Import flasgger
 import time
+import logging
+
+# 获取当前文件的目录
+current_dir = os.path.dirname(os.path.abspath(__file__))
+print(current_dir)
+
+# 设置日志文件的路径
+log_dir = os.path.join(current_dir, 'logs')
+log_file_path = os.path.join(log_dir, 'app.log')
+
+# 检查并创建日志目录
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    filename=log_file_path,  # 使用相对路径
+    filemode='a'
+)
 
 app = Flask(__name__)
 CORS(app)
@@ -45,6 +67,7 @@ def get_available_cameras():
             cap.release()
         except Exception as e:
             print(f"Error accessing camera {index}: {e}")
+            logging.error(f"Error accessing camera {index}: {e}")
         index += 1
     return available_cams
 
@@ -59,6 +82,7 @@ def list_cameras():
         examples:
           application/json: [0, 1, 2]
     """
+    logging.info("Listing available cameras")
     return jsonify(get_available_cameras())
 
 @app.route('/select_camera', methods=['POST'])
@@ -95,6 +119,7 @@ def select_camera():
     video_thread = threading.Thread(target=generate_video_feed)
     video_thread.start()
 
+    logging.info(f"Selected camera with index {current_camera_index}")
     return jsonify({"status": "success", "camera_index": current_camera_index})
 
 def generate_video_feed():
@@ -103,6 +128,7 @@ def generate_video_feed():
     cap = cv2.VideoCapture(current_camera_index)
     if not cap.isOpened():
         print("Failed to open camera.")
+        logging.error("Failed to open camera.")
         return
 
     # Initialize MediaPipe Pose and Face Mesh
@@ -135,6 +161,7 @@ def generate_video_feed():
                         elapsed_time = time.time() - posture_start_time
                         if current_posture not in posture_times:
                             print(f"New posture detected: {current_posture}")
+                            logging.info(f"New posture detected: {current_posture}")
                             posture_times[current_posture] = 0
                         if elapsed_time > 1:
                             print(f"Adding {elapsed_time} seconds to {current_posture}")
@@ -227,6 +254,7 @@ def check_eye_position(left_eye_coords, right_eye_coords, frame_width, frame_hei
         eye_status = "Not looking at screen"
         eye_color = (0, 0, 255)  # Red for not looking at screen
 
+    logging.debug(f"Eye status: {eye_status}")
     return eye_status
 
     # Display the eye status on the frame
@@ -282,6 +310,9 @@ def detect_posture(landmarks, width, height):
                   left_shoulder_x_norm, left_shoulder_y_norm,
                   right_shoulder_x_norm, right_shoulder_y_norm)
     # Posture check (e.g., head tilt or slouching)
+
+    # Posture check (e.g., head tilt or slouching)
+    logging.debug(f"Detected posture: {results_detect}")
     return results_detect
 
 
@@ -317,8 +348,10 @@ def detect_eye_test(landmarks, width, height):
     
 
     if eye_status != 'Looking at screen':
+        logging.debug(f"Eye test failed: {eye_status}")
         return False
     else:
+        logging.debug("Eye test passed")
         return True
         
 
@@ -355,6 +388,7 @@ def video_feed():
     current_camera_index = camera_index
 
     # Start streaming video from the selected camera
+    logging.info(f"Streaming video from camera index {camera_index}")
     return Response(generate_video_feed(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/posture_times', methods=['GET'])
@@ -373,6 +407,7 @@ def get_posture_times():
         totle_time += posture_times[key]
     posture_times_with_total = posture_times.copy()
     posture_times_with_total["total"] = totle_time
+    logging.info(f"Posture times: {posture_times_with_total}")
     return jsonify(posture_times_with_total)
 
 if __name__ == "__main__":
