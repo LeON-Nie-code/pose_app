@@ -11,9 +11,7 @@ from alibabacloud_dysmsapi20170525 import models as dysmsapi_20170525_models
 from alibabacloud_tea_util import models as util_models
 from alibabacloud_tea_util.client import Client as UtilClient
 
-ALIBABA_CLOUD_ACCESS_KEY_ID = ""
-ALIBABA_CLOUD_ACCESS_KEY_SECRET = ""
-TEMPLATE_CODE = ""
+
 
 
 @staticmethod
