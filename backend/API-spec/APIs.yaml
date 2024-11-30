@@ -1,184 +1,500 @@
 openapi: 3.1.0
 info:
-  title: pose_app's social backend
+  title: pose_app 社交后端API
   description: |
-    Almost all APIs, except potential mediapipe inference delegation.
+    通过下列REST风格API访问用户、动态、专注记录等资源，并操作。
     
-    Warning: Now backend uses django's built-in auth module, so client should maintain session information.
-    
-    I guess an Flutter HTTP client (https://pub.dev/documentation/http/latest/http/Client-class.html) should be enough.
-  version: '0.1'
+    注意！当下使用的是django自带认证框架，该框架使用会话对象来管理网络请求，因此前端需要保留cookie信息，可能得维护客户端对象。
+  version: '0.2'
   contact:
-    name: THSS undergraduate
-    url: https://github.com/LeON-Nie-code/pose_app/wiki
+    name: THSS本科生们
+    url: https://github.com/LeON-Nie-code/pose_app/issues
+
 servers:
-  - url: http://localhost:8080
+  - url: http://118.89.124.30:8080
 
 paths:
-  /user/register:
-    description: Register with necessary information, returns guiding.
-    post:
-      requestBody:
-        $ref: '#/components/requestBodies/account'
-      responses:
-        200:
-          description: Register succeed.
-        400:
-          description: Aware failures.
-          content:
-            text/plain:
-              schema:
-                type:
-                  - string
-              examples:
-                JSON:
-                  $ref: '#/components/examples/JsonFault'
-                Argument:
-                  $ref: '#/components/examples/ArgFault'
-
-  /user/recovery:
-    description: Reset forgotten password.
-    post:
-      requestBody:
-        $ref: '#/components/requestBodies/account'
-      responses:
-        200:
-          description: Register succeed.
-          links:
-            login:
-              operationRef: '#/paths/user/login'
-        400:
-          description: Aware failures.
-          content:
-            text/plain:
-              schema:
-                type:
-                  - string
-              examples:
-                JSON:
-                  $ref: '#/components/examples/JsonFault'
-                Argument:
-                  $ref: '#/components/examples/ArgFault'
-
-  /user/login:
-    description: User login with username and password, establish session (maybe save some token).
+  /user/verify:
+    description: 根据手机验证码判断用户真实性，用于注册等操作。
     post:
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type:
-                - object
+              type: object
               properties:
                 username:
-                  type:
-                    - string
-                password:
-                  type:
-                    - string
+                  type: string
+                  description: 此前尝试注册的用户名
+                code:
+                  type: string
+                  description: 验证码
+
       responses:
         200:
-          description: Login succeed, return necessary information.
-          content:
-            application/json:
-              schema:
-                type:
-                  - object
+          description: 通过
         400:
-          description: Aware failures.
-          content:
-            text/plain:
-              schema:
-                type:
-                  - string
+          description: 无前置操作——须事先登录或者申请密码找回。
+        403:
+          description: 验证码错误
 
-  /user/logout:
-    description: Logout with session token, disable session.
-#    parameters:
-#      - $ref: '#/components/parameters/token'
-    post:
-      responses:
-        200:
-          description: Logout succeed.
-
-  /updates/post:
-    description: Logged in user post an update
-#    parameters:
-#      - $ref: '#/components/parameters/token'
+  /user/register:
+    description: 提供必要信息，开始注册；前端接下来应在60秒内发送验证码。
     post:
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type:
-                - object
+              type: object
               properties:
-                text:
-                  type:
-                    - string
+                username:
+                  type: string
+                password:
+                  type: string
+                mobile:
+                  type: string
       responses:
         200:
-          description: Post succeed, return key of the new post.
+          description: 验证码已发送，请更新UI。
+        400:
+          description: 请求不合规，返回简短说明。
           content:
-            application/json:
+            text/plain:
               schema:
-                type:
-                  - object
-                properties:
-                  pk:
-                    type:
-                      - integer
+                type: string
+              examples:
+                JSON:
+                  $ref: '#/components/examples/InvalidJSON'
+                Argument:
+                  $ref: '#/components/examples/BadArgument'
 
-  /updates/comment:
-    description: Logged in user make comment to an update known to him/her.
-#    parameters:
-#      - $ref: '#/components/parameters/token'
+  /user/login:
+    description: 用户名-密码登录。
     post:
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              type:
-                - object
+              type: object
               properties:
-                 text:
-                   type:
-                     - string
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        200:
+          description: 登录成功！可能返回一些有用的信息。
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          description: 登录失败，返回简短说明。
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /user/logout:
+    description: 登出。如果未登录，会在入口直接被django拒绝。
+    post:
+      responses:
+        200:
+          description: 成功登出。
+
+  #  /user/recovery:
+  #    description: Reset forgotten password.
+  #    patch:
+  #      requestBody:
+  #        required: true
+  #        content: #          TODO
+  #          application/json:
+  #            schema: false
+  #
+  #      responses:
+  #        200:
+  #          description: Register succeed.
+  #          links:
+  #            login:
+  #              operationRef: '#/paths/user/login'
+  #        400:
+  #          description: Aware failures.
+  #          content:
+  #            text/plain:
+  #              schema:
+  #                type: string
+  #              examples:
+  #                JSON:
+  #                  $ref: '#/components/examples/InvalidJSON'
+  #                Argument:
+  #                  $ref: '#/components/examples/BadArgument'
+
+  /user/profile:
+    get:
+      description: 读取用户“非认证性质”账户信息，不包括用户名、密码、电话、专注记录、好友关系。
+      responses:
+        200:
+          description: 用户信息文字描述以JSON形式给出
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/profile'
+    patch:
+      description: 与GET不同，请求中的所有字段均为可选。
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/profile'
+      responses:
+        200:
+          description: 修改成功
+        400:
+          description: 字段名不对，或者值有问题。
+
+  /user/profile/{field}:
+    description: 当前用户的非文本账户信息，尤其是头像。
+    parameters:
+      - name: field
+        in: path
+        description: “avatar”-头像，……
+        schema:
+          type: string
+          enum:
+            - avatar
+        required: true
+    get:
+      responses:
+        200:
+          description: 请查看响应体。
+          content:
+            image/*:
+              description: 头像图片文件
+              schema:
+                type: string
+                format: binary
+        400:
+          description: field参数错误
+        404:
+          description: 相应field内容为空
+
+  /user/friend:
+    description: 查看好友列表
+    get:
+      responses:
+        200:
+          description: 返回的用户名按照状态组织成数组成员。
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  online:
+                    type: array
+                    items:
+                      type: string
+                    description: 在线好友们
+                  offline:
+                    type: array
+                    items:
+                      type: string
+                    description: 离线好友们
+                  applying:
+                    type: array
+                    items:
+                      type: string
+                    description: 新的待通过好友们
+
+  /user/friend/{userid}:
+    description: 管理好友关系
+    parameters:
+      - $ref: '#/components/parameters/user_id'
+    put:
+      description: 向其他用户发出好友申请
+      responses:
+        202:
+          description: 申请已发送。等待对方在客户端刷新、通过。
+        404:
+          description: 不允许加该用户。
+    post:
+      description: 通过此人的邀请。
+      responses:
+        200:
+          description: 成功加上好友。可以向后端拿新的好友列表。
+        400:
+          description: 未受邀请。
+        404:
+          description: 不允许通过该用户（用户不存在或者其他原因）
+    delete:
+      description: 结束好友关系（不是拉黑）
+      responses:
+        200:
+          description: 成功
+        404:
+          description: 你们还不是好友
+
+  /updates/post:
+    description: 创建一个动态
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                  description: 文字部分
+                n_image:
+                  type: integer
+                  minimum: 0
+                  maximum: 3
+                  description: 动态包含的图片数。
+      responses:
+        200:
+          $ref: '#/components/responses/key'
+
+  /updates/{updateid}:
+    description: 对已有动态的操作
+    parameters:
+      - $ref: '#/components/parameters/update_id'
+    delete:
+      description: 删除动态连带其资源
+      responses:
+        200:
+          description: 成功删除
+        403:
+          description: 这不是你的动态
+    put:
+      description: 一些简单幂等操作，比如点赞
+      responses:
+        200:
+          description: 操作成功
+    get:
+      description: 获得动态的内容信息
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  text:
+                    type: string
+                    description: 文字内容
+                  comments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/comment'
+                    description: 动态下的评论内容，排好序。
+                  likes:
+                    type: integer
+                    minimum: 0
+                    description: 点赞数
+
+  /updates/{updateid}/image/{index}:
+    description: 动态下的图片资源
+    parameters:
+      - $ref: '#/components/parameters/update_id'
+      - name: index
+        in: path
+        schema:
+          type: integer
+          minimum: 0
+        required: true
+        description: 序号
+    put:
+      description: 上传对应下标号的图片
+      requestBody:
+        required: true
+        content:
+          image/*:
+            schema:
+              type: string
+              format: binary
+      responses:
+        201:
+          description: 成功
+        400:
+          description: 下标应小于动态所含图片数
+        403:
+          description: 无权上传
+    get:
+      description: 下载图片
+      responses:
+        200:
+          description: 成功，见请求体。
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+        400:
+          description: 下标应小于动态所含图片数
+
+        404:
+          description: 出错，返回描述。
+          content:
+            text/plain:
+              schema:
+                type: string
+              examples:
+                Missing:
+                  value: No image found for specified location.
+                NotYours:
+                  value: Update not accessible.
+
+  /updates/{updateid}/comment:
+    description: 向动态附加评论
+    parameters:
+      - $ref: '#/components/parameters/update_id'
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/comment'
+      responses:
+        200:
+          $ref: '#/components/responses/key'
+
+  /updates:/{update_id}/comment/{comment_id}:
+    description: 操作一条自己的评论
+    parameters:
+      - $ref: '#/components/parameters/update_id'
+      - $ref: '#/components/parameters/comment_id'
+    delete:
+      responses:
+        200:
+          description: 成功
+        403:
+          description: 无权删除
+
+  /records/{userid}:
+    description: 上传一次专注记录
+    parameters:
+      - $ref: '#/components/parameters/user_id'
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/record'
+      responses:
+        200:
+          description: 成功保存，保存时间已记录。
 
 components:
-  requestBodies:
-    account:
-      required: true
-      content:
-        application/json:
-          schema:
-            type:
-              - object
-            properties:
-              username:
-                type:
-                  - string
-              password:
-                type:
-                  - string
-              mobile:
-                type:
-                  - string
   parameters:
-    token:
-      name: sessionid
-      description: The sessionid cookie of django's built-in auth service.
-      in: cookie
-      required: true
+    user_id:
+      name: user_id
+      in: path
+      description: The key returned by prior API calls.
       schema:
-        type:
-          - string
+        type: string
+      required: true
+    update_id:
+      name: update_id
+      in: path
+      description: The key returned by prior API calls.
+      schema:
+        type: string
+      required: true
+    comment_id:
+      name: comment_id
+      in: path
+      description: The key returned by prior API calls.
+      schema:
+        type: string
+      required: true
+
+  schemas:
+    profile:
+      type: object
+      properties:
+        name:
+          type: string
+          description: 实名（不过也许可以变成昵称？）
+        school:
+          type: string
+          description: 单位
+        gender:
+          type: string
+          enum:
+            - M
+            - F
+          description: 性别
+        email:
+          type: string
+          format: email
+    update:
+      type: object
+      properties:
+        text:
+          type: string
+        n_image:
+          type: integer
+    comment:
+      type: object
+      properties:
+        text:
+          type: string
+    record:
+      type: object
+      properties:
+        left tilt:
+          type: string
+          format: duration
+        right tilt:
+          type: string
+          format: duration
+        lying down in the chair:
+          type: string
+          format: duration
+        bow:
+          type: string
+          format: duration
+        left face:
+          type: string
+          format: duration
+        right face:
+          type: string
+          format: duration
+        high shoulder:
+          type: string
+          format: duration
+        low shoulder:
+          type: string
+          format: duration
+        supporting the table:
+          type: string
+          format: duration
+        looking up:
+          type: string
+          format: duration
+        normal:
+          type: string
+          format: duration
+
   examples:
-    JsonFault:
+    InvalidJSON:
       description: Invalid structure or missing field.
       value: Invalid JSON
-    ArgFault:
+    BadArgument:
       description: Arguments mismatch patterns.
       value: Invalid arguments
+
+  responses:
+    key:
+      description: Created. Use this to visit it in the future.
+      content:
+        text/plain:
+          schema:
+            type: string

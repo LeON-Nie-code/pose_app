@@ -6,6 +6,7 @@ from django.http import JsonResponse, HttpResponse
 
 from updates import models
 
+
 # Create your views here.
 
 @login_required

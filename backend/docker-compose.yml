@@ -7,12 +7,12 @@ services:
 
     ports:
       - '8080:8080'
-    command: ["bash", "-c", "
+    command: [ "bash", "-c", "
       source ~/.bashrc
       && python manage.py makemigrations user updates
       && python manage.py migrate
       && gunicorn -w4 -b 0.0.0.0:8080 --log-level debug pose_remote.wsgi
-      "]
+      " ]
 
   swagger:
     image: swaggerapi/swagger-ui

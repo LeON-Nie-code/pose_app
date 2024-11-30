@@ -6,6 +6,7 @@ from django.urls import reverse
 
 from user.models import User
 
+
 # Create your tests here.
 
 class TestPost(TestCase):

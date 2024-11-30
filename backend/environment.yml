@@ -5,4 +5,5 @@ dependencies:
   - python=3.11
   - django
   - gunicorn
+  - Pillow
 prefix: D:\App_Installations\miniconda3\envs\SEproject

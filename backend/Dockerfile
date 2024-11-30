@@ -1,6 +1,6 @@
 FROM continuumio/miniconda3
 ENV PYTHONUNBUFFERED=1
-WORKDIR .
+WORKDIR /home/server
 RUN for url in  \
     https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main  \
     https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/r  \
