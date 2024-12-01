@@ -161,18 +161,21 @@ paths:
     parameters:
       - name: field
         in: path
-        description: “avatar”-头像，……
+        description: 账户档案的字段名
         schema:
           type: string
           enum:
             - avatar
         required: true
+        examples:
+          头像:
+            value: avatar
     get:
       responses:
         200:
           description: 请查看响应体。
           content:
-            image/*:
+            image/png:
               description: 头像图片文件
               schema:
                 type: string
@@ -181,6 +184,18 @@ paths:
           description: field参数错误
         404:
           description: 相应field内容为空
+    put:
+      requestBody:
+        required: true
+        content:
+          image/png:
+            description: 头像
+            schema:
+              type: string
+              format: binary
+      responses:
+        200:
+          description: 成功
 
   /user/friend:
     description: 查看好友列表
@@ -258,8 +273,10 @@ paths:
       responses:
         200:
           $ref: '#/components/responses/key'
+        400:
+          description: 动态错误（图片太多等）
 
-  /updates/{updateid}:
+  /updates/{update_id}:
     description: 对已有动态的操作
     parameters:
       - $ref: '#/components/parameters/update_id'
@@ -268,13 +285,13 @@ paths:
       responses:
         200:
           description: 成功删除
-        403:
+        404:
           description: 这不是你的动态
-    put:
-      description: 一些简单幂等操作，比如点赞
-      responses:
-        200:
-          description: 操作成功
+    #    put:
+    #      description: 一些简单幂等操作，比如点赞
+    #      responses:
+    #        200:
+    #          description: 操作成功
     get:
       description: 获得动态的内容信息
       responses:
@@ -296,8 +313,13 @@ paths:
                     type: integer
                     minimum: 0
                     description: 点赞数
+                  images:
+                    type: array
+                    items:
+                      type: string
+                      format: uri
 
-  /updates/{updateid}/image/{index}:
+  /updates/{update_id}/image/{index}:
     description: 动态下的图片资源
     parameters:
       - $ref: '#/components/parameters/update_id'
@@ -313,7 +335,7 @@ paths:
       requestBody:
         required: true
         content:
-          image/*:
+          image/png:
             schema:
               type: string
               format: binary
@@ -322,15 +344,15 @@ paths:
           description: 成功
         400:
           description: 下标应小于动态所含图片数
-        403:
-          description: 无权上传
+        404:
+          description: 不是你的动态，无权上传
     get:
       description: 下载图片
       responses:
         200:
           description: 成功，见请求体。
           content:
-            image/*:
+            image/png:
               schema:
                 type: string
                 format: binary
@@ -349,7 +371,7 @@ paths:
                 NotYours:
                   value: Update not accessible.
 
-  /updates/{updateid}/comment:
+  /updates/{update_id}/comment:
     description: 向动态附加评论
     parameters:
       - $ref: '#/components/parameters/update_id'
@@ -445,6 +467,8 @@ components:
       type: object
       properties:
         text:
+          type: string
+        author:
           type: string
     record:
       type: object

@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
 
 from . import constraint, models
 from .models import Friendship
@@ -71,7 +72,7 @@ def profile(request, field=''):
     info = request.user.profile
     if request.method == 'GET':
         if field == '':
-            data = {'avatar': '/user/profile/avatar'}
+            data = {'avatar': reverse('profile', kwargs={'field': 'avatar'}), }
             if info.nickname:
                 data['name'] = info.nickname
             if info.email:
@@ -85,7 +86,7 @@ def profile(request, field=''):
             if info.avatar:
                 with info.avatar.open('rb') as f:
                     data = f.read()
-                return HttpResponse(data, content_type='image/*')
+                return HttpResponse(data, content_type='image/png')
             else:
                 return HttpResponse(status=404)
 
@@ -101,10 +102,10 @@ def profile(request, field=''):
 
 
 @login_required
-def friend(request, userid=''):
+def friend(request, userid=None):
     user = request.user
 
-    if userid == '':
+    if userid is None:
         if request.method == 'GET':
             data = {'online': [], 'offline': [], 'applying': []}
             for friendship in user.friendship_set.all():

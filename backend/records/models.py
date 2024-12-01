@@ -36,6 +36,7 @@ def load_record(record: Entry, data: dict):
 
     def float2duration(category: str) -> timedelta:
         return timedelta(seconds=float(data[category]))
+
     record.left_tilt = float2duration('left tilt')
     record.right_tilt = float2duration('right tilt')
     record.lying_down_in_the_chair = float2duration('lying down in the chair')
