@@ -15,6 +15,7 @@ class AppColors {
   static const barcolor = Color(0xFFF9F2E1);
   static const pinkpg = Color(0xFFE99278);
   static const bluegrey = Color(0xFF67A1AC);
+  static const yellowBr = Color(0xFFFFC300);
 
 
 }
