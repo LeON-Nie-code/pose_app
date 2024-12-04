@@ -1,3 +1,4 @@
+import os
 import cv2
 from flask import Flask, jsonify, request, Response
 import mediapipe as mp
@@ -7,6 +8,27 @@ import math
 from detect.utils import all_detection
 from flasgger import Swagger  # Import flasgger
 import time
+import logging
+
+# 获取当前文件的目录
+current_dir = os.path.dirname(os.path.abspath(__file__))
+print(current_dir)
+
+# 设置日志文件的路径
+log_dir = os.path.join(current_dir, 'logs')
+log_file_path = os.path.join(log_dir, 'app.log')
+
+# 检查并创建日志目录
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    filename=log_file_path,  # 使用相对路径
+    filemode='a'
+)
 
 app = Flask(__name__)
 CORS(app)
@@ -45,6 +67,7 @@ def get_available_cameras():
             cap.release()
         except Exception as e:
             print(f"Error accessing camera {index}: {e}")
+            logging.error(f"Error accessing camera {index}: {e}")
         index += 1
     return available_cams
 
@@ -59,6 +82,7 @@ def list_cameras():
         examples:
           application/json: [0, 1, 2]
     """
+    logging.info("Listing available cameras")
     return jsonify(get_available_cameras())
 
 @app.route('/select_camera', methods=['POST'])
@@ -95,6 +119,7 @@ def select_camera():
     video_thread = threading.Thread(target=generate_video_feed)
     video_thread.start()
 
+    logging.info(f"Selected camera with index {current_camera_index}")
     return jsonify({"status": "success", "camera_index": current_camera_index})
 
 def generate_video_feed():
@@ -103,6 +128,7 @@ def generate_video_feed():
     cap = cv2.VideoCapture(current_camera_index)
     if not cap.isOpened():
         print("Failed to open camera.")
+        logging.error("Failed to open camera.")
         return
 
     # Initialize MediaPipe Pose and Face Mesh
@@ -134,13 +160,25 @@ def generate_video_feed():
                     if current_posture and posture_start_time:
                         elapsed_time = time.time() - posture_start_time
                         if current_posture not in posture_times:
+                            print(f"New posture detected: {current_posture}")
+                            logging.info(f"New posture detected: {current_posture}")
                             posture_times[current_posture] = 0
-                        posture_times[current_posture] += elapsed_time
+                        if elapsed_time > 1:
+                            print(f"Adding {elapsed_time} seconds to {current_posture}")
+                            posture_times[current_posture] += elapsed_time
                     current_posture = posture
+                    if current_posture not in posture_times:
+                        posture_times[current_posture] = 0
                     posture_start_time = time.time()
                 else:
                     if posture_start_time and time.time() - posture_start_time > 1:
-                        posture_times[current_posture] = time.time() - posture_start_time
+                        print(f"Adding 1 second to {current_posture}")
+                        posture_times[current_posture] += time.time() - posture_start_time
+                        posture_start_time = time.time()
+ 
+                        
+                
+                print(posture_times)
 
                 # Draw border around the frame based on posture
                 if posture == "normal":
@@ -156,12 +194,15 @@ def generate_video_feed():
 
             # Draw eye landmarks if face mesh is available
             if results_face.multi_face_landmarks:
+                h, w, _ = frame.shape
                 for face_landmarks in results_face.multi_face_landmarks:
                     # Draw the landmarks of the eyes
                     left_eye = face_landmarks.landmark[33]  # Left eye center
                     right_eye = face_landmarks.landmark[133]  # Right eye center
                     left_eye_coords = (int(left_eye.x * w), int(left_eye.y * h))
                     right_eye_coords = (int(right_eye.x * w), int(right_eye.y * h))
+                    
+                    
 
                     # Draw circles around the eyes
                     cv2.circle(image, left_eye_coords, 5, (255, 0, 0), -1)  # Blue dot for left eye
@@ -169,6 +210,18 @@ def generate_video_feed():
 
                     # Eye gaze detection (checking if eyes are in the center of the screen)
                     eye_status = check_eye_position(left_eye_coords, right_eye_coords, w, h)
+
+                    looking_at_screen = detect_eye_test(landmarks, w, h)
+                    if not looking_at_screen:
+                        eye_status = 'Not looking at screen'
+
+                    if posture == "bow" or posture == "looking up":
+                        eye_status = "Not looking at screen"
+
+                    # if posture == "normal" and eye_status == "Looking at screen":
+                    #     cv2.putText(image, "Good posture and eye gaze", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
+
                     cv2.putText(image, eye_status, (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
             # Encode the frame as JPEG
@@ -201,6 +254,7 @@ def check_eye_position(left_eye_coords, right_eye_coords, frame_width, frame_hei
         eye_status = "Not looking at screen"
         eye_color = (0, 0, 255)  # Red for not looking at screen
 
+    logging.debug(f"Eye status: {eye_status}")
     return eye_status
 
     # Display the eye status on the frame
@@ -256,7 +310,50 @@ def detect_posture(landmarks, width, height):
                   left_shoulder_x_norm, left_shoulder_y_norm,
                   right_shoulder_x_norm, right_shoulder_y_norm)
     # Posture check (e.g., head tilt or slouching)
+
+    # Posture check (e.g., head tilt or slouching)
+    logging.debug(f"Detected posture: {results_detect}")
     return results_detect
+
+
+def detect_eye_test(landmarks, width, height):
+    """Analyze pose landmarks and determine posture conditions."""
+    # Extract key points
+    left_ear = landmarks[mp_pose.PoseLandmark.LEFT_EAR]
+    right_ear = landmarks[mp_pose.PoseLandmark.RIGHT_EAR]
+    left_eye_inner = landmarks[mp_pose.PoseLandmark.LEFT_EYE_INNER]
+    left_eye_outer = landmarks[mp_pose.PoseLandmark.LEFT_EYE_OUTER]
+    right_eye_inner = landmarks[mp_pose.PoseLandmark.RIGHT_EYE_INNER]
+    right_eye_outer = landmarks[mp_pose.PoseLandmark.RIGHT_EYE_OUTER]
+    left_eye = landmarks[mp_pose.PoseLandmark.LEFT_EYE]
+    right_eye = landmarks[mp_pose.PoseLandmark.RIGHT_EYE]
+    
+
+    # Compute relevant distances and angles for posture analysis
+    left_ear_x, left_ear_y = int(left_ear.x * width), int(left_ear.y * height)
+    right_ear_x, right_ear_y = int(right_ear.x * width), int(right_ear.y * height)
+    left_eye_x, left_eye_y = int(left_eye.x * width), int(left_eye.y * height)
+    right_eye_x, right_eye_y = int(right_eye.x * width), int(right_eye.y * height)
+    left_eye_inner_x, left_eye_inner_y = int(left_eye_inner.x * width), int(left_eye_inner.y * height)
+    right_eye_inner_x, right_eye_inner_y = int(right_eye_inner.x * width), int(right_eye_inner.y * height)
+    left_eye_outer_x, left_eye_outer_y = int(left_eye_outer.x * width), int(left_eye_outer.y * height)
+    right_eye_outer_x, right_eye_outer_y = int(right_eye_outer.x * width), int(right_eye_outer.y * height)
+
+    eye_status = 'Looking at screen'
+    
+    if left_ear_x < right_eye_inner_x:
+        eye_status = 'left face'
+    elif right_ear_x > left_eye_inner_x:
+        eye_status = 'right face'
+    
+
+    if eye_status != 'Looking at screen':
+        logging.debug(f"Eye test failed: {eye_status}")
+        return False
+    else:
+        logging.debug("Eye test passed")
+        return True
+        
 
 @app.route('/video_feed')
 def video_feed():
@@ -291,6 +388,7 @@ def video_feed():
     current_camera_index = camera_index
 
     # Start streaming video from the selected camera
+    logging.info(f"Streaming video from camera index {camera_index}")
     return Response(generate_video_feed(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/posture_times', methods=['GET'])
@@ -304,7 +402,13 @@ def get_posture_times():
         examples:
           application/json: {"normal": 45, "left tilt": 30, "right tilt": 20}
     """
-    return jsonify(posture_times)
+    totle_time = 0
+    for key in posture_times:
+        totle_time += posture_times[key]
+    posture_times_with_total = posture_times.copy()
+    posture_times_with_total["total"] = totle_time
+    logging.info(f"Posture times: {posture_times_with_total}")
+    return jsonify(posture_times_with_total)
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)

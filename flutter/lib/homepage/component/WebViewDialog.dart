@@ -44,8 +44,8 @@ class _VideoWebViewDialogState extends State<VideoWebViewDialog> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Container(
-        width: 400,
-        height: 300,
+        width: 800,
+        height: 600,
         child: Column(
           children: [
             // 只有在 WebView 初始化后才显示
