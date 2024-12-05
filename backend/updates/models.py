@@ -17,6 +17,7 @@ class Comment(models.Model):
         return {
             'text': self.text,
             'author': self.author.username,
+            'id': self.pk,
         }
 
 

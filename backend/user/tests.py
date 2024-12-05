@@ -17,7 +17,7 @@ class TestUser(TestCase):
     def test_login_logout(self):
         # 未注册用户登录
         response = self.client.post(
-            reverse('login'),
+            '/user/login',
             {'username': 'oracle', 'password': '<PASSWORD>'},
             content_type='application/json')
         self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
@@ -51,7 +51,7 @@ class TestUser(TestCase):
         # 成功登录
         response = self.client.post(
             reverse('login'),
-            {'username': 'victor', 'password': 'vector', 'mobile': '14703692581'},
+            {'username': 'victor', 'password': 'vector'},
             content_type='application/json'
         )
         self.assertEqual(response.status_code, HTTPStatus.OK)
@@ -74,11 +74,7 @@ class TestFriends(TestCase):
         response = self.client.put('user/friend/neo')
         self.assertNotIn(response.status_code, (202, 404))
 
-        response = self.client.post(
-            reverse('login'),
-            {'username': 'neo', 'password': 'one'},
-            content_type='application/json'
-        )
+        self.client.login(username='neo', password='one')
         # 邀请错了人
         response = self.client.put('user/friend/knuth')
         self.assertEqual(response.status_code, 404)
@@ -88,13 +84,9 @@ class TestFriends(TestCase):
         # 未经对方通过
         response = self.client.post('user/friend/victor')
         self.assertEqual(response.status_code, 400)
-        response = self.client.post(reverse('logout'))
+        self.client.logout()
 
-        response = self.client.post(
-            reverse('login'),
-            {'username': 'victor', 'password': 'vector'},
-            content_type='application/json'
-        )
+        self.client.login(username='victor', password='vector')
         # 进入待通过好友列表
         response = self.client.get('user/friend')
         self.assertEqual(response.status_code, 200)
@@ -107,26 +99,18 @@ class TestFriends(TestCase):
         self.assertEqual(response.status_code, 200)
         response = self.client.get('user/friend')
         self.assertIn('neo', json.loads(response.content['offline']))
-        response = self.client.post(reverse('logout'))
+        self.client.logout()
 
-        response = self.client.post(
-            reverse('login'),
-            {'username': 'neo', 'password': 'one'},
-            content_type='application/json'
-        )
+        self.client.login(username='neo', password='one')
         # 申请通过，更新好友列表
         response = self.client.get('user/friend')
         self.assertIn('victor', json.loads(response.content['offline']))
-        response = self.client.post(reverse('logout'))
+        self.client.logout()
 
     def test_break(self):
         if not Friendship.objects.exists():
             Friendship.objects.create(userA=User.objects.get(username='neo'), userB=User.objects.get(username='victor'))
-        response = self.client.post(
-            reverse('login'),
-            {'username': 'neo', 'password': 'one'},
-            content_type='application/json'
-        )
+        self.client.login(username='neo', password='one')
         # 删除未知好友
         response = self.client.delete('user/friend/knuth')
         self.assertEqual(response.status_code, 404)

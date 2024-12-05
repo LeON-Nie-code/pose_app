@@ -20,17 +20,22 @@ def release_post(request):
     blog = models.Post(text=data['text'], author=request.user, n_image=data['n_image'], )
     blog.save()
 
-    return HttpResponse(blog.pk)
+    return HttpResponse(str(blog.pk))
 
 
 @login_required
 def visit_post(request, update_id):
     if request.method == 'GET':
-        update = get_object_or_404(request.user.post_set, pk=update_id)
+        update = get_object_or_404(models.Post, pk=update_id)
 
-        data = {'text': update.text, 'comments': [c.to_obj() for c in update.comments.all()], 'likes': update.likes,
-                'images': [reverse('update:image', kwargs={'update_id': update_id, 'index': i}) for i in
-                           range(update.n_image)], }
+        data = {
+            'text': update.text,
+            'comments': [c.to_obj() for c in update.comments.all()],
+            'likes': update.likes,
+            'images': [
+                reverse('update:image', kwargs={'update_id': update_id, 'index': i})
+                for i in range(update.n_image)
+            ], }
         return JsonResponse(data)
     elif request.method == 'DELETE':
         get_object_or_404(request.user.post_set, pk=update_id).delete()
@@ -42,11 +47,15 @@ def visit_post(request, update_id):
 def picture(request, update_id, index):
     update = get_object_or_404(request.user.post_set, pk=update_id)
     if not index in range(update.n_image):
-        return HttpResponse(status=400)
+        return HttpResponse(f'only {update.n_image} images', status=400)
+    if request.content_type != 'image/png':
+        return HttpResponse(f'only png', status=400)
+
     if request.method == 'GET':
         with getattr(update, f'image{index}').open('rb') as img:
             data = img.read()
         return HttpResponse(status=200, content=data, content_type='image/png')
+
     elif request.method == 'PUT':
         data = request.body
         img_field = getattr(update, f'image{index}')
@@ -54,6 +63,7 @@ def picture(request, update_id, index):
             img_field.delete(save=False)
         img_field.save(name=f'{index}.png', content=ContentFile(data), save=True)
         return HttpResponse(status=200)
+
     return HttpResponse(status=HTTPStatus.METHOD_NOT_ALLOWED)
 
 
@@ -65,8 +75,8 @@ def comment(request, update_id, comment_id=None):
             data = json.loads(request.body)
             text = data['text']
             author = models.User.objects.get(username=data['author'])
-            update.comments.create(author=author, text=text)
-            return HttpResponse(status=200)
+            c = update.comments.create(author=author, text=text)
+            return HttpResponse(str(c.pk), status=200)
         return HttpResponse(status=HTTPStatus.METHOD_NOT_ALLOWED)
     else:
         if request.method == 'DELETE':

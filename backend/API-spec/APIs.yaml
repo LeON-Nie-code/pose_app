@@ -287,11 +287,6 @@ paths:
           description: 成功删除
         404:
           description: 这不是你的动态
-    #    put:
-    #      description: 一些简单幂等操作，比如点赞
-    #      responses:
-    #        200:
-    #          description: 操作成功
     get:
       description: 获得动态的内容信息
       responses:
@@ -395,7 +390,7 @@ paths:
       responses:
         200:
           description: 成功
-        403:
+        404:
           description: 无权删除
 
   /records/{userid}:
@@ -465,6 +460,7 @@ components:
           type: integer
     comment:
       type: object
+      description: 上传时只用得上text属性
       properties:
         text:
           type: string

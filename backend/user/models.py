@@ -10,6 +10,8 @@ class User(django.contrib.auth.models.AbstractUser):
 
     mobile = models.CharField(max_length=11, unique=True)
 
+    online = models.BooleanField(default=False)
+
 
 class Friendship(models.Model):
     class Meta:

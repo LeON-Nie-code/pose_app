@@ -2,6 +2,7 @@ import json
 from http import HTTPStatus
 from json import JSONDecodeError
 
+from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -9,8 +10,9 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 
+import user
 from . import constraint, models
-from .models import Friendship
+from .models import Friendship, User
 
 
 def register(request):
@@ -27,35 +29,41 @@ def register(request):
     except ValueError as e:
         return HttpResponse(str(e), status=HTTPStatus.BAD_REQUEST)
 
-    code = ''
-    # TODO 生成并发送验证码
-    request.session.update(
-        {'username': data.username, 'password': data.password, 'mobile': data.mobile, 'verification_code': code,
-         'operation_to_complete': 'register'})
-    request.session.set_expiry(80)  # 一定时间内不验证就清零。留了些富余。
-    request.session.save()
-    return HttpResponse(status=200)
+    if settings.USE_SMS_VERIFICATION:
+        code = ''
+        # TODO 生成并发送验证码
+        request.session.update(
+            {'username': data.username, 'password': data.password, 'mobile': data.mobile, 'verification_code': code,
+             'operation_to_complete': 'register'})
+        request.session.set_expiry(80)  # 一定时间内不验证就清零。留了些富余。
+        request.session.save()
+        return HttpResponse(status=200)
+    else:
+        User.objects.create_user(username=data.username, password=data.password, mobile=data.mobile)
+        return HttpResponse(status=200)
 
 
 def login(request):
     if request.method != 'POST':
         return HttpResponse(status=HTTPStatus.METHOD_NOT_ALLOWED)
-    if request.user:
-        return HttpResponse('已登录', status=HTTPStatus.BAD_REQUEST)
+    if request.user.is_authenticated:
+        return HttpResponse('已登录')
 
     try:
         data = constraint.LoginMsg(json.loads(request.body))
     except JSONDecodeError:
-        return HttpResponse('Invalid JSON', status=HTTPStatus.BAD_REQUEST)
+        return HttpResponse('Invalid JSON', status=400)
     except ValueError as e:
         return HttpResponse(str(e), status=HTTPStatus.BAD_REQUEST)
 
-    user = auth.authenticate(username=data.username, password=data.password)
-    if user is None:
-        return HttpResponse('验证不通过', status=HTTPStatus.BAD_REQUEST)
+    the_user = auth.authenticate(username=data.username, password=data.password)
+    if the_user is None:
+        return HttpResponse('验证不通过', status=400)
 
-    auth.login(request, user)
-    return JsonResponse({}, status=HTTPStatus.OK)
+    auth.login(request, the_user)
+    the_user.online = True
+    the_user.save()
+    return JsonResponse({})
 
 
 @login_required
@@ -63,6 +71,8 @@ def logout(request):
     if request.method != 'POST':
         return HttpResponse(status=HTTPStatus.METHOD_NOT_ALLOWED)
 
+    request.user.online = False
+    request.user.save()
     auth.logout(request)
     return HttpResponse(status=HTTPStatus.OK)
 
@@ -129,9 +139,11 @@ def friend(request, userid=None):
             if not user.friendship_set.filter(Q(userA=other) | Q(userB=other)).exists():
                 user.friendship_set.create(userA=user, userB=other)
             return HttpResponse(status=200)
+
         elif request.method == 'DELETE':
             get_object_or_404(user.friendship_set, Q(userA=other) | Q(userB=other)).delete()
             return HttpResponse(status=200)
+
         elif request.method == 'POST':
             try:
                 friendship = user.friendship_set.get(Q(userA=other) | Q(userB=other), waiting=True)
@@ -158,11 +170,8 @@ def verify(request):
         return HttpResponse(status=403)
 
     if verify_for == 'register':
-        args = {
-            'username': request.session['username'],
-            'password': request.session['password'],
-            'mobile': request.session['mobile'],
-        }
+        args = {'username': request.session['username'], 'password': request.session['password'],
+                'mobile': request.session['mobile'], }
         if data['username'] != args['username']:
             return HttpResponse('用户名对不上', status=HTTPStatus.INTERNAL_SERVER_ERROR)
 
