@@ -125,4 +125,4 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # 自定义设置项
-USE_SMS_VERIFICATION = True
+USE_SMS_VERIFICATION = False

@@ -130,11 +130,11 @@ class TestComment(TestCase):
     def setUp(self):
         self.clientA = Client()
         User.objects.create_user(username='alice', mobile='12345678901', password='A')
-        self.client.login(username='alice', password='A')
+        self.clientA.login(username='alice', password='A')
 
         self.clientB = Client()
         User.objects.create_user(username='bob', mobile='12345678902', password='B')
-        self.client.login(username='bob', password='B')
+        self.clientB.login(username='bob', password='B')
 
     def test_add(self):
         response = self.clientA.post(
@@ -173,6 +173,7 @@ class TestComment(TestCase):
             {'text': 'happy!'},
             content_type='application/json',
         )
+        self.assertEqual(response.status_code, 200, msg=response.context)
         comment_id = response.content.decode('utf-8')
 
         # 别人删除

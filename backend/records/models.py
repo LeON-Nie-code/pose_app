@@ -48,3 +48,18 @@ def load_record(record: Entry, data: dict):
     record.supporting_the_table = float2duration('supporting the table')
     record.looking_up = float2duration('looking up')
     record.normal = float2duration('normal')
+def dump_record(record: Entry):
+    data = {
+        'left tilt': record.left_tilt,
+        'right tilt': record.right_tilt,
+        'lying down in the chair': record.lying_down_in_the_chair,
+        'bow': record.bow,
+        'left face': record.left_face,
+        'right face': record.right_face,
+        'high shoulder': record.high_shoulder,
+        'low shoulder': record.low_shoulder,
+        'supporting the table': record.supporting_the_table,
+        'looking up': record.looking_up,
+        'normal': record.normal,
+    }
+    return {k: v.total_seconds() for k, v in data.items()}

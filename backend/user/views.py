@@ -118,7 +118,7 @@ def friend(request, userid=None):
     if userid is None:
         if request.method == 'GET':
             data = {'online': [], 'offline': [], 'applying': []}
-            for friendship in user.friendship_set.all():
+            for friendship in (user.friendships_asA.all() | user.friendships_asB.all()):
                 # TODO 瓶颈
                 other = friendship.userB
                 if other == user:
@@ -136,17 +136,20 @@ def friend(request, userid=None):
     else:
         other = get_object_or_404(models.User, username=userid)
         if request.method == 'PUT':
-            if not user.friendship_set.filter(Q(userA=other) | Q(userB=other)).exists():
-                user.friendship_set.create(userA=user, userB=other)
+            if not user.friendships_asA.exists() and not user.friendships_asB.exists():
+                user.friendships_asA.create(userA=user, userB=other)
             return HttpResponse(status=200)
 
         elif request.method == 'DELETE':
-            get_object_or_404(user.friendship_set, Q(userA=other) | Q(userB=other)).delete()
+            get_object_or_404(
+                user.friendships_asA.all() | user.friendships_asB.all(),
+                Q(userA=other) | Q(userB=other)).delete()
             return HttpResponse(status=200)
 
         elif request.method == 'POST':
             try:
-                friendship = user.friendship_set.get(Q(userA=other) | Q(userB=other), waiting=True)
+                friendship = (user.friendships_asA.all() | user.friendships_asB.all()).get(
+                    Q(userA=other) | Q(userB=other), waiting=True)
                 friendship.waiting = False
                 return HttpResponse(status=200)
             except Friendship.DoesNotExist:

@@ -17,8 +17,8 @@ class Friendship(models.Model):
     class Meta:
         db_table = 'friendship'
 
-    userA = models.ForeignKey(User, on_delete=models.CASCADE, related_name='userA')
-    userB = models.ForeignKey(User, on_delete=models.CASCADE, related_name='userB')
+    userA = models.ForeignKey(User, on_delete=models.CASCADE, related_name='friendships_asA')
+    userB = models.ForeignKey(User, on_delete=models.CASCADE, related_name='friendships_asB')
 
     waiting = models.BooleanField(default=True)
 

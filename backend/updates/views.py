@@ -74,7 +74,7 @@ def comment(request, update_id, comment_id=None):
         if request.method == 'POST':
             data = json.loads(request.body)
             text = data['text']
-            author = models.User.objects.get(username=data['author'])
+            author = request.user
             c = update.comments.create(author=author, text=text)
             return HttpResponse(str(c.pk), status=200)
         return HttpResponse(status=HTTPStatus.METHOD_NOT_ALLOWED)

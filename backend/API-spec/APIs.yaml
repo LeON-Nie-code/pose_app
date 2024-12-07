@@ -14,33 +14,33 @@ servers:
   - url: http://118.89.124.30:8080
 
 paths:
-  /user/verify:
-    description: 根据手机验证码判断用户真实性，用于注册等操作。
-    post:
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                  description: 此前尝试注册的用户名
-                code:
-                  type: string
-                  description: 验证码
-
-      responses:
-        200:
-          description: 通过
-        400:
-          description: 无前置操作——须事先登录或者申请密码找回。
-        403:
-          description: 验证码错误
+#  /user/verify:
+#    description: 根据手机验证码判断用户真实性，用于注册等操作。
+#    post:
+#      requestBody:
+#        required: true
+#        content:
+#          application/json:
+#            schema:
+#              type: object
+#              properties:
+#                username:
+#                  type: string
+#                  description: 此前尝试注册的用户名
+#                code:
+#                  type: string
+#                  description: 验证码
+#
+#      responses:
+#        200:
+#          description: 通过
+#        400:
+#          description: 无前置操作——须事先登录或者申请密码找回。
+#        403:
+#          description: 验证码错误
 
   /user/register:
-    description: 提供必要信息，开始注册；前端接下来应在60秒内发送验证码。
+    description: 提供必要信息，开始注册 #前端接下来应在60秒内发送验证码。
     post:
       requestBody:
         required: true
@@ -57,7 +57,7 @@ paths:
                   type: string
       responses:
         200:
-          description: 验证码已发送，请更新UI。
+          description: 注册成功 #验证码已发送，请更新UI。
         400:
           description: 请求不合规，返回简短说明。
           content:
@@ -129,8 +129,8 @@ paths:
   #              examples:
   #                JSON:
   #                  $ref: '#/components/examples/InvalidJSON'
-  #                Argument:
   #                  $ref: '#/components/examples/BadArgument'
+  #                Argument:
 
   /user/profile:
     get:
@@ -381,7 +381,7 @@ paths:
         200:
           $ref: '#/components/responses/key'
 
-  /updates:/{update_id}/comment/{comment_id}:
+  /updates/{update_id}/comment/{comment_id}:
     description: 操作一条自己的评论
     parameters:
       - $ref: '#/components/parameters/update_id'
@@ -393,10 +393,8 @@ paths:
         404:
           description: 无权删除
 
-  /records/{userid}:
+  /records/new:
     description: 上传一次专注记录
-    parameters:
-      - $ref: '#/components/parameters/user_id'
     post:
       requestBody:
         required: true
@@ -408,26 +406,56 @@ paths:
         200:
           description: 成功保存，保存时间已记录。
 
+  /records/{user_id}/{record_id}:
+    description: 根据ID获取特定的一次原始记录。允许请求好友的记录。
+    parameters:
+      - $ref: '#/components/parameters/user_id'
+      - $ref: '#/components/parameters/record_id'
+    get:
+      responses:
+        404:
+          description: 请求的本人或好友记录不存在。
+        200:
+          description: 您的指定记录存在且已返回。
+          content:
+            application/json:
+              description: 记录及其元数据。
+              schema:
+                type: object
+                properties:
+                  record:
+                    $ref: '#/components/schemas/record'
+                  taken-at:
+                    type: string
+                    format: date-time
+
 components:
   parameters:
     user_id:
       name: user_id
       in: path
-      description: The key returned by prior API calls.
+      description: 用户唯一标识符。目前为用户名。
       schema:
         type: string
       required: true
     update_id:
       name: update_id
       in: path
-      description: The key returned by prior API calls.
+      description: 帖子唯一标识符。目前为数据表项ID。
       schema:
         type: string
       required: true
     comment_id:
       name: comment_id
       in: path
-      description: The key returned by prior API calls.
+      description: 评论唯一标识符。目前为数据表项ID。
+      schema:
+        type: string
+      required: true
+    record_id:
+      name: record_id
+      in: path
+      description: 专注记录唯一标识符。目前为数据表项ID。
       schema:
         type: string
       required: true
