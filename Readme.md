@@ -55,6 +55,17 @@
 
 ## 使用方法
 
+在detect文件夹下执行
+```bash
+python app.py
+```
+即可在 http://127.0.0.1:5000 提供API服务
+
+在flutter文件夹下执行
+```bash
+flutter run -d windows
+```
+即可运行flutter前端应用
 
 ## 理论指导
 

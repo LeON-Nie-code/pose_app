@@ -25,7 +25,10 @@ class MyApp extends StatelessWidget {
         '/': (context) => const LoginPage(), // 登录页面
         '/register': (context) => const RegisterAccount(), // 注册页面
         '/resetPassword': (context) => const ResetPasswordPage(), // 重置密码页面
-        '/home': (context) => const HomePage(), // 主页页面
+        '/home': (context) {
+          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          return HomePage(username: args['username']);
+        }, // 主页页面
       },
     );
   }

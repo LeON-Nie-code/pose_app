@@ -16,7 +16,9 @@ import 'package:pose_app/SignOut/signout_page.dart';
 import 'package:pose_app/style/style.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final String username;
+
+  const HomePage({Key? key, required this.username}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -79,7 +81,7 @@ class _HomePageState extends State<HomePage> {
                           EdgeInsets.symmetric(vertical: 30.0, horizontal: 30.0),
                       child: Column(
                         children: [
-                          Header(),
+                          Header(username: widget.username),
                           SizedBox(height: SizeConfig.blockSizeVertical! * 4),
                           SizedBox(
                             width: SizeConfig.screenWidth,
