@@ -12,6 +12,7 @@ from django.urls import reverse
 
 from . import constraint, models
 from .models import Friendship, User
+from .SendCode import send
 
 
 def register(request):
@@ -28,9 +29,16 @@ def register(request):
     except ValueError as e:
         return HttpResponse(str(e), status=HTTPStatus.BAD_REQUEST)
 
+    if User.objects.filter(username=data.username).exists():
+        return HttpResponse('Username collision', status=HTTPStatus.BAD_REQUEST)
+
     if settings.USE_SMS_VERIFICATION:
-        code = ''
+        code = '4567'
+        sms_resp = send.SendCode(code, data.mobile)
+        if sms_resp.body.code != 'OK':
+            return HttpResponse(sms_resp.body.message, status=HTTPStatus.BAD_REQUEST)
         # TODO 生成并发送验证码
+
         request.session.update(
             {'username': data.username, 'password': data.password, 'mobile': data.mobile, 'verification_code': code,
              'operation_to_complete': 'register'})
@@ -137,7 +145,7 @@ def friend(request, userid=None):
         if request.method == 'PUT':
             if not user.friendships_asA.exists() and not user.friendships_asB.exists():
                 user.friendships_asA.create(userA=user, userB=other)
-            return HttpResponse(status=200)
+            return HttpResponse(status=202)
 
         elif request.method == 'DELETE':
             get_object_or_404(

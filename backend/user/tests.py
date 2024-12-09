@@ -1,23 +1,26 @@
 import json
 from http import HTTPStatus
+from http.client import responses
 
+from django.conf import settings
 from django.test import TestCase, Client
 from django.urls import reverse
 
-from .models import User, Friendship
+from .models import User, Friendship, Profile
 
 
 # Create your tests here.
 
 class TestUser(TestCase):
     def setUp(self):
+        settings.USE_SMS_VERIFICATION = True
         self.client = Client()
         User.objects.create_user(username='neo', mobile='18529630741', password='one')
 
     def test_login_logout(self):
         # 未注册用户登录
         response = self.client.post(
-            '/user/login',
+            reverse('login'),
             {'username': 'oracle', 'password': '<PASSWORD>'},
             content_type='application/json')
         self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
@@ -45,9 +48,16 @@ class TestUser(TestCase):
         # 成功注册
         response = self.client.post(
             reverse('register'),
-            {'username': 'victor', 'password': 'vector', 'mobile': '14703692581'},
+            {'username': 'victor', 'password': 'vector', 'mobile': '18101375056'},
             content_type='application/json')
         self.assertEqual(response.status_code, HTTPStatus.OK)
+        code = input('验证码：')
+        response = self.client.post(
+            reverse('verify'),
+            {'code': code, 'username': 'victor'},
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, 200)
         # 成功登录
         response = self.client.post(
             reverse('login'),
@@ -61,6 +71,7 @@ class TestUser(TestCase):
 
     def tearDown(self):
         User.objects.all().delete()
+        settings.USE_SMS_VERIFICATION = False
 
 
 class TestFriends(TestCase):
@@ -71,18 +82,18 @@ class TestFriends(TestCase):
 
     def test_invite(self):
         # 未登录直接操作
-        response = self.client.put('user/friend/neo')
-        self.assertNotIn(response.status_code, (202, 404))
+        response = self.client.put(reverse('friend_user', args=['neo']))
+        self.assertNotIn(response.status_code, (202, 404), msg=response.context)
 
         self.client.login(username='neo', password='one')
         # 邀请错了人
-        response = self.client.put('user/friend/knuth')
+        response = self.client.put(reverse('friend_user', args=['knuth']))
         self.assertEqual(response.status_code, 404)
         # 邀请成功
-        response = self.client.put('user/friend/victor')
+        response = self.client.put(reverse('friend_user', args=['victor']))
         self.assertEqual(response.status_code, 202)
-        # 未经对方通过
-        response = self.client.post('user/friend/victor')
+        # 未经对方邀请
+        response = self.client.post(reverse('friend_user', args=['victor']))
         self.assertEqual(response.status_code, 400)
         self.client.logout()
 
@@ -112,13 +123,49 @@ class TestFriends(TestCase):
             Friendship.objects.create(userA=User.objects.get(username='neo'), userB=User.objects.get(username='victor'))
         self.client.login(username='neo', password='one')
         # 删除未知好友
-        response = self.client.delete('user/friend/knuth')
+        response = self.client.delete(reverse('friend_user', args=['knuth']))
         self.assertEqual(response.status_code, 404)
         # 删除好友成功
-        response = self.client.delete('user/friend/victor')
-        self.assertEqual(response.status_code, 202)
+        response = self.client.delete(reverse('friend_user', args=['victor']))
+        self.assertEqual(response.status_code, 200, response.context)
         response = self.client.post(reverse('logout'))
 
     def tearDown(self):
         Friendship.objects.all().delete()
         User.objects.all().delete()
+
+
+class TestProfile(TestCase):
+    def setUp(self):
+        self.client = Client()
+        User.objects.create_user(username='neo', password='one')
+        Profile.objects.create(user=User.objects.get(username='neo'))
+        self.client.login(username='neo', password='one')
+
+    def test_read(self):
+        user = User.objects.get(username='neo')
+        profile = user.profile
+        data = {
+            'name': 'hero',
+            'school': 'Tsinghua',
+            'gender': 'F',
+            'email': 'hello@mails.tsinghau.edu.cn'
+        }
+        profile.nickname = data['name']
+        profile.institution = data['school']
+        profile.gender = data['gender']
+        profile.email = data['email']
+        profile.save()
+        response = self.client.get('user/profile')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), data)
+
+    def test_update(self):
+        data = self.client.patch(
+            '/user/profile',
+            {'school': 'Bilibili'},
+            content_type='application/json'
+        )
+        self.assertEqual(data.status_code, 200)
+        profile = Profile.objects.get(user=User.objects.get(username='neo'))
+        self.assertEqual(profile.school, 'Bilibili')
