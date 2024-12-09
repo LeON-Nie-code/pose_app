@@ -6,4 +6,6 @@ dependencies:
   - django
   - gunicorn
   - Pillow
+  - pip
+    - alibabacloud_dysmsapi20170525==3.1.0
 prefix: D:\App_Installations\miniconda3\envs\SEproject

@@ -10,7 +10,6 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 
-import user
 from . import constraint, models
 from .models import Friendship, User
 

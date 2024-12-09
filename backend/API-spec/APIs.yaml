@@ -14,30 +14,30 @@ servers:
   - url: http://118.89.124.30:8080
 
 paths:
-#  /user/verify:
-#    description: 根据手机验证码判断用户真实性，用于注册等操作。
-#    post:
-#      requestBody:
-#        required: true
-#        content:
-#          application/json:
-#            schema:
-#              type: object
-#              properties:
-#                username:
-#                  type: string
-#                  description: 此前尝试注册的用户名
-#                code:
-#                  type: string
-#                  description: 验证码
-#
-#      responses:
-#        200:
-#          description: 通过
-#        400:
-#          description: 无前置操作——须事先登录或者申请密码找回。
-#        403:
-#          description: 验证码错误
+  #  /user/verify:
+  #    description: 根据手机验证码判断用户真实性，用于注册等操作。
+  #    post:
+  #      requestBody:
+  #        required: true
+  #        content:
+  #          application/json:
+  #            schema:
+  #              type: object
+  #              properties:
+  #                username:
+  #                  type: string
+  #                  description: 此前尝试注册的用户名
+  #                code:
+  #                  type: string
+  #                  description: 验证码
+  #
+  #      responses:
+  #        200:
+  #          description: 通过
+  #        400:
+  #          description: 无前置操作——须事先登录或者申请密码找回。
+  #        403:
+  #          description: 验证码错误
 
   /user/register:
     description: 提供必要信息，开始注册 #前端接下来应在60秒内发送验证码。

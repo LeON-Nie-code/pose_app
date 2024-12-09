@@ -48,6 +48,8 @@ def load_record(record: Entry, data: dict):
     record.supporting_the_table = float2duration('supporting the table')
     record.looking_up = float2duration('looking up')
     record.normal = float2duration('normal')
+
+
 def dump_record(record: Entry):
     data = {
         'left tilt': record.left_tilt,
