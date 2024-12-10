@@ -1,23 +1,127 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import 'package:pose_app/style/colors.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingPage extends StatefulWidget {
-  const SettingPage({Key? key}) : super(key: key);
+  final String username;
+  const SettingPage({Key? key, required this.username}) : super(key: key);
 
   @override
   _SettingPageState createState() => _SettingPageState();
 }
 
 class _SettingPageState extends State<SettingPage> {
-  // 临时保存的个人信息变量
-  String name = '金民周';
-  String school = '清华大学';
-  String gender = '女';
-  String accountId = '42557833';
-  String email = 'jinm*****u0000@gmail.com';
-  String phoneNumber = '111111111111';
+  String sessionId = ''; // 存储当前会话的 session ID
+  String name = '暂无'; //先默认“暂无”
+  String school = '暂无';
+  String gender = '暂无';
+  String email = '暂无';
 
-  bool isReminderEnabled = true; // 用于提醒设置的开关状态
+  bool isReminderEnabled = true;
+  bool isLoading = true;
+
+  final Dio _dio = Dio(
+    BaseOptions(
+      baseUrl: 'http://118.89.124.30:8080',
+      //connectTimeout: 5000,
+      //receiveTimeout: 3000,
+    ),
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeSessionId(); // 初始化 session ID 并加载用户信息
+  }
+// 从 SharedPreferences 中加载 session ID
+  Future<void> _initializeSessionId() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final storedSessionId = prefs.getString('sessionId');
+      if (storedSessionId == null || storedSessionId.isEmpty) {
+        throw Exception('Session ID not found');
+      }
+      // 更新本地状态
+      setState(() {
+        sessionId = storedSessionId;
+      });
+
+      await _loadProfile();  // 加载用户信息
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('无法加载会话 ID: $e')),
+      );
+    }
+  }
+  // 调用后端接口加载用户信息
+  Future<void> _loadProfile() async {
+    try {
+      print('Session ID: $sessionId'); // 确认 sessionId 是否为空
+      
+      final response = await _dio.get(
+        '/user/profile',
+        options: Options(headers: {'sessionid': sessionId}), // 将 session ID 添加到请求头
+      );
+
+      print('Request headers: sessionid=$sessionId');
+
+       // 更新用户信息到本地状态
+      setState(() {
+        name = response.data['name'] ?? '暂无';
+        school = response.data['school'] ?? '暂无';
+        gender = response.data['gender'] ?? '暂无';
+        email = response.data['email'] ?? '暂无';
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('加载个人信息失败: $e')),
+      );
+    }
+  }
+  // 调用后端接口更新用户信息
+  Future<void> _saveProfile(String tempName, String tempSchool, String tempGender, String tempEmail) async {
+    try {
+      await _dio.patch(
+        '/user/profile',
+        data: {
+          'name': tempName,
+          'school': tempSchool,
+          'gender': tempGender,
+          'email': tempEmail,
+        },
+        options: Options(
+          headers: {'sessionid': sessionId},
+          validateStatus: (status){
+            return status != null && status < 500;
+          },
+        ),
+      );
+       // 更新本地状态
+      setState(() {
+        name = tempName;
+        school = tempSchool;
+        gender = tempGender;
+        email = tempEmail;
+      });
+
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('信息已更新')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('更新个人信息失败: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,167 +132,123 @@ class _SettingPageState extends State<SettingPage> {
         backgroundColor: AppColors.deppBeige,
       ),
       backgroundColor: AppColors.beige,
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              // 第一部分：个人信息展示
-              Container(
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      blurRadius: 5,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          '个人信息',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) => _buildEditDialog(context),
-                            );
-                          },
-                          child: const Text(
-                            '编辑',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: AppColors.warmOrange,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    _buildInfoSection('姓名', name),
-                    _buildInfoSection('学校/公司', school),
-                    _buildInfoSection('性别', gender),
-                    _buildInfoSection('账号ID', accountId),
-                    _buildInfoSection('邮箱', email),
-                    _buildInfoSection('手机号', phoneNumber),
-                  ],
-                ),
-              ),
-              
-              const SizedBox(height: 20),
-
-              // 第二部分：设置功能展示
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      blurRadius: 5,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '设置',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-
-                    // 提醒设置
+                    // 第一部分：个人信息展示
                     Container(
-                      child: ListTile(
-                        leading: const Icon(Icons.notifications),
-                        title: const Text(
-                          '提醒设置',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        trailing: Switch(
-                          value: isReminderEnabled,
-                          activeColor: AppColors.warmOrange, // 开启时的开关颜色
-                          inactiveThumbColor: Colors.grey, // 关闭时的开关颜色
-                          inactiveTrackColor:
-                              Colors.grey.withOpacity(0.4), // 轨道关闭时颜色
-                          onChanged: (value) {
-                            setState(() {
-                              isReminderEnabled = value;
-                            });
-                          },
-                        ),
+                      padding: const EdgeInsets.all(16.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.2),
+                            blurRadius: 5,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
                       ),
-                    ),
-                    const Divider(),
-
-                    // 使用指南
-                    ListTile(
-                      leading: const Icon(Icons.info_outline),
-                      title: const Text(
-                        '使用指南',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                      onTap: () {
-                        // 跳转到使用指南页面或弹窗
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('使用指南'),
-                            content: const Text(
-                              '正在准备',
-                            ),
-                            actions: [
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                '个人信息',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                               TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('关闭'),
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => _buildEditDialog(context),
+                                  );
+                                },
+                                child: const Text(
+                                  '编辑',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: AppColors.warmOrange,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
-                        );
-                      },
+                          const SizedBox(height: 10),
+                           _buildInfoSection('账号ID', widget.username),
+                          _buildInfoSection('姓名', name),
+                          _buildInfoSection('学校/公司', school),
+                          _buildInfoSection('性别', gender),
+                          _buildInfoSection('邮箱', email),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    // 第二部分：设置功能展示
+                    Container(
+                      padding: const EdgeInsets.all(16.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.2),
+                            blurRadius: 5,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            '设置',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          ListTile(
+                            leading: const Icon(Icons.notifications),
+                            title: const Text('提醒设置', style: TextStyle(fontSize: 16)),
+                            trailing: Switch(
+                              value: isReminderEnabled,
+                              activeColor: AppColors.warmOrange,
+                              onChanged: (value) {
+                                setState(() {
+                                  isReminderEnabled = value;
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 
-  // 编辑对话框（临时保存）
   Widget _buildEditDialog(BuildContext context) {
     String tempName = name;
     String tempSchool = school;
     String tempGender = gender;
     String tempEmail = email;
-    String tempPhoneNumber = phoneNumber;
-
 
     return AlertDialog(
       title: const Text('编辑个人信息'),
-      backgroundColor: AppColors.beige,
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -204,9 +264,6 @@ class _SettingPageState extends State<SettingPage> {
           _buildTextField('邮箱', tempEmail, (value) {
             tempEmail = value;
           }),
-          _buildTextField('手机号', tempPhoneNumber, (value) {
-            tempPhoneNumber = value;
-          }),
         ],
       ),
       actions: [
@@ -216,16 +273,7 @@ class _SettingPageState extends State<SettingPage> {
         ),
         ElevatedButton(
           onPressed: () {
-            setState(() {
-              name = tempName;
-              school = tempSchool;
-              gender = tempGender;
-              email = tempEmail;
-            });
-            Navigator.pop(context);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('信息已更新')),
-            );
+            _saveProfile(tempName, tempSchool, tempGender, tempEmail);
           },
           child: const Text('保存'),
         ),
@@ -233,7 +281,6 @@ class _SettingPageState extends State<SettingPage> {
     );
   }
 
-  // 文本输入框
   Widget _buildTextField(String label, String initialValue, Function(String) onChanged) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10.0),
@@ -248,22 +295,14 @@ class _SettingPageState extends State<SettingPage> {
     );
   }
 
-  // 个人信息项
   Widget _buildInfoSection(String title, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 14, color: Colors.grey),
-          ),
+          Text(title, style: const TextStyle(fontSize: 14, color: Colors.grey)),
           const SizedBox(width: 20),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
+          Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         ],
       ),
     );

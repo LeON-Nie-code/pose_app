@@ -173,7 +173,7 @@ class _HomePageState extends State<HomePage> {
                     StatisticsPage(),
                     CalendarPage(),
                     CommunicationPage(),
-                    SettingPage(),
+                    SettingPage(username: widget.username,),
                     SignOutPage(),
                   ],
                 ),
