@@ -1,10 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:pose_app/Community/dataAboutCommunity.dart';
 import 'package:pose_app/style/colors.dart';
-
-
 
 // 添加新帖子的页面
 // TODO: 后端接口需求
@@ -40,8 +40,8 @@ class _AddPostPageState extends State<AddPostPage> {
       setState(() {
         // 过滤掉重复的文件
         _selectedFiles.addAll(
-          newFiles.where((newFile) =>
-              !_selectedFiles.any((existingFile) => existingFile.path == newFile.path)),
+          newFiles.where((newFile) => !_selectedFiles
+              .any((existingFile) => existingFile.path == newFile.path)),
         );
       });
     } else {
@@ -52,25 +52,64 @@ class _AddPostPageState extends State<AddPostPage> {
   }
 
   // 提交帖子
-  void _submitPost() {
+  Future<void> _submitPost() async {
     if (_descriptionController.text.isNotEmpty && _selectedFiles.isNotEmpty) {
-      
       // TODO: 调用后端图片上传接口，将图片文件上传到后端并获取 URL
       // 示例：List<String> imageUrls = await uploadImagesToServer(_selectedFiles);
 
-      
+      // 创建 Dio 实例
+      final dio = Dio();
+
+      // 构建请求数据
+      final requestBody = {
+        "text": _descriptionController.text,
+        "n_image": _selectedFiles.length,
+      };
+
+      try {
+        // 发送 POST 请求
+        final response = await dio.post(
+          'http://118.89.124.30:8080/updates/post',
+          data: requestBody,
+        );
+
+        // 检查响应状态
+        if (response.statusCode == 200) {
+          print('帖子提交成功');
+          // 提交成功
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('帖子提交成功')),
+          );
+        } else {
+          print('帖子提交失败');
+          // 提交失败
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('帖子提交失败')),
+          );
+        }
+      } catch (e) {
+        print('请求失败：$e');
+        // 请求失败
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('请求失败')),
+        );
+      }
+
+      // 检查响应状态
+
       final newPost = Post(
         user: currentUser,
         caption: _descriptionController.text,
         timeAgo: '刚刚',
         imageUrls: null,
-        assetImages: _selectedFiles.map((file) => file.path).toList(), // 存储多个本地路径
+        assetImages:
+            _selectedFiles.map((file) => file.path).toList(), // 存储多个本地路径
         likes: 0,
         comments: 0,
         shares: 0,
       );
 
-       // TODO: 调用后端提交帖子接口，将帖子内容和图片 URL 一起发送到后端
+      // TODO: 调用后端提交帖子接口，将帖子内容和图片 URL 一起发送到后端
       // 示例：await submitPostToServer(newPost);
 
       widget.onPostAdded(newPost);
@@ -98,11 +137,15 @@ class _AddPostPageState extends State<AddPostPage> {
         actions: [
           ElevatedButton.icon(
             onPressed: _submitPost,
-            icon: const Icon(Icons.send, color: AppColors.secondary,),
+            icon: const Icon(
+              Icons.send,
+              color: AppColors.secondary,
+            ),
             label: const Text(
               '发布',
-              style: TextStyle(color: AppColors.secondary),),
-              style: ElevatedButton.styleFrom(
+              style: TextStyle(color: AppColors.secondary),
+            ),
+            style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               backgroundColor: AppColors.deppBeige,
             ),
@@ -128,7 +171,7 @@ class _AddPostPageState extends State<AddPostPage> {
                     controller: _descriptionController,
                     decoration: const InputDecoration(
                       hintText: '说点什么吧...',
-                      hintStyle: TextStyle(color: AppColors.secondary ),
+                      hintStyle: TextStyle(color: AppColors.secondary),
                       border: InputBorder.none,
                     ),
                   ),
@@ -138,14 +181,17 @@ class _AddPostPageState extends State<AddPostPage> {
             const SizedBox(height: 16.0),
             ElevatedButton.icon(
               onPressed: () => _selectFiles(context),
-              icon: const Icon(Icons.add_a_photo, color: AppColors.secondary,),
+              icon: const Icon(
+                Icons.add_a_photo,
+                color: AppColors.secondary,
+              ),
               label: const Text(
                 '选择图片',
                 style: TextStyle(color: AppColors.secondary),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.deppBeige,
-                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.deppBeige,
+              ),
             ),
             const SizedBox(height: 16.0),
             Expanded(
@@ -154,7 +200,8 @@ class _AddPostPageState extends State<AddPostPage> {
                       child: Text('尚未选择图片'),
                     )
                   : GridView.builder(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 3,
                         crossAxisSpacing: 12.0,
                         mainAxisSpacing: 12.0,

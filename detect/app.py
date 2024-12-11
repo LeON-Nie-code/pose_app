@@ -48,6 +48,10 @@ posture_times = {}  # Key: posture name, Value: duration in seconds
 current_posture = None  # Current posture being tracked
 posture_start_time = None  # Start time of the current posture
 
+# Session start and end times
+session_start_time = None
+session_end_time = None
+
 
 def find_angle(x1, y1, x2, y2):
     """Calculate the angle between two points."""
@@ -124,114 +128,124 @@ def select_camera():
 
 def generate_video_feed():
     """Stream video feed from the selected camera."""
-    global cap, posture_start_time, current_posture
-    cap = cv2.VideoCapture(current_camera_index)
-    if not cap.isOpened():
-        print("Failed to open camera.")
-        logging.error("Failed to open camera.")
-        return
+    global cap, posture_start_time, current_posture,session_end_time
+    try:
 
-    # Initialize MediaPipe Pose and Face Mesh
-    with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose, \
-         mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5) as face_mesh:
-        while cap.isOpened():
-            ret, frame = cap.read()
-            if not ret:
-                break
+        cap = cv2.VideoCapture(current_camera_index)
+        if not cap.isOpened():
+            print("Failed to open camera.")
+            logging.error("Failed to open camera.")
+            return
 
-            # Convert color format: OpenCV uses BGR, MediaPipe uses RGB
-            image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            results_pose = pose.process(image)
-            results_face = face_mesh.process(image)
+        # Initialize MediaPipe Pose and Face Mesh
+        with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose, \
+            mp_face_mesh.FaceMesh(min_detection_confidence=0.5, min_tracking_confidence=0.5) as face_mesh:
+            while cap.isOpened():
+                ret, frame = cap.read()
+                if not ret:
+                    break
 
-            # Convert back to BGR for display
-            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+                # Convert color format: OpenCV uses BGR, MediaPipe uses RGB
+                image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                results_pose = pose.process(image)
+                results_face = face_mesh.process(image)
 
-            if results_pose.pose_landmarks:
-                mp_drawing.draw_landmarks(image, results_pose.pose_landmarks, mp_pose.POSE_CONNECTIONS)
-                landmarks = results_pose.pose_landmarks.landmark
-                h, w, _ = frame.shape
-                
-                # Detect posture by analyzing key points
-                posture = detect_posture(landmarks, w, h)
+                # Convert back to BGR for display
+                image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
-                # Update posture time if posture changes
-                if posture != current_posture:
-                    if current_posture and posture_start_time:
-                        elapsed_time = time.time() - posture_start_time
+                if results_pose.pose_landmarks:
+                    mp_drawing.draw_landmarks(image, results_pose.pose_landmarks, mp_pose.POSE_CONNECTIONS)
+                    landmarks = results_pose.pose_landmarks.landmark
+                    h, w, _ = frame.shape
+                    
+                    # Detect posture by analyzing key points
+                    posture = detect_posture(landmarks, w, h)
+
+                    # Update posture time if posture changes
+                    if posture != current_posture:
+                        if current_posture and posture_start_time:
+                            elapsed_time = time.time() - posture_start_time
+                            if current_posture not in posture_times:
+                                print(f"New posture detected: {current_posture}")
+                                logging.info(f"New posture detected: {current_posture}")
+                                posture_times[current_posture] = 0
+                            if elapsed_time > 1:
+                                print(f"Adding {elapsed_time} seconds to {current_posture}")
+                                posture_times[current_posture] += elapsed_time
+                        current_posture = posture
                         if current_posture not in posture_times:
-                            print(f"New posture detected: {current_posture}")
-                            logging.info(f"New posture detected: {current_posture}")
                             posture_times[current_posture] = 0
-                        if elapsed_time > 1:
-                            print(f"Adding {elapsed_time} seconds to {current_posture}")
-                            posture_times[current_posture] += elapsed_time
-                    current_posture = posture
-                    if current_posture not in posture_times:
-                        posture_times[current_posture] = 0
-                    posture_start_time = time.time()
-                else:
-                    if posture_start_time and time.time() - posture_start_time > 1:
-                        print(f"Adding 1 second to {current_posture}")
-                        posture_times[current_posture] += time.time() - posture_start_time
                         posture_start_time = time.time()
- 
+                    else:
+                        if posture_start_time and time.time() - posture_start_time > 1:
+                            print(f"Adding 1 second to {current_posture}")
+                            posture_times[current_posture] += time.time() - posture_start_time
+                            posture_start_time = time.time()
+    
+                            
+                    
+                    print(posture_times)
+
+                    # Draw border around the frame based on posture
+                    if posture == "normal":
+                        border_color = (0, 255, 0)  # Green border for correct posture
+                    else:
+                        border_color = (0, 0, 255)  # Red border for incorrect posture
+
+                    # Draw a border around the frame
+                    thickness = 10
+                    cv2.rectangle(image, (0, 0), (w, h), border_color, thickness)
+
+                    cv2.putText(image, posture, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
+                # Draw eye landmarks if face mesh is available
+                if results_face.multi_face_landmarks:
+                    h, w, _ = frame.shape
+                    for face_landmarks in results_face.multi_face_landmarks:
+                        # Draw the landmarks of the eyes
+                        left_eye = face_landmarks.landmark[33]  # Left eye center
+                        right_eye = face_landmarks.landmark[133]  # Right eye center
+                        left_eye_coords = (int(left_eye.x * w), int(left_eye.y * h))
+                        right_eye_coords = (int(right_eye.x * w), int(right_eye.y * h))
                         
-                
-                print(posture_times)
+                        
 
-                # Draw border around the frame based on posture
-                if posture == "normal":
-                    border_color = (0, 255, 0)  # Green border for correct posture
-                else:
-                    border_color = (0, 0, 255)  # Red border for incorrect posture
+                        # Draw circles around the eyes
+                        cv2.circle(image, left_eye_coords, 5, (255, 0, 0), -1)  # Blue dot for left eye
+                        cv2.circle(image, right_eye_coords, 5, (255, 0, 0), -1)  # Red dot for right eye
 
-                # Draw a border around the frame
-                thickness = 10
-                cv2.rectangle(image, (0, 0), (w, h), border_color, thickness)
+                        # Eye gaze detection (checking if eyes are in the center of the screen)
+                        eye_status = check_eye_position(left_eye_coords, right_eye_coords, w, h)
 
-                cv2.putText(image, posture, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                        looking_at_screen = detect_eye_test(landmarks, w, h)
+                        if not looking_at_screen:
+                            eye_status = 'Not looking at screen'
 
-            # Draw eye landmarks if face mesh is available
-            if results_face.multi_face_landmarks:
-                h, w, _ = frame.shape
-                for face_landmarks in results_face.multi_face_landmarks:
-                    # Draw the landmarks of the eyes
-                    left_eye = face_landmarks.landmark[33]  # Left eye center
-                    right_eye = face_landmarks.landmark[133]  # Right eye center
-                    left_eye_coords = (int(left_eye.x * w), int(left_eye.y * h))
-                    right_eye_coords = (int(right_eye.x * w), int(right_eye.y * h))
-                    
-                    
+                        if posture == "bow" or posture == "looking up":
+                            eye_status = "Not looking at screen"
 
-                    # Draw circles around the eyes
-                    cv2.circle(image, left_eye_coords, 5, (255, 0, 0), -1)  # Blue dot for left eye
-                    cv2.circle(image, right_eye_coords, 5, (255, 0, 0), -1)  # Red dot for right eye
-
-                    # Eye gaze detection (checking if eyes are in the center of the screen)
-                    eye_status = check_eye_position(left_eye_coords, right_eye_coords, w, h)
-
-                    looking_at_screen = detect_eye_test(landmarks, w, h)
-                    if not looking_at_screen:
-                        eye_status = 'Not looking at screen'
-
-                    if posture == "bow" or posture == "looking up":
-                        eye_status = "Not looking at screen"
-
-                    # if posture == "normal" and eye_status == "Looking at screen":
-                    #     cv2.putText(image, "Good posture and eye gaze", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                        # if posture == "normal" and eye_status == "Looking at screen":
+                        #     cv2.putText(image, "Good posture and eye gaze", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
 
-                    cv2.putText(image, eye_status, (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                        cv2.putText(image, eye_status, (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
-            # Encode the frame as JPEG
-            _, jpeg = cv2.imencode('.jpg', image)
-            frame = jpeg.tobytes()
+                # Encode the frame as JPEG
+                _, jpeg = cv2.imencode('.jpg', image)
+                frame = jpeg.tobytes()
 
-            # Return the frame as a stream
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
+                # Return the frame as a stream
+                yield (b'--frame\r\n'
+                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+    finally:
+        # Record the end time of the session
+        end_time = time.time()
+        # Release the camera
+        if cap:
+            cap.release()
+        # Log the end of the video feed
+        logging.info("Video feed has ended at %s", time.ctime(end_time))
+            
     cap.release()
 
 def check_eye_position(left_eye_coords, right_eye_coords, frame_width, frame_height):
@@ -375,6 +389,15 @@ def video_feed():
               type: string
               format: byte
     """
+
+    global session_start_time, session_end_time
+
+    # Record the start time of the session
+    session_start_time = time.time()
+
+    # Log the start of the video feed
+    logging.info("Video feed started at %s", time.ctime(session_start_time))
+
     # Get the camera index from the query parameters, default to 0
     camera_index = request.args.get('index', default=0, type=int)
 
@@ -409,6 +432,46 @@ def get_posture_times():
     posture_times_with_total["total"] = totle_time
     logging.info(f"Posture times: {posture_times_with_total}")
     return jsonify(posture_times_with_total)
+
+@app.route('/session_record', methods=['GET'])
+def session_record():
+    """
+    Get the overall record of the current detection session.
+    ---
+    responses:
+      200:
+        description: Overall record of the detection session.
+        examples:
+          application/json: {
+            "start_time": 1609459200,
+            "end_time": 1609459260,
+            "duration": 60,
+            "posture_times": {"normal": 45, "left tilt": 30, "right tilt": 20}
+          }
+    """
+    global session_start_time, session_end_time, posture_times
+    session_end_time = time.time()
+    print (session_start_time, session_end_time)
+    if session_start_time is None or session_end_time is None:
+        return jsonify({"error": "No session has been started or ended yet"}), 400
+
+    session_duration = session_end_time - session_start_time
+    posture_times_with_total = posture_times.copy()
+    posture_times_with_total["total"] = sum(posture_times_with_total.values())
+    posture_times_with_total["session_duration"] = session_duration
+
+    logging.info(f"Session record: {posture_times_with_total}")
+    return jsonify({
+        "start_time": int(session_start_time),
+        "duration": int(session_duration),
+        "end_time": int(session_end_time),
+        "posture_times": posture_times_with_total
+    })
+
+
+@app.route("/")
+def home():
+    return "Welcome to Pose App!"
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)

@@ -2,6 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:pose_app/style/colors.dart';
 
+import 'dart:io';
+
+void logErrorToFile(String message) {
+  final file = File('error_log.html');
+  try {
+    print('write message to file:');
+    file.writeAsStringSync(
+      '${DateTime.now()}: $message\n',
+      // mode: FileMode.write, // 覆盖写入
+      flush: true, // 确保立即写入磁盘
+    );
+  } catch (e) {
+    print('Failed to write to file: $e');
+  }
+}
+
 class RegisterAccount extends StatefulWidget {
   const RegisterAccount({Key? key}) : super(key: key);
 
@@ -105,6 +121,8 @@ class _RegisterAccountState extends State<RegisterAccount> {
         showErrorDialog(response.data["message"] ?? "注册失败，请稍后再试！");
       }
     } on DioError catch (e) {
+      logErrorToFile("DioError response data: ${e.response?.data}");
+      print("after logErrorToFile");
       if (e.response != null) {
         print("DioError response data: ${e.response?.data}");
         showErrorDialog("注册失败！${e.response?.data['message'] ?? '未知错误'}");

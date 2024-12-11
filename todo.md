@@ -53,3 +53,20 @@
 3. 优化统计数据输出模式
 
 
+
+├── __init__.py
+├── app.py
+├── app.spec
+├── app_backup.txt
+├── detect
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-312.pyc
+│   │   ├── utils.cpython-312.pyc
+│   │   └── utils.cpython-38.pyc
+│   ├── hand.py
+│   ├── main.py
+│   └── utils.py
+├── logs
+│   └── app.log
+└── requirements.txt
