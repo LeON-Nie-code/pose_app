@@ -4,7 +4,6 @@ import 'package:pose_app/homepage/homepage.dart' as homepage;
 import 'package:pose_app/style/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
@@ -44,72 +43,81 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-Future<void> _login() async {
-  final username = usernameController.text;
-  final password = passwordController.text;
+  Future<void> _login() async {
+    final username = usernameController.text;
+    final password = passwordController.text;
 
-  if (username.isEmpty || password.isEmpty) {
-    setState(() {
-      errorMessage = "用户名或密码不能为空";
-    });
-    return;
-  }
+    if (username.isEmpty || password.isEmpty) {
+      setState(() {
+        errorMessage = "用户名或密码不能为空";
+      });
+      return;
+    }
 
-  try {
-    setState(() {
-      isLoading = true;
-      errorMessage = '';
-    });
+    try {
+      setState(() {
+        isLoading = true;
+        errorMessage = '';
+      });
 
-    final response = await Dio().post(
-      'http://118.89.124.30:8080/user/login',
-      data: {
-        "username": username,
-        "password": password,
-      },
-      options: Options(headers: {
-        "Content-Type": "application/json",
-      }),
-    );
-    // 检查响应状态码
-    if (response.statusCode == 200) {
-      // 登录成功，提取 set-cookie 中的 sessionid
-      final rawCookie = response.headers.value('set-cookie') ?? '';
-      print('Raw cookie: $rawCookie'); // 打印原始 cookie 值供调试（在终端中）
+      final response = await Dio().post(
+        // 'http://118.89.124.30:8080/user/login',
+        'http://8.217.68.60/login_username',
+        data: {
+          "username": username,
+          "password": password,
+        },
+        options: Options(headers: {
+          "Content-Type": "application/json",
+        }),
+      );
+      // 检查响应状态码
+      if (response.statusCode == 200) {
+        // 登录成功，提取response 中的accessToken
+        final accessToken = response.data['access_token'];
+        print('Access Token: $accessToken');
 
-      // 提取 sessionid
-      final sessionId = RegExp(r'sessionid=([^;]+)').firstMatch(rawCookie)?.group(1);
-      // 如果未能提取到有效的 sessionid，抛出异常
-      if (sessionId == null || sessionId.isEmpty) {
-        throw Exception('未找到有效的 sessionid');
+        // 将 accessToken 存储到 SharedPreferences 中，供后续请求使用
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('accessToken', accessToken);
+        print('Access Token stored: $accessToken');
+
+        // final rawCookie = response.headers.value('set-cookie') ?? '';
+        // print('Raw cookie: $rawCookie'); // 打印原始 cookie 值供调试（在终端中）
+
+        // // 提取 sessionid
+        // final sessionId =
+        //     RegExp(r'sessionid=([^;]+)').firstMatch(rawCookie)?.group(1);
+        // // 如果未能提取到有效的 sessionid，抛出异常
+        // if (sessionId == null || sessionId.isEmpty) {
+        //   throw Exception('未找到有效的 sessionid');
+        // }
+
+        // print('Extracted sessionId: $sessionId');
+
+        // // 将 sessionid 存储到 SharedPreferences 中，供后续请求使用
+        // final prefs = await SharedPreferences.getInstance();
+        // await prefs.setString('sessionId', sessionId);
+        // print('Session ID stored: $sessionId');
+
+        // 登录成功，显示弹框并跳转
+        _showLoginSuccessDialog(username);
+      } else {
+        setState(() {
+          errorMessage = '登录失败，请检查用户名和密码。';
+        });
       }
-      
-      print('Extracted sessionId: $sessionId');
-
-      // 将 sessionid 存储到 SharedPreferences 中，供后续请求使用
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('sessionId', sessionId);
-      print('Session ID stored: $sessionId');
-
-      // 登录成功，显示弹框并跳转
-      _showLoginSuccessDialog(username);
-    } else {
+    } catch (e) {
+      print('Error: $e');
       setState(() {
         errorMessage = '登录失败，请检查用户名和密码。';
       });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
-  } catch (e) {
-    print('Error: $e');
-    setState(() {
-      errorMessage = '登录失败，请检查用户名和密码。';
-    });
-  } finally {
-    setState(() {
-      isLoading = false;
-    });
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -293,12 +301,8 @@ Future<void> _login() async {
   }
 }
 
-
-
-
-
 // import 'package:flutter/material.dart';
-// import 'package:pose_app/homepage/homepage.dart' as homepage; 
+// import 'package:pose_app/homepage/homepage.dart' as homepage;
 
 // class LoginPage extends StatefulWidget {
 //   const LoginPage({Key? key}) : super(key: key);

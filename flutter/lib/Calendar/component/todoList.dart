@@ -1,4 +1,5 @@
 import 'package:date_picker_timeline/date_picker_timeline.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:pose_app/Calendar/component/addTaskPage.dart';
 import 'package:pose_app/Calendar/component/button.dart';
@@ -9,6 +10,7 @@ import 'package:pose_app/style/colors.dart';
 import 'package:pose_app/style/style.dart';
 import 'package:intl/intl.dart';
 import 'package:pose_app/Calendar/dataAboutTask.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Todolist extends StatefulWidget {
   const Todolist({super.key});
@@ -20,6 +22,61 @@ class Todolist extends StatefulWidget {
 class _TodolistState extends State<Todolist> {
   DateTime _selectedDate = DateTime.now(); // 当前选择的日期
   List<Task> tasks = []; // 存储所有任务
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchTasks(); // 初始化时获取任务
+  }
+
+  // 从 API 获取任务列表
+  Future<void> _fetchTasks() async {
+    try {
+      // 初始化 SharedPreferences 并获取 accessToken
+      final prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
+      if (accessToken == null) {
+        throw Exception("Access token is missing");
+      }
+
+      // 使用 Dio 发起 GET 请求
+      final dio = Dio();
+      final response = await dio.get(
+        'http://8.217.68.60/user/todos',
+        options: Options(
+          headers: {'Authorization': 'Bearer $accessToken'},
+        ),
+      );
+
+      // 检查响应状态码
+      if (response.statusCode == 200) {
+        final data = response.data as List;
+
+        print(response.data);
+
+        // 将 JSON 数据解析为 Task 列表
+        setState(() {
+          tasks = data.map((item) {
+            return Task(
+              title: item['title'],
+              note: item['note'],
+              date: item['date']?.split('T')?.first, // 提取日期部分
+              remind: item['remind_time']?.split('T')?.last, // 提取时间部分
+              isCompleted: 0, // 默认值（API 无 isCompleted 字段）
+            );
+          }).toList();
+        });
+      } else {
+        throw Exception(
+            "Failed to load tasks, status code: ${response.statusCode}");
+      }
+
+      print("Parsed tasks: $tasks");
+    } catch (e) {
+      // 错误处理
+      print("Error fetching tasks: $e");
+    }
+  }
 
   // 添加或更新任务
   void addOrUpdateTask(Task task, {int? index}) {
@@ -63,10 +120,14 @@ class _TodolistState extends State<Todolist> {
 
   @override
   Widget build(BuildContext context) {
+    print("in build,rendering tasks: $tasks");
     // 筛选出当前选择日期的任务
     List<Task> filteredTasks = tasks.where((task) {
-      return task.date == DateFormat("yyyy.MM.dd").format(_selectedDate);
+      return DateFormat("yyyy-MM-dd").format(DateTime.parse(task.date!)) ==
+          DateFormat("yyyy-MM-dd").format(_selectedDate);
     }).toList();
+
+    print("filtered tasks: $filteredTasks");
 
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 15.0),
@@ -109,7 +170,8 @@ class _TodolistState extends State<Todolist> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     PrimaryText(
-                      text: "${DateFormat("yyyy.MM.dd").format(DateTime.now())}",
+                      text:
+                          "${DateFormat("yyyy.MM.dd").format(DateTime.now())}",
                       size: 20.0,
                       color: AppColors.secondary,
                     ),

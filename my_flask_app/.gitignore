@@ -1,0 +1,52 @@
+# 忽略虚拟环境
+venv/
+# 忽略虚拟环境的激活脚本
+Activate.ps1
+activate
+activate.csh
+activate.fish
+
+# 忽略Python编译文件
+__pycache__/
+*.py[cod]
+
+# 忽略数据库文件
+*.db
+*.sqlite
+
+# 忽略临时文件
+temp.py
+
+
+# 忽略migrations目录，因为版本控制中通常不需要包含数据库迁移文件
+migrations/
+
+# 忽略日志文件
+*.log
+
+# 忽略由pip生成的文件
+pip-selfcheck.json
+pip-log.txt
+
+# 忽略编辑器和IDE的配置文件
+*.egg-info
+.idea/
+.vscode/
+*.sublime-*
+*.tmproj
+
+# 忽略node_modules目录
+node_modules/
+
+# 忽略Dart项目的构建目录
+build/
+
+# 忽略Flutter的iOS和Android构建文件
+ios/Flutter/Generated.xcconfig
+android/app/build/
+android/Flutter/build/
+android/Flutter/ephemeral/
+
+# 忽略其他可能的临时或缓存文件
+*.DS_Store
+Thumbs.db
