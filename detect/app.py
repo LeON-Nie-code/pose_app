@@ -48,6 +48,11 @@ posture_times = {}  # Key: posture name, Value: duration in seconds
 current_posture = None  # Current posture being tracked
 posture_start_time = None  # Start time of the current posture
 
+current_eye_status = None  # Current eye status being tracked
+eye_start_time = None  # Start time of the current eye status
+eye_times = {}  # Key: eye status name, Value: duration in seconds
+
+
 # Session start and end times
 session_start_time = None
 session_end_time = None
@@ -128,7 +133,7 @@ def select_camera():
 
 def generate_video_feed():
     """Stream video feed from the selected camera."""
-    global cap, posture_start_time, current_posture,session_end_time
+    global cap, posture_start_time, current_posture,session_end_time, session_start_time, posture_times, current_eye_status, eye_start_time, eye_times
     try:
 
         cap = cv2.VideoCapture(current_camera_index)
@@ -170,7 +175,7 @@ def generate_video_feed():
                                 logging.info(f"New posture detected: {current_posture}")
                                 posture_times[current_posture] = 0
                             if elapsed_time > 1:
-                                print(f"Adding {elapsed_time} seconds to {current_posture}")
+                                # print(f"Adding {elapsed_time} seconds to {current_posture}")
                                 posture_times[current_posture] += elapsed_time
                         current_posture = posture
                         if current_posture not in posture_times:
@@ -178,13 +183,13 @@ def generate_video_feed():
                         posture_start_time = time.time()
                     else:
                         if posture_start_time and time.time() - posture_start_time > 1:
-                            print(f"Adding 1 second to {current_posture}")
+                            # print(f"Adding 1 second to {current_posture}")
                             posture_times[current_posture] += time.time() - posture_start_time
                             posture_start_time = time.time()
     
                             
                     
-                    print(posture_times)
+                    # print(posture_times)
 
                     # Draw border around the frame based on posture
                     if posture == "normal":
@@ -197,6 +202,8 @@ def generate_video_feed():
                     cv2.rectangle(image, (0, 0), (w, h), border_color, thickness)
 
                     cv2.putText(image, posture, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
+                eye_status = "Looking at screen"
 
                 # Draw eye landmarks if face mesh is available
                 if results_face.multi_face_landmarks:
@@ -229,6 +236,27 @@ def generate_video_feed():
 
 
                         cv2.putText(image, eye_status, (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                
+                # Update eye status time if eye status changes
+                if eye_status != current_eye_status:
+                    if current_eye_status and eye_start_time:
+                        elapsed_time = time.time() - eye_start_time
+                        if current_eye_status not in eye_times:
+                            print(f"New eye status detected: {current_eye_status}")
+                            logging.info(f"New eye status detected: {current_eye_status}")
+                            eye_times[current_eye_status] = 0
+                        if elapsed_time > 1:
+                            # print(f"Adding {elapsed_time} seconds to {current_eye_status}")
+                            eye_times[current_eye_status] += elapsed_time
+                    current_eye_status = eye_status
+                    if current_eye_status not in eye_times:
+                        eye_times[current_eye_status] = 0
+                    eye_start_time = time.time()
+                else:
+                    if eye_start_time and time.time() - eye_start_time > 1:
+                        # print(f"Adding 1 second to {current_eye_status}")
+                        eye_times[current_eye_status] += time.time() - eye_start_time
+                        eye_start_time = time.time()
 
                 # Encode the frame as JPEG
                 _, jpeg = cv2.imencode('.jpg', image)
@@ -460,12 +488,17 @@ def session_record():
     posture_times_with_total["total"] = sum(posture_times_with_total.values())
     posture_times_with_total["session_duration"] = session_duration
 
+    eye_times_with_total = eye_times.copy()
+    eye_times_with_total["total"] = sum(eye_times_with_total.values())
+    eye_times_with_total["session_duration"] = session_duration
+
     logging.info(f"Session record: {posture_times_with_total}")
     return jsonify({
         "start_time": int(session_start_time),
         "duration": int(session_duration),
         "end_time": int(session_end_time),
-        "posture_times": posture_times_with_total
+        "posture_times": posture_times_with_total,
+        "eye_times": eye_times_with_total
     })
 
 

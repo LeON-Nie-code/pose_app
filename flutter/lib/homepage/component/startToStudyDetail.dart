@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:intl/intl.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pose_app/homepage/component/VideoDialog.dart';
@@ -7,11 +10,153 @@ import 'package:pose_app/config/size_config.dart';
 import 'package:pose_app/data.dart';
 import 'package:pose_app/style/colors.dart';
 import 'package:pose_app/style/style.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class StartToStudyDetail extends StatelessWidget {
-  const StartToStudyDetail({
-    super.key,
-  });
+class StartToStudyDetail extends StatefulWidget {
+  const StartToStudyDetail({Key? key}) : super(key: key);
+
+  @override
+  _StartToStudyDetailState createState() => _StartToStudyDetailState();
+}
+
+class _StartToStudyDetailState extends State<StartToStudyDetail> {
+  List<Map<String, dynamic>> recentActivities = [];
+  List<Map<String, dynamic>> upcomingPayments = [];
+  List<dynamic> records = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // 在这里添加初始化逻辑，比如网络请求
+    fetchAndInitialize();
+  }
+
+  Future<void> fetchAndInitialize() async {
+    await fetchVideoUrl();
+    await getUserRecords();
+    initializeRecentActivities();
+    initializaUpcomingPayments();
+  }
+
+  void initializeRecentActivities() {
+    print('Initialize Recent Activities');
+    print('Records: $records');
+    records.forEach((record) {
+      int startTime = record['start_time'];
+      double sessionDuration = record['eye_times']['session_duration'];
+
+      // 将Unix时间戳转换为日期时间
+      DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(startTime * 1000);
+      String formattedDateTime =
+          DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
+
+      // 将session_duration转换为分钟和秒
+      int minutes = (sessionDuration / 60).floor();
+      double seconds = sessionDuration % 60;
+
+      //将minutes和seconds截断为整数
+      int minutes_int = minutes.toInt();
+      int seconds_int = seconds.toInt();
+
+      recentActivities.add({
+        "icon": "assets/icons/User.svg",
+        "label": "专注任务",
+        "amount": "$minutes_int 分 $seconds_int 秒",
+      });
+
+      // 打印格式化后的数据
+      print(
+          'Start Time: $formattedDateTime, Session Duration: $minutes min $seconds sec');
+    });
+    // setState(() {
+    //   recentActivities = [
+    //     {"icon": "assets/icons/User.svg", "label": "专注任务1", "amount": "25分钟"},
+    //     {"icon": "assets/icons/User.svg", "label": "专注任务2", "amount": "30分钟"},
+    //   ];
+    // });
+  }
+
+  void initializaUpcomingPayments() {
+    setState(() {
+      upcomingPayments = [
+        {"icon": 'assets/icons/Group.svg', "label": "专注任务1", "amount": "25分钟"},
+        {"icon": 'assets/icons/Group.svg', "label": "专注任务2", "amount": "30分钟"},
+      ];
+    });
+  }
+
+  void updateRecentActivities() {
+    // 遍历记录并提取和格式化数据
+    records.forEach((record) {
+      int startTime = record['start_time'];
+      double sessionDuration = record['eye_times']['session_duration'];
+
+      // 将Unix时间戳转换为日期时间
+      DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(startTime * 1000);
+      String formattedDateTime =
+          DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
+
+      // 将session_duration转换为分钟和秒
+      int minutes = (sessionDuration / 60).floor();
+      double seconds = sessionDuration % 60;
+
+      // 打印格式化后的数据
+      print(
+          'Start Time: $formattedDateTime, Session Duration: $minutes min $seconds sec');
+    });
+    setState(() {
+      recentActivities.add({
+        "icon": Icons.work,
+        "label": "新任务",
+        "amount": "20分钟",
+      });
+    });
+  }
+
+  void updateUpcomingPayments() {
+    setState(() {
+      upcomingPayments.add({
+        "icon": Icons.work,
+        "label": "新任务",
+        "amount": "20分钟",
+      });
+    });
+  }
+
+  fetchVideoUrl() async {
+    // 模拟网络请求
+    print('Video URL fetched');
+  }
+
+  Future<void> getUserRecords() async {
+    final prefs = await SharedPreferences.getInstance();
+    final storedAccessToken = prefs.getString('accessToken');
+    if (storedAccessToken == null || storedAccessToken.isEmpty) {
+      throw Exception('Access Token not found');
+    }
+    // 更新本地状态
+    final access_token = storedAccessToken;
+
+    print(' access_token in startToStudyDetail: $access_token');
+    // 获取用户记录
+    print('User records fetched');
+    try {
+      Dio dio = Dio();
+      Response response = await dio.get(
+        'http://8.217.68.60/records',
+        options: Options(headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $access_token', // 在请求头中添加 accessToken
+        }), // 将 accessToken 添加到请求头
+      );
+      print('Session Record: ${response.data}');
+      print(response.data.runtimeType);
+      records = response.data;
+      // 将response.data作为JSON数据传递给POST请求
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,6 +198,8 @@ class StartToStudyDetail extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            FloatingActionButton(
+                onPressed: fetchAndInitialize, child: Icon(Icons.add)),
             PrimaryText(
               text: '个人专注记录',
               size: 18,

@@ -29,6 +29,7 @@ class _RegisterAccountState extends State<RegisterAccount> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
   bool isLoading = false;
 
   // 成功对话框
@@ -80,9 +81,13 @@ class _RegisterAccountState extends State<RegisterAccount> {
     final String email = emailController.text;
     final String username = usernameController.text;
     final String password = passwordController.text;
+    final String phone = phoneController.text;
 
-    if (email.isEmpty || username.isEmpty || password.isEmpty) {
-      showErrorDialog('手机号、用户名或密码不能为空！');
+    if (phone.isEmpty ||
+        username.isEmpty ||
+        password.isEmpty ||
+        email.isEmpty) {
+      showErrorDialog('手机号 邮箱、用户名或密码不能为空！');
       return;
     }
 
@@ -93,15 +98,17 @@ class _RegisterAccountState extends State<RegisterAccount> {
 
       print("Sending POST request to /user/register");
       print(
-          "Request body: { username: $username, password: $password, mobile: $email }");
+          "Request body: { username: $username, password: $password, mobile: $phone, email: $email }");
 
       // 向后端发送请求
       final response = await Dio().post(
-        'http://118.89.124.30:8080/user/register',
+        // 'http://118.89.124.30:8080/user/register',
+        'http://8.217.68.60/register_no_code',
         data: {
-          "mobile": email,
+          "phone_number": email,
           "username": username,
           "password": password,
+          "email": email,
         },
         options: Options(
           headers: {"Content-Type": "application/json"},
@@ -111,12 +118,8 @@ class _RegisterAccountState extends State<RegisterAccount> {
       print("Response status: ${response.statusCode}");
       print("Response data: ${response.data}");
 
-      if (response.statusCode == 200) {
-        if (response.data.containsKey("login")) {
-          showSuccessDialog(); // 注册成功
-        } else {
-          showErrorDialog("注册成功，但返回数据异常，请稍后再试！");
-        }
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        showSuccessDialog();
       } else {
         showErrorDialog(response.data["message"] ?? "注册失败，请稍后再试！");
       }
@@ -175,9 +178,16 @@ class _RegisterAccountState extends State<RegisterAccount> {
                 ),
                 const SizedBox(height: 20),
                 _buildTextField(
-                  controller: emailController,
+                  controller: phoneController,
                   hintText: '手机号',
                   iconPath: 'assets/icons/phone.png',
+                  width: fieldWidth,
+                ),
+                const SizedBox(height: 10),
+                _buildTextField(
+                  controller: emailController,
+                  hintText: '邮箱',
+                  iconPath: 'assets/icons/lock.png',
                   width: fieldWidth,
                 ),
                 const SizedBox(height: 10),

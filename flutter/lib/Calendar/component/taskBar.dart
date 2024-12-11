@@ -29,7 +29,7 @@ class _TaskBarState extends State<TaskBar> {
   void _toggleCompletion() {
     setState(() {
       _task.isCompleted = _task.isCompleted == 0 ? 1 : 0; // 完成任务时置为1，未完成为0
-       //TODO: 调用更新任务完成状态的 API 接口
+      //TODO: 调用更新任务完成状态的 API 接口
     });
   }
 
@@ -62,7 +62,9 @@ class _TaskBarState extends State<TaskBar> {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 600),
               decoration: BoxDecoration(
-                color: _task.isCompleted == 0 ? AppColors.warmOrange : Colors.green, // 完成时为绿色，未完成为橙色
+                color: _task.isCompleted == 0
+                    ? AppColors.warmOrange
+                    : Colors.green, // 完成时为绿色，未完成为橙色
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.grey, width: .8),
               ),

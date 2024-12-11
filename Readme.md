@@ -74,3 +74,9 @@ flutter run -d windows
 1. https://www.uclahealth.org/safety/ergonomics/office-ergonomics/good-posture
 2. https://ergonomictrends.com/proper-sitting-posture-computer-experts/
 
+
+8.217.68.60
+
+
+
+

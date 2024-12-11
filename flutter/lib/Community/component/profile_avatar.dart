@@ -1,13 +1,10 @@
-
 //用于圆圈头像，到时候也多处用到其他用户的头像部分
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:pose_app/style/colors.dart';
 
-
 // TODO: 用户头像路径需从后端接口获取
-
 
 class ProfileAvatar extends StatelessWidget {
   final String imageUrl;
@@ -31,7 +28,8 @@ class ProfileAvatar extends StatelessWidget {
           child: CircleAvatar(
             radius: hasBorder ? 17.0 : 20.0,
             backgroundColor: Colors.grey[200],
-            backgroundImage: CachedNetworkImageProvider(imageUrl),
+            // backgroundImage: CachedNetworkImageProvider(imageUrl),
+            backgroundImage: AssetImage(imageUrl),
           ),
         ),
         isActive

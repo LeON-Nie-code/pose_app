@@ -17,13 +17,17 @@ class _SettingPageState extends State<SettingPage> {
   String school = '暂无';
   String gender = '暂无';
   String email = '暂无';
+  String age = '暂无';
+  String access_token = '';
 
   bool isReminderEnabled = true;
   bool isLoading = true;
 
   final Dio _dio = Dio(
     BaseOptions(
-      baseUrl: 'http://118.89.124.30:8080',
+      // baseUrl: 'http://118.89.124.30:8080',
+      baseUrl: 'http://8.217.68.60',
+
       //connectTimeout: 5000,
       //receiveTimeout: 3000,
     ),
@@ -34,7 +38,8 @@ class _SettingPageState extends State<SettingPage> {
     super.initState();
     _initializeSessionId(); // 初始化 session ID 并加载用户信息
   }
-// 从 SharedPreferences 中加载 session ID
+
+// 从 SharedPreferences 中加载 accessToken
   Future<void> _initializeSessionId() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -47,29 +52,46 @@ class _SettingPageState extends State<SettingPage> {
         sessionId = storedSessionId;
       });
 
-      await _loadProfile();  // 加载用户信息
-    } catch (e) {
+      final storedAccessToken = prefs.getString('accessToken');
+      if (storedAccessToken == null || storedAccessToken.isEmpty) {
+        throw Exception('Access Token not found');
+      }
+      // 更新本地状态
+      setState(() {
+        access_token = storedAccessToken;
+      });
+
+      print('before load access_token: $access_token');
+
+      // await _loadProfile(); // 加载用户信息
+      await _loadProfileUseAccessToken(); // 加载用户信息
+    } catch (e, stackTrace) {
       setState(() {
         isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('无法加载会话 ID: $e')),
       );
+      // 打印错误详细信息到控制台
+      print("Error: $e");
+      print("StackTrace: $stackTrace");
     }
   }
+
   // 调用后端接口加载用户信息
   Future<void> _loadProfile() async {
     try {
       print('Session ID: $sessionId'); // 确认 sessionId 是否为空
-      
+
       final response = await _dio.get(
         '/user/profile',
-        options: Options(headers: {'sessionid': sessionId}), // 将 session ID 添加到请求头
+        options:
+            Options(headers: {'sessionid': sessionId}), // 将 session ID 添加到请求头
       );
 
       print('Request headers: sessionid=$sessionId');
 
-       // 更新用户信息到本地状态
+      // 更新用户信息到本地状态
       setState(() {
         name = response.data['name'] ?? '暂无';
         school = response.data['school'] ?? '暂无';
@@ -86,30 +108,70 @@ class _SettingPageState extends State<SettingPage> {
       );
     }
   }
-  // 调用后端接口更新用户信息
-  Future<void> _saveProfile(String tempName, String tempSchool, String tempGender, String tempEmail) async {
+
+  // 调用后端接口加载用户信息
+  Future<void> _loadProfileUseAccessToken() async {
     try {
-      await _dio.patch(
-        '/user/profile',
-        data: {
-          'name': tempName,
-          'school': tempSchool,
-          'gender': tempGender,
-          'email': tempEmail,
-        },
-        options: Options(
-          headers: {'sessionid': sessionId},
-          validateStatus: (status){
-            return status != null && status < 500;
-          },
-        ),
+      print('loading the profile using access token...');
+      print('Access Token: $access_token'); // 确认 accessToken 是否为空
+
+      final response = await _dio.get(
+        '/user_info',
+        options: Options(headers: {
+          'Authorization': 'Bearer $access_token', // 在请求头中添加 accessToken
+        }), // 将 accessToken 添加到请求头
       );
-       // 更新本地状态
+
+      print('Request headers: Authorization=Bearer $access_token');
+
+      print('response.data: ${response.data}');
+
+      print('response.data[\'full_name\']: ${response.data['full_name']}');
+      print('response.data[\'institution\']: ${response.data['institution']}');
+      print('response.data[\'gender\']: ${response.data['gender']}');
+
+      // 更新用户信息到本地状态
+      setState(() {
+        name = response.data['full_name'] ?? '暂无';
+        school = response.data['institution'] ?? '暂无';
+        gender = response.data['gender'] ?? '暂无';
+        email = response.data['email'] ?? '暂无';
+        age = response.data['age']?.toString() ?? '暂无';
+
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('加载个人信息失败: $e')),
+      );
+    }
+  }
+
+  // 调用后端接口更新用户信息
+  Future<void> _saveProfile(String tempName, String tempSchool,
+      String tempGender, String tempAge) async {
+    try {
+      await _dio.put(
+        '/user_info',
+        data: {
+          'full_name': tempName,
+          'institution': tempSchool,
+          'gender': tempGender,
+          'age': tempAge,
+        },
+        options: Options(headers: {
+          'Authorization': 'Bearer $access_token', // 在请求头中添加 accessToken
+        }), // 将 accessToken 添加到请求头
+      );
+      // 更新本地状态
       setState(() {
         name = tempName;
         school = tempSchool;
         gender = tempGender;
-        email = tempEmail;
+        age = tempAge;
       });
 
       Navigator.pop(context);
@@ -170,7 +232,8 @@ class _SettingPageState extends State<SettingPage> {
                                 onPressed: () {
                                   showDialog(
                                     context: context,
-                                    builder: (context) => _buildEditDialog(context),
+                                    builder: (context) =>
+                                        _buildEditDialog(context),
                                   );
                                 },
                                 child: const Text(
@@ -184,11 +247,12 @@ class _SettingPageState extends State<SettingPage> {
                             ],
                           ),
                           const SizedBox(height: 10),
-                           _buildInfoSection('账号ID', widget.username),
+                          _buildInfoSection('账号ID', widget.username),
                           _buildInfoSection('姓名', name),
                           _buildInfoSection('学校/公司', school),
                           _buildInfoSection('性别', gender),
                           _buildInfoSection('邮箱', email),
+                          _buildInfoSection('年龄', age)
                         ],
                       ),
                     ),
@@ -220,7 +284,8 @@ class _SettingPageState extends State<SettingPage> {
                           const SizedBox(height: 10),
                           ListTile(
                             leading: const Icon(Icons.notifications),
-                            title: const Text('提醒设置', style: TextStyle(fontSize: 16)),
+                            title: const Text('提醒设置',
+                                style: TextStyle(fontSize: 16)),
                             trailing: Switch(
                               value: isReminderEnabled,
                               activeColor: AppColors.warmOrange,
@@ -245,7 +310,7 @@ class _SettingPageState extends State<SettingPage> {
     String tempName = name;
     String tempSchool = school;
     String tempGender = gender;
-    String tempEmail = email;
+    String tempAge = age;
 
     return AlertDialog(
       title: const Text('编辑个人信息'),
@@ -261,8 +326,8 @@ class _SettingPageState extends State<SettingPage> {
           _buildTextField('性别', tempGender, (value) {
             tempGender = value;
           }),
-          _buildTextField('邮箱', tempEmail, (value) {
-            tempEmail = value;
+          _buildTextField('年龄', tempAge, (value) {
+            tempAge = value;
           }),
         ],
       ),
@@ -273,7 +338,7 @@ class _SettingPageState extends State<SettingPage> {
         ),
         ElevatedButton(
           onPressed: () {
-            _saveProfile(tempName, tempSchool, tempGender, tempEmail);
+            _saveProfile(tempName, tempSchool, tempGender, tempAge);
           },
           child: const Text('保存'),
         ),
@@ -281,7 +346,8 @@ class _SettingPageState extends State<SettingPage> {
     );
   }
 
-  Widget _buildTextField(String label, String initialValue, Function(String) onChanged) {
+  Widget _buildTextField(
+      String label, String initialValue, Function(String) onChanged) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10.0),
       child: TextFormField(
@@ -302,7 +368,9 @@ class _SettingPageState extends State<SettingPage> {
         children: [
           Text(title, style: const TextStyle(fontSize: 14, color: Colors.grey)),
           const SizedBox(width: 20),
-          Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(value,
+              style:
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         ],
       ),
     );

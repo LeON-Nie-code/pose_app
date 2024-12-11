@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:dio/dio.dart'; // 导入 Dio
 import 'package:pose_app/Calendar/component/button.dart';
 import 'package:pose_app/Calendar/component/inputContent.dart';
 import 'package:pose_app/style/colors.dart';
 import 'package:pose_app/style/style.dart';
-import 'package:pose_app/Calendar/dataAboutTask.dart'; 
+import 'package:pose_app/Calendar/dataAboutTask.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddTaskPage extends StatefulWidget {
   final DateTime selectedDate; // 选中的日期
@@ -12,7 +14,7 @@ class AddTaskPage extends StatefulWidget {
 
   const AddTaskPage({
     Key? key,
-    required this.selectedDate,  // 必须传递 selectedDate
+    required this.selectedDate, // 必须传递 selectedDate
     this.taskToEdit, // 传递可选的 taskToEdit，用于编辑任务
   }) : super(key: key);
 
@@ -24,19 +26,73 @@ class _AddTaskPageState extends State<AddTaskPage> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
   late DateTime _selectedDate = widget.selectedDate; // 使用传入的 selectedDate
+
   int _selectedRemind = 5;
   List<int> remindList = [5, 10, 15, 20];
+  String access_token = '';
+
+  // 创建 Dio 实例
+  final Dio _dio = Dio();
+
+  // // 从本地存储中获取 access_token
+  // String storedAccessToken = '';
+  // _getAccessToken() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   storedAccessToken = prefs.getString('access_token') ?? '';
+  //   access_token = storedAccessToken;
+  //   print('Access Token in addTaskpage: $access_token');
+  // }
+
+  // 从 SharedPreferences 中加载 accessToken
+  Future<void> _initializeAccessToken() async {
+    try {
+      print('datatime.now: ${DateTime.now()}');
+      print('selectedDate: $_selectedDate');
+
+      final prefs = await SharedPreferences.getInstance();
+      final storedAccessToken = prefs.getString('accessToken');
+      if (storedAccessToken == null || storedAccessToken.isEmpty) {
+        throw Exception('Access Token not found');
+      }
+      // 更新本地状态
+      setState(() {
+        access_token = storedAccessToken;
+      });
+
+      print(' access_token in addTaskPage: $access_token');
+
+      // await _loadProfile(); // 加载用户信息
+      // await _loadProfileUseAccessToken(); // 加载用户信息
+    } catch (e, stackTrace) {
+      // setState(() {
+      //   isLoading = false;
+      // });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('无法加载会话 ID: $e')),
+      );
+      // 打印错误详细信息到控制台
+      print("Error: $e");
+      print("StackTrace: $stackTrace");
+    }
+  }
 
   @override
   void initState() {
     super.initState();
 
+    _initializeAccessToken();
+
     // 如果传入了 taskToEdit，初始化输入框内容
     if (widget.taskToEdit != null) {
       _titleController.text = widget.taskToEdit!.title ?? "";
       _noteController.text = widget.taskToEdit!.note ?? "";
-      _selectedDate = DateFormat('yyyy.MM.dd').parse(widget.taskToEdit!.date ?? '2020.01.01');
-      _selectedRemind = int.parse(widget.taskToEdit!.remind?.split(" ")[0] ?? '5');
+      _selectedDate = DateFormat('yyyy-MM-dd')
+          .parse(widget.taskToEdit!.date ?? '2020.01.01');
+      // _selectedRemind =
+      //     int.parse(widget.taskToEdit!.remind?.split(" ")[0] ?? '5');
+      _selectedRemind = 5;
+      // TODO 暂时将_selectedRemind硬编码为为 5 分钟,因为点击编辑按钮时会报错，后续需要考虑一下Task.remind的处理
+      // _selectedRemind = 5;
     }
   }
 
@@ -157,7 +213,9 @@ class _AddTaskPageState extends State<AddTaskPage> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         MyButton(
-                          label: widget.taskToEdit == null ? "添加" : "更新", // 根据是否是编辑任务显示不同按钮
+                          label: widget.taskToEdit == null
+                              ? "添加"
+                              : "更新", // 根据是否是编辑任务显示不同按钮
                           onTap: () => _validateData(context),
                         ),
                       ],
@@ -172,20 +230,61 @@ class _AddTaskPageState extends State<AddTaskPage> {
     );
   }
 
-  // 验证输入的数据并返回任务对象
-  _validateData(BuildContext context) {
+  // 验证输入的数据并发送 POST 请求
+  _validateData(BuildContext context) async {
     if (_titleController.text.isNotEmpty && _noteController.text.isNotEmpty) {
-      // 创建 Task 对象
-      Task newTask = Task(
-        title: _titleController.text,
-        note: _noteController.text,
-        date: DateFormat('yyyy.MM.dd').format(_selectedDate),
-        remind: "$_selectedRemind minutes",
-        isCompleted: 0,
-      );
+      // 创建新的任务数据
+      final newTask = {
+        "title": _titleController.text,
+        "date":
+            DateFormat('yyyy-MM-ddTHH:mm:ss').format(_selectedDate), // 格式化日期
+        "note": _noteController.text,
+        "remind_time": DateFormat('yyyy-MM-ddTHH:mm:ss').format(
+            _selectedDate.subtract(Duration(minutes: _selectedRemind))), // 提醒时间
+      };
 
-      // 如果是编辑任务，传回修改后的任务；如果是新任务，添加新任务
-      Navigator.pop(context, newTask);
+      try {
+        // 发送POST请求
+        final response = await _dio.post(
+          'http://8.217.68.60/user/todos',
+          data: {
+            "title": newTask['title'],
+            "date": newTask['date'],
+            "note": newTask['note'],
+            "remind_time": newTask['remind_time'],
+          },
+          options: Options(headers: {
+            'Authorization': 'Bearer $access_token', // 在请求头中添加 accessToken
+          }), // 将 accessToken 添加到请求头
+        );
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          // 请求成功后返回新任务
+          print('Response data: ${response.data}');
+          if (mounted) {
+            Future.delayed(Duration(milliseconds: 100), () {
+              Task realTask = Task(
+                  date: newTask['date'],
+                  title: newTask['title'],
+                  note: newTask['note'],
+                  remind: newTask['remind_time']);
+              Navigator.pop(context, realTask);
+            });
+          }
+        } else {
+          // 打印响应数据，查看后端错误信息
+          print('Error response: ${response.data}');
+          throw Exception('Failed to add task');
+        }
+      } catch (e) {
+        // 请求失败，显示错误信息
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

@@ -2,9 +2,15 @@ class Task {
   String? userName;
   String? title;
   String? note;
-  int? isCompleted; 
+  int? isCompleted;
   String? date;
   String? remind;
+
+  //Task的字符串表示
+  @override
+  String toString() {
+    return 'Task{userName: $userName, title: $title, note: $note, isCompleted: $isCompleted, date: $date, remind: $remind}';
+  }
 
   Task({
     this.userName,
@@ -14,6 +20,18 @@ class Task {
     this.date,
     this.remind,
   });
+
+  // 从 JSON 构造 Task 实例
+  factory Task.fromJson(Map<String, dynamic> json) {
+    return Task(
+      userName: json['userName'],
+      title: json['title'],
+      note: json['note'],
+      isCompleted: json['isCompleted'],
+      date: json['date'],
+      remind: json['remind'],
+    );
+  }
 
   // 将 toJson 方法放入类内部
   Map<String, dynamic> toJson() {

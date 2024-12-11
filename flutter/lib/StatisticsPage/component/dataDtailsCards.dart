@@ -8,10 +8,23 @@ import 'package:pose_app/style/colors.dart';
 import 'package:pose_app/StatisticsPage/component/pieChart.dart';
 import 'package:pose_app/style/style.dart';
 
+class DataDetailsCard extends StatefulWidget {
+  final StudyDetails studyDetails; // 将成员变量作为构造函数参数传递
 
-class DataDetailsCard extends StatelessWidget {
-  final studyDetails = StudyDetails(); // 初始状态为0（默认值）
-  DataDetailsCard({super.key});
+  DataDetailsCard({Key? key, required this.studyDetails}) : super(key: key);
+
+  @override
+  _DataDetailsCardState createState() => _DataDetailsCardState();
+}
+
+class _DataDetailsCardState extends State<DataDetailsCard> {
+  // 在这里定义需要在状态中管理的变量
+
+  @override
+  void initState() {
+    super.initState();
+    // 初始化状态
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +92,7 @@ class DataDetailsCard extends StatelessWidget {
                     runSpacing: 20.0, // 垂直间距
                     spacing: 30.0, // 水平间距
                     alignment: WrapAlignment.spaceBetween, // 均匀分布
-                    children: studyDetails.aboutTotalData.map((model) {
+                    children: widget.studyDetails.aboutTotalData.map((model) {
                       return SizedBox(
                         child: CustomCard(
                           child: Column(
@@ -154,7 +167,7 @@ class DataDetailsCard extends StatelessWidget {
                     runSpacing: 20.0,
                     spacing: 30.0,
                     alignment: WrapAlignment.spaceBetween,
-                    children: studyDetails.aboutTodayData.map((model) {
+                    children: widget.studyDetails.aboutTodayData.map((model) {
                       return SizedBox(
                         child: CustomCard(
                           child: Column(
@@ -215,12 +228,13 @@ class DataDetailsCard extends StatelessWidget {
                 children: [
                   // 左侧部分
                   Expanded(
-                    flex: 5, 
+                    flex: 5,
                     child: Container(
                       padding: EdgeInsets.all(10.0),
                       decoration: BoxDecoration(
                         color: AppColors.deppBeige,
-                        borderRadius: const BorderRadius.all(Radius.circular(10)),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
                       ),
                       child: Column(
                         children: [
@@ -230,34 +244,32 @@ class DataDetailsCard extends StatelessWidget {
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
-                            ),
-                          SizedBox(height: SizeConfig.blockSizeVertical! * 2),  
-                          MyPieChart(), 
-                          SizedBox(height: SizeConfig.blockSizeVertical! * 2),  
+                          ),
+                          SizedBox(height: SizeConfig.blockSizeVertical! * 2),
+                          MyPieChart(),
+                          SizedBox(height: SizeConfig.blockSizeVertical! * 2),
                           Container(
                             padding: EdgeInsets.all(defaultPadding),
                             decoration: BoxDecoration(
                               border: Border.all(
-                                width: 2,
-                                color: AppColors.secondary.withOpacity(0.15)
-                              ),
+                                  width: 2,
+                                  color: AppColors.secondary.withOpacity(0.15)),
                               borderRadius: const BorderRadius.all(
-                                Radius.circular(defaultPadding)
-                              ),
+                                  Radius.circular(defaultPadding)),
                             ),
                           ),
                         ],
                       ),
                     ),
                   ),
-                  SizedBox(width: 3), 
+                  SizedBox(width: 3),
                   // 右侧部分
                   Expanded(
-                    flex: 5, 
+                    flex: 5,
                     child: Container(
                       padding: EdgeInsets.all(10.0),
                       //位于lib/StatisticsPage/component/calendarWidget.dart中
-                      child: CalendarWidget(), 
+                      child: CalendarWidget(),
                     ),
                   ),
                 ],
@@ -269,4 +281,3 @@ class DataDetailsCard extends StatelessWidget {
     );
   }
 }
-
