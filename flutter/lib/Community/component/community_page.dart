@@ -72,7 +72,8 @@ class _CommunityState extends State<Community> {
           ],
         ),
         SliverToBoxAdapter(
-          child: AboutMyContainer(currentUser: currentUser),
+          //child: AboutMyContainer(currentUser: currentUser),
+          child: AboutMyContainer(),
         ),
         // 动态列表展示
         SliverList(

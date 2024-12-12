@@ -5,16 +5,28 @@
 // - 用户信息接口：包括用户名、头像路径
 // - 帖子列表接口：包括帖子内容、图片路径、发布时间、点赞数、评论数、转发数
 
+import 'package:flutter/material.dart';
+
 class User {
   final String name;
-  final String? imageUrl;
-  final String? assetImage;
+  //final String? imageUrl;
+  //final String? assetImage;
+  final Color avatarColor; 
+  //到时候前后端对接的话改成提取十六进制的办法
+  //final String avatarColorHex;
 
   const User({
     required this.name,
-    this.imageUrl,
-    this.assetImage,
+    //this.imageUrl,
+    //this.assetImage,
+    this.avatarColor=Colors.red, 
+    //required this.avatarColorHex,
   });
+
+    // 将十六进制颜色转换为 Color 对象
+  // Color get avatarColor {
+  //   return Color(int.parse(avatarColorHex.replaceFirst('#', '0xFF')));
+  // }
 }
 
 class Post {
@@ -43,20 +55,24 @@ class Post {
 // TODO: 替换为从后端 API 获取的当前用户信息
 final User currentUser = User(
   name: 'User1',
-  imageUrl:
-      'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRIy7a_ku4Wciy5AfV7pyjiX2cBWpcdVfad4HsvKJjMFBy5T53pJW-HiVZeaMXky2-7B6c96TNwyhuiY48guQ7rog',
+//   imageUrl:
+//       'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRIy7a_ku4Wciy5AfV7pyjiX2cBWpcdVfad4HsvKJjMFBy5T53pJW-HiVZeaMXky2-7B6c96TNwyhuiY48guQ7rog',
+  avatarColor: Colors.blue,
 );
+
 
 final List<User> onlineUsers = [
   User(
     name: 'User2',
-    imageUrl:
-        'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRIy7a_ku4Wciy5AfV7pyjiX2cBWpcdVfad4HsvKJjMFBy5T53pJW-HiVZeaMXky2-7B6c96TNwyhuiY48guQ7rog',
+    //imageUrl:
+    //    'https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcRIy7a_ku4Wciy5AfV7pyjiX2cBWpcdVfad4HsvKJjMFBy5T53pJW-HiVZeaMXky2-7B6c96TNwyhuiY48guQ7rog',
+    avatarColor: Colors.red,
   ),
   User(
     name: 'User3',
-    imageUrl:
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdY38b13sLgNh8HhJoTPS5JsvNBirQ5gzauA&s',
+    //imageUrl:
+    //    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdY38b13sLgNh8HhJoTPS5JsvNBirQ5gzauA&s',
+    avatarColor: Colors.green,  
   ),
 ];
 // TODO: 替换为从后端 API 获取的帖子列表

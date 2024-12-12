@@ -22,6 +22,7 @@ class Todolist extends StatefulWidget {
 class _TodolistState extends State<Todolist> {
   DateTime _selectedDate = DateTime.now(); // 当前选择的日期
   List<Task> tasks = []; // 存储所有任务
+  Color _avatarColor = const Color.fromRGBO(248, 187, 208, 1); // 默认头像颜色为红色
 
   @override
   void initState() {
@@ -150,11 +151,25 @@ class _TodolistState extends State<Todolist> {
                   ],
                 ),
               ),
-              Expanded(child: SizedBox()),
+              //Expanded(child: SizedBox()),
+              const Spacer(),
+              // 可以选头像颜色并显示用户名
               ProfileAvatar(
-                imageUrl: 'assets/icons/userIcon.png',
+                avatarColor: _avatarColor, // 动态头像颜色
                 isActive: false,
                 hasBorder: true,
+                //userName: _userName, // 显示当前用户名
+                onTap: () {
+                  ProfileAvatar.showColorPicker(
+                    context: context,
+                    currentColor: _avatarColor,
+                    onColorSelected: (selectedColor) {
+                      setState(() {
+                        _avatarColor = selectedColor;
+                      });
+                    },
+                  );
+                },
               ),
             ],
           ),

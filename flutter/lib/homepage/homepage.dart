@@ -14,6 +14,7 @@ import 'package:pose_app/Community/communication_page.dart';
 import 'package:pose_app/Setting/setting_page.dart';
 import 'package:pose_app/SignOut/signout_page.dart';
 import 'package:pose_app/style/style.dart';
+import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
   final String username;
@@ -48,6 +49,12 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    
+    DateTime today = DateTime.now();
+    DateTime sevenDaysAgo = today.subtract(Duration(days: 7));
+    String dateRange =
+        "${DateFormat('MM月dd日').format(sevenDaysAgo)} - ${DateFormat('MM月dd日').format(today)}";
+
     SizeConfig().init(context);
     return Scaffold(
       body: SafeArea(
@@ -58,6 +65,7 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               flex: 1,
               child: SideMenu(
+                username: widget.username,
                 onNavigateToHome: () => _navigateToPage(0),
                 onNavigateToStatistics: () => _navigateToPage(1),
                 onNavigateToCalendar: () => _navigateToPage(2),
@@ -130,7 +138,7 @@ class _HomePageState extends State<HomePage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   PrimaryText(
-                                    text: 'xx月xx日 - xx月xx',
+                                    text: dateRange,
                                     size: 16,
                                     fontWeight: FontWeight.w800,
                                     color: AppColors.secondary,

@@ -159,10 +159,11 @@ class _AddPostPageState extends State<AddPostPage> {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundImage: NetworkImage(
-                    currentUser.imageUrl ??
-                        'https://example.com/default_avatar.png',
-                  ),
+                  // backgroundImage: NetworkImage(
+                  //   currentUser.imageUrl ??
+                  //       'https://example.com/default_avatar.png',
+                  // ),
+                  backgroundColor: currentUser.avatarColor,
                   radius: 20.0,
                 ),
                 const SizedBox(width: 12.0),

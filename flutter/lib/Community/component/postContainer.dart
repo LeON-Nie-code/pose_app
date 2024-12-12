@@ -141,7 +141,10 @@ class _PostHeader extends StatelessWidget {
     return Row(
       children: [
         ProfileAvatar(
-          imageUrl: post.user.imageUrl ?? 'https://example.com/default.png',
+          //imageUrl: post.user.imageUrl ?? 'https://example.com/default.png',
+          avatarColor: post.user.avatarColor, 
+          isActive: false,
+          hasBorder: true,    
         ),
         const SizedBox(width: 8.0),
         Expanded(

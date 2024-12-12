@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pose_app/style/colors.dart';
 import 'package:pose_app/style/style.dart';
+import 'package:intl/intl.dart';
 
 class Header extends StatelessWidget {
   final String username;
@@ -12,6 +13,7 @@ class Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String todayDate = DateFormat('yyyy/MM/dd').format(DateTime.now());
     return Row(
       children: [
         SizedBox(
@@ -25,7 +27,7 @@ class Header extends StatelessWidget {
                 fontWeight: FontWeight.w800,
               ),
               PrimaryText(
-                text: '20xx/xx/xx',
+                text: todayDate,
                 size: 16.0,
                 color: AppColors.secondary,
               ),
