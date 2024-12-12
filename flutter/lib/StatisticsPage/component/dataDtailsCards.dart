@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:pose_app/StatisticsPage/component/calendarWidget.dart';
@@ -7,6 +8,8 @@ import 'package:pose_app/config/size_config.dart';
 import 'package:pose_app/style/colors.dart';
 import 'package:pose_app/StatisticsPage/component/pieChart.dart';
 import 'package:pose_app/style/style.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 class DataDetailsCard extends StatefulWidget {
   final StudyDetails studyDetails; // 将成员变量作为构造函数参数传递
@@ -19,11 +22,136 @@ class DataDetailsCard extends StatefulWidget {
 
 class _DataDetailsCardState extends State<DataDetailsCard> {
   // 在这里定义需要在状态中管理的变量
+  List<dynamic> records = [];
 
   @override
   void initState() {
     super.initState();
     // 初始化状态
+    fetchAndInitialize();
+  }
+
+  void fetchAndInitialize() {
+    getUserRecords();
+    initializaStudyDetails();
+  }
+
+  bool isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
+  }
+
+  Map<String, dynamic> analyzeData(List<dynamic> records) {
+    Map<String, dynamic> result = {
+      'totalRecords': 0,
+      'todayRecords': 0,
+      'totalDuration': 0.0,
+      'todayDuration': 0.0,
+    };
+
+    // 获取今天的日期
+    DateTime today = DateTime.now();
+
+    print('Today: $today');
+    // DateTime recordDate;
+
+    for (var record in records) {
+      String createdAt = record['created_at'];
+
+      // 使用DateFormat解析RFC 2822格式的日期字符串
+      DateFormat format = DateFormat("EEE, dd MMM yyyy HH:mm:ss 'GMT'");
+      DateTime recordDate;
+
+      try {
+        recordDate = format.parse(createdAt);
+      } catch (e) {
+        print('Error parsing date: $e');
+        continue; // 跳过这个记录
+      }
+
+      // 解析记录的日期
+      // recordDate = DateTime.parse(record['created_at']);
+
+      // 检查记录是否是今天的
+      if (isSameDay(recordDate, today)) {
+        result['todayRecords'] += 1;
+        result['todayDuration'] += record['duration'];
+      }
+
+      result['totalRecords'] += 1;
+      result['totalDuration'] += record['duration'];
+    }
+
+    return result;
+  }
+
+  void initializaStudyDetails() {
+    Map<String, dynamic> data = {
+      'totalRecords': 0,
+      'todayRecords': 0,
+      'totalDuration': 0.0,
+      'todayDuration': 0.0,
+    };
+
+    data = analyzeData(records);
+
+    print('Data: $data');
+
+    // 更新数据
+
+    // 更新累计数据
+    setState(() {
+      widget.studyDetails.aboutTotalData[0] = StudyDataModel(
+        title: "次数",
+        data: {"value": data['totalRecords'].toString()},
+      );
+      widget.studyDetails.aboutTotalData[1] = StudyDataModel(
+        title: "时长",
+        data: {"totalHour": (data['totalDuration'] / 60).toStringAsFixed(2)},
+      );
+
+      // 更新今日数据
+      widget.studyDetails.aboutTodayData[0] = StudyDataModel(
+        title: "次数",
+        data: {"todayValue": data['todayRecords'].toString()},
+      );
+      widget.studyDetails.aboutTodayData[1] = StudyDataModel(
+        title: "时长",
+        data: {"todayHour": (data['todayDuration'] / 60).toStringAsFixed(2)},
+      );
+    });
+  }
+
+  void getUserRecords() async {
+    final prefs = await SharedPreferences.getInstance();
+    final storedAccessToken = prefs.getString('accessToken');
+    if (storedAccessToken == null || storedAccessToken.isEmpty) {
+      throw Exception('Access Token not found');
+    }
+    // 更新本地状态
+    final access_token = storedAccessToken;
+
+    print(' access_token in startToStudyDetail: $access_token');
+    // 获取用户记录
+    print('User records fetched');
+    try {
+      Dio dio = Dio();
+      Response response = await dio.get(
+        'http://8.217.68.60/records',
+        options: Options(headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $access_token', // 在请求头中添加 accessToken
+        }), // 将 accessToken 添加到请求头
+      );
+      print('Session Record: ${response.data}');
+      print(response.data.runtimeType);
+      print('record count: ${response.data.length}');
+      records = response.data;
+      // 将response.data作为JSON数据传递给POST请求
+    } catch (e) {
+      print('Error: $e');
+    }
   }
 
   @override
@@ -53,6 +181,11 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
                       color: AppColors.secondary,
                     ),
                   ],
+                ),
+                FloatingActionButton(
+                  onPressed: fetchAndInitialize,
+                  child: Icon(Icons.refresh),
+                  backgroundColor: AppColors.warmOrange,
                 ),
               ],
             ),

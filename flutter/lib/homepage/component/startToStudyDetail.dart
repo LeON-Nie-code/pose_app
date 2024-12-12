@@ -39,6 +39,8 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
   }
 
   void initializeRecentActivities() {
+    recentActivities.clear();
+    print('recentActivities count: ${recentActivities.length}');
     print('Initialize Recent Activities');
     print('Records: $records');
     records.forEach((record) {
@@ -151,6 +153,7 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
       );
       print('Session Record: ${response.data}');
       print(response.data.runtimeType);
+      print('record count: ${response.data.length}');
       records = response.data;
       // 将response.data作为JSON数据传递给POST请求
     } catch (e) {
