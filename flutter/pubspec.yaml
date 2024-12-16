@@ -51,6 +51,7 @@ dependencies:
   shared_preferences: ^2.3.3
   date_picker_timeline: ^1.2.6
   get: ^4.6.6
+  path_provider: ^2.0.11
 
 dev_dependencies:
   flutter_test:

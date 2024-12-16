@@ -42,7 +42,7 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
     recentActivities.clear();
     print('recentActivities count: ${recentActivities.length}');
     print('Initialize Recent Activities');
-    print('Records: $records');
+    // print('Records: $records');
     records.forEach((record) {
       int startTime = record['start_time'];
       double sessionDuration = record['eye_times']['session_duration'];
@@ -67,8 +67,8 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
       });
 
       // 打印格式化后的数据
-      print(
-          'Start Time: $formattedDateTime, Session Duration: $minutes min $seconds sec');
+      // print(
+      //     'Start Time: $formattedDateTime, Session Duration: $minutes min $seconds sec');
     });
     // setState(() {
     //   recentActivities = [
@@ -151,7 +151,7 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
           'Authorization': 'Bearer $access_token', // 在请求头中添加 accessToken
         }), // 将 accessToken 添加到请求头
       );
-      print('Session Record: ${response.data}');
+      // print('Session Record: ${response.data}');
       print(response.data.runtimeType);
       print('record count: ${response.data.length}');
       records = response.data;

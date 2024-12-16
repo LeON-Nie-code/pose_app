@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:pose_app/Community/dataAboutCommunity.dart';
 import 'package:pose_app/style/colors.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // 添加新帖子的页面
 // TODO: 后端接口需求
@@ -23,6 +24,25 @@ class AddPostPage extends StatefulWidget {
 class _AddPostPageState extends State<AddPostPage> {
   final TextEditingController _descriptionController = TextEditingController();
   List<File> _selectedFiles = []; // 存储多张图片
+
+  String access_token = '';
+
+  @override
+  void initState() {
+    super.initState();
+    // 初始化状态
+    getAccessToken();
+  }
+
+  void getAccessToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final storedAccessToken = prefs.getString('accessToken');
+    if (storedAccessToken == null || storedAccessToken.isEmpty) {
+      throw Exception('Access Token not found');
+    }
+    // 更新本地状态
+    access_token = storedAccessToken;
+  }
 
   // 打开文件选择对话框
   Future<void> _selectFiles(BuildContext context) async {
@@ -51,49 +71,69 @@ class _AddPostPageState extends State<AddPostPage> {
     }
   }
 
+  Future<void> createPost({
+    required String token,
+    required String title,
+    required String content,
+    List<String>? imagePaths, // 图片文件路径列表
+  }) async {
+    final dio = Dio();
+    const String url = 'http://8.217.68.60/post'; // 替换为实际的 API 地址
+
+    try {
+      // 构造表单数据
+      final formData = FormData.fromMap({
+        'title': title,
+        'content': content,
+        if (imagePaths != null)
+          for (int i = 0; i < imagePaths.length && i < 3; i++)
+            'photo${i + 1}': await MultipartFile.fromFile(imagePaths[i]),
+      });
+
+      // 发送 POST 请求
+      final response = await dio.post(
+        url,
+        data: formData,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token', // 携带 JWT token
+          },
+          contentType: 'multipart/form-data', // 确保内容类型正确
+        ),
+      );
+
+      // 检查响应
+      if (response.statusCode == 201) {
+        print('Post created successfully!');
+      } else {
+        print('Failed to create post: ${response.data}');
+      }
+    } on DioException catch (e) {
+      print('Error occurred: ${e.response?.data ?? e.message}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('请求失败')),
+      );
+    }
+  }
+
   // 提交帖子
   Future<void> _submitPost() async {
-    if (_descriptionController.text.isNotEmpty && _selectedFiles.isNotEmpty) {
+    //删除了对于上传图片的判断，可以只上传文字
+    if (_descriptionController.text.isNotEmpty) {
       // TODO: 调用后端图片上传接口，将图片文件上传到后端并获取 URL
       // 示例：List<String> imageUrls = await uploadImagesToServer(_selectedFiles);
 
       // 创建 Dio 实例
-      final dio = Dio();
 
-      // 构建请求数据
-      final requestBody = {
-        "text": _descriptionController.text,
-        "n_image": _selectedFiles.length,
-      };
+      List<String> imagePaths =
+          _selectedFiles.map((file) => file.path).toList();
 
-      try {
-        // 发送 POST 请求
-        final response = await dio.post(
-          'http://118.89.124.30:8080/updates/post',
-          data: requestBody,
-        );
-
-        // 检查响应状态
-        if (response.statusCode == 200) {
-          print('帖子提交成功');
-          // 提交成功
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('帖子提交成功')),
-          );
-        } else {
-          print('帖子提交失败');
-          // 提交失败
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('帖子提交失败')),
-          );
-        }
-      } catch (e) {
-        print('请求失败：$e');
-        // 请求失败
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('请求失败')),
-        );
-      }
+      await createPost(
+        token: access_token,
+        title: "auto_title",
+        content: _descriptionController.text,
+        imagePaths: imagePaths,
+      );
 
       // 检查响应状态
 

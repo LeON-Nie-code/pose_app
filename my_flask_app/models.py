@@ -65,7 +65,7 @@ class Post(db.Model):
     photo3 = db.Column(db.LargeBinary, nullable=True)  # 第三张照片
 
     def __repr__(self):
-        return f"Post('{self.title}', '{self.date_posted}')"
+        return f"Post('{self.title}', '{self.date_posted}', '{self.id}')"
 
 class Todo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -77,3 +77,18 @@ class Todo(db.Model):
 
     def __repr__(self):
         return f"Todo('{self.title}', '{self.date}')"
+
+class Friendship(db.Model):
+    __tablename__ = 'friendships'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    friend_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    status = db.Column(db.String(20), nullable=False, default='pending')  # pending, accepted, blocked
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', foreign_keys=[user_id], backref=db.backref('friendships', lazy=True))
+    friend = db.relationship('User', foreign_keys=[friend_id])
+
+    def __repr__(self):
+        return f"Friendship('{self.user_id}', '{self.friend_id}', '{self.status}')"
+

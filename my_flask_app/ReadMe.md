@@ -4,6 +4,8 @@ python3 -m venv
 source venv/bin/activate
 pip install -r requirements.txt
 
+python3 app.py
+
 
 
 gunicorn -w 4 -b 0.0.0.0:8889 app:app
@@ -12,8 +14,14 @@ sudo tail -f /var/log/nginx/error.log
 
 flask db migrate -m "Add eye_time to user_detection_records."
 
-
+ 
 flask db upgrade
+
+
+nohup python3 app.py &
+
+netstat -tulnp | grep 8889
+
 
 
 {
@@ -38,3 +46,10 @@ flask db upgrade
   },
   "start_time": 1733925584
 }
+
+
+curl -X POST http://8.217.68.60/post \
+     -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTczNDMzNzk0NCwianRpIjoiOGE4M2Y0NjYtOGM2Zi00OWRkLWI4NmEtMTA0ODc0MWMxYjQ5IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjIiLCJuYmYiOjE3MzQzMzc5NDQsImNzcmYiOiI4ZDVlZGI0Yy01ZWJjLTQwZjktYTkxMS1kMDI3ZDA5MTc3YWYiLCJleHAiOjE3MzQzNDE1NDR9.bTH_wwBnDYR3swvgGofwDdrX-nTmgEa3U19_0n4RoOM" \
+     -F "title=My New Post" \
+     -F "content=This is the content of my new post." \
+     -F "photo1=@1.jpg"

@@ -121,14 +121,14 @@ class _TodolistState extends State<Todolist> {
 
   @override
   Widget build(BuildContext context) {
-    print("in build,rendering tasks: $tasks");
+    // print("in build,rendering tasks: $tasks");
     // 筛选出当前选择日期的任务
     List<Task> filteredTasks = tasks.where((task) {
       return DateFormat("yyyy-MM-dd").format(DateTime.parse(task.date!)) ==
           DateFormat("yyyy-MM-dd").format(_selectedDate);
     }).toList();
 
-    print("filtered tasks: $filteredTasks");
+    // print("filtered tasks: $filteredTasks");
 
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 15.0),

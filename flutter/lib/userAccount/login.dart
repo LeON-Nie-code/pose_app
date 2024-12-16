@@ -32,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     // 2秒后关闭弹框并跳转到主页
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 1), () {
       Navigator.pop(context); // 关闭弹框
       Navigator.pushReplacement(
         context,

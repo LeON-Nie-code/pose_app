@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pose_app/config/size_config.dart';
 import 'package:pose_app/style/colors.dart';
+import 'package:pose_app/userAccount/login.dart';
 
 class SideMenu extends StatelessWidget {
   final VoidCallback onNavigateToHome;
@@ -53,42 +54,48 @@ class SideMenu extends StatelessWidget {
               // 主页按钮
               IconButton(
                 onPressed: onNavigateToHome,
-                icon: SvgPicture.asset('assets/icons/Home.svg', color: AppColors.iconGray),
+                icon: SvgPicture.asset('assets/icons/Home.svg',
+                    color: AppColors.iconGray),
                 iconSize: 20,
                 padding: EdgeInsets.symmetric(vertical: 20.0),
               ),
               // 日历按钮
               IconButton(
                 onPressed: onNavigateToCalendar,
-                icon: SvgPicture.asset('assets/icons/calendar.svg', color: AppColors.iconGray),
+                icon: SvgPicture.asset('assets/icons/calendar.svg',
+                    color: AppColors.iconGray),
                 iconSize: 20,
                 padding: EdgeInsets.symmetric(vertical: 20.0),
               ),
               // 朋友圈按钮
               IconButton(
                 onPressed: onNavigateToCommunication,
-                icon: SvgPicture.asset('assets/icons/Chat.svg', color: AppColors.iconGray),
+                icon: SvgPicture.asset('assets/icons/Chat.svg',
+                    color: AppColors.iconGray),
                 iconSize: 20,
                 padding: EdgeInsets.symmetric(vertical: 20.0),
               ),
               // 统计按钮
               IconButton(
                 onPressed: onNavigateToStatistics,
-                icon: SvgPicture.asset('assets/icons/pie-chart.svg', color: AppColors.iconGray),
+                icon: SvgPicture.asset('assets/icons/pie-chart.svg',
+                    color: AppColors.iconGray),
                 iconSize: 20,
                 padding: EdgeInsets.symmetric(vertical: 20.0),
               ),
               // 设置按钮
               IconButton(
                 onPressed: onNavigateToSettings,
-                icon: SvgPicture.asset('assets/icons/Setting.svg', color: AppColors.iconGray),
+                icon: SvgPicture.asset('assets/icons/Setting.svg',
+                    color: AppColors.iconGray),
                 iconSize: 20,
                 padding: EdgeInsets.symmetric(vertical: 20.0),
               ),
               // 退出按钮
               IconButton(
                 onPressed: onNavigateToSignOut,
-                icon: SvgPicture.asset('assets/icons/signout.svg', color: AppColors.iconGray),
+                icon: SvgPicture.asset('assets/icons/signout.svg',
+                    color: AppColors.iconGray),
                 iconSize: 20,
                 padding: EdgeInsets.symmetric(vertical: 20.0),
               ),
@@ -101,7 +108,8 @@ class SideMenu extends StatelessWidget {
 
   void _showPopupDialog(BuildContext context, Offset position) {
     // 计算弹窗位置
-    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+    final RenderBox overlay =
+        Overlay.of(context).context.findRenderObject() as RenderBox;
 
     showDialog(
       context: context,
@@ -115,7 +123,7 @@ class SideMenu extends StatelessWidget {
                 color: Colors.transparent,
                 child: Container(
                   width: 250,
-                  height: 150,  
+                  height: 150,
                   padding: EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -132,7 +140,9 @@ class SideMenu extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(height: 10,),
+                      SizedBox(
+                        height: 10,
+                      ),
                       Text(
                         "用户名: $username",
                         style: TextStyle(
@@ -149,14 +159,20 @@ class SideMenu extends StatelessWidget {
                           ),
                           onPressed: () {
                             // 执行退出逻辑
-                            Navigator.of(context).pop();
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => LoginPage()),
+                            );
+                            // Navigator.of(context).pop();
                             onNavigateToSignOut();
                           },
                           child: Text(
                             "退出账号",
                             style: TextStyle(
                               color: AppColors.warmOrange,
-                            ),),
+                            ),
+                          ),
                         ),
                       ),
                     ],

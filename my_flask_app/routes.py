@@ -1,9 +1,10 @@
 import random
 from flask import Blueprint, request, jsonify
-from models import UserDetectionRecord, db, User, Post, bcrypt, VerificationCode,Todo
+from models import UserDetectionRecord, db, User, Post, bcrypt, VerificationCode,Todo,Friendship
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from datetime import timedelta,datetime
 from werkzeug.utils import secure_filename
+import base64
 # from SendCode.send import SendCode
 
 auth_bp = Blueprint('auth', __name__)
@@ -201,15 +202,41 @@ def get_user_info():
 
 # 发布帖子
 # 发布帖子
+# @auth_bp.route("/post", methods=["POST"])
+# @jwt_required()
+# def create_post():
+#     data = request.get_json()
+#     current_user_id = get_jwt_identity()
+#     user = User.query.get_or_404(current_user_id)
+    
+#     title = data.get("title")
+#     content = data.get("content")
+
+#     # 创建帖子
+#     post = Post(title=title, content=content, user_id=user.id)
+
+#     # 处理图片上传
+#     for i in range(1, 4):  # 最多三张照片
+#         photo = request.files.get(f"photo{i}")
+#         if photo:
+#             photo_data = photo.read()  # 读取文件内容
+#             setattr(post, f"photo{i}", photo_data)  # 将图像数据保存到相应字段
+
+#     # 将帖子数据存储到数据库
+#     db.session.add(post)
+#     db.session.commit()
+
+#     return jsonify({"message": "Post created successfully!"}), 201
+
 @auth_bp.route("/post", methods=["POST"])
 @jwt_required()
 def create_post():
-    data = request.get_json()
     current_user_id = get_jwt_identity()
     user = User.query.get_or_404(current_user_id)
     
-    title = data.get("title")
-    content = data.get("content")
+    # 从表单数据中获取标题和内容
+    title = request.form.get("title")
+    content = request.form.get("content")
 
     # 创建帖子
     post = Post(title=title, content=content, user_id=user.id)
@@ -227,6 +254,7 @@ def create_post():
 
     return jsonify({"message": "Post created successfully!"}), 201
 
+
 # 获取用户发布的所有帖子
 @auth_bp.route("/posts", methods=["GET"])
 @jwt_required()
@@ -239,8 +267,11 @@ def get_posts():
     
     # 格式化帖子数据，包含图片的Base64编码
     post_list = []
+    print("here is get post ")
     for post in posts:
+        print(post.id)
         post_data = {
+            "post_id": post.id,
             "title": post.title,
             "content": post.content,
             "date_posted": post.date_posted,
@@ -364,6 +395,164 @@ def delete_todo(todo_id):
     db.session.commit()
 
     return jsonify({'message': 'Todo deleted successfully'}), 200
+
+
+
+@auth_bp.route('/friend/request', methods=['POST'])
+@jwt_required()
+def send_friend_request():
+    current_user_id = get_jwt_identity()  # 获取当前用户 ID
+    user = User.query.get_or_404(current_user_id)
+
+    data = request.json
+    friend_id = data.get('friend_id')
+
+    if not friend_id:
+        return jsonify({'error': 'Friend ID is required'}), 400
+
+    if current_user_id == friend_id:
+        return jsonify({'error': 'Cannot add yourself as a friend'}), 400
+
+    # 检查是否已有好友请求或是好友
+    existing_request = Friendship.query.filter_by(user_id=current_user_id, friend_id=friend_id).first()
+    if existing_request:
+        return jsonify({'error': 'Friend request already sent or you are already friends'}), 400
+
+    friendship = Friendship(user_id=current_user_id, friend_id=friend_id)
+    db.session.add(friendship)
+    db.session.commit()
+
+    return jsonify({'message': 'Friend request sent successfully'}), 200
+
+
+@auth_bp.route('/friend/request/<int:request_id>', methods=['PUT'])
+@jwt_required()
+def respond_to_friend_request(request_id):
+    current_user_id = get_jwt_identity()  # 获取当前用户 ID
+    user = User.query.get_or_404(current_user_id)
+
+    data = request.json
+    action = data.get('action')  # accept 或 reject
+
+    friendship = Friendship.query.get_or_404(request_id)
+    
+    print("user_id:", current_user_id)
+    print(type(current_user_id))
+    print("friend_id:", friendship.friend_id)
+    print(type(friendship.friend_id))
+
+    if friendship.friend_id != int(current_user_id):
+        return jsonify({'error': 'You are not authorized to respond to this friend request'}), 403
+
+    if action == 'accept':
+        friendship.status = 'accepted'
+        db.session.commit()
+        return jsonify({'message': 'Friend request accepted'}), 200
+    elif action == 'reject':
+        db.session.delete(friendship)
+        db.session.commit()
+        return jsonify({'message': 'Friend request rejected'}), 200
+    else:
+        return jsonify({'error': 'Invalid action'}), 400
+
+
+@auth_bp.route('/friends', methods=['GET'])
+@jwt_required()
+def get_friends():
+    current_user_id = get_jwt_identity()  # 获取当前用户 ID
+    user = User.query.get_or_404(current_user_id)
+
+    friends = Friendship.query.filter(
+        ((Friendship.user_id == current_user_id) | (Friendship.friend_id == current_user_id)) &
+        (Friendship.status == 'accepted')
+    ).all()
+
+    friend_list = []
+    for friend in friends:
+        friend_id = friend.friend_id if friend.user_id == current_user_id else friend.user_id
+        friend_user = User.query.get(friend_id)
+        friend_list.append({'id': friend_user.id, 'username': friend_user.username})
+
+    return jsonify(friend_list), 200
+
+
+@auth_bp.route('/friend/<int:friend_id>', methods=['DELETE'])
+@jwt_required()
+def delete_friend(friend_id):
+    current_user_id = get_jwt_identity()  # 获取当前用户 ID
+    user = User.query.get_or_404(current_user_id)
+
+    friendship = Friendship.query.filter(
+        ((Friendship.user_id == current_user_id) & (Friendship.friend_id == friend_id)) |
+        ((Friendship.user_id == friend_id) & (Friendship.friend_id == current_user_id))
+    ).first()
+
+    if not friendship:
+        return jsonify({'error': 'Friendship not found'}), 404
+
+    db.session.delete(friendship)
+    db.session.commit()
+    return jsonify({'message': 'Friend deleted successfully'}), 200
+
+
+@auth_bp.route('/friend/status/<int:friend_id>', methods=['GET'])
+@jwt_required()
+def check_friend_status(friend_id):
+    current_user_id = get_jwt_identity()  # 获取当前用户 ID
+    user = User.query.get_or_404(current_user_id)
+
+    friendship = Friendship.query.filter(
+        ((Friendship.user_id == current_user_id) & (Friendship.friend_id == friend_id)) |
+        ((Friendship.user_id == friend_id) & (Friendship.friend_id == current_user_id))
+    ).first()
+
+    if not friendship:
+        return jsonify({'status': 'none'}), 200
+    return jsonify({'status': friendship.status}), 200
+
+@auth_bp.route('/friend/requests/received', methods=['GET'])
+@jwt_required()
+def get_received_friend_requests():
+    current_user_id = get_jwt_identity()  # 获取当前用户 ID
+
+    # 查询别人发给当前用户的好友请求
+    received_requests = Friendship.query.filter_by(friend_id=current_user_id, status='pending').all()
+
+    # 构造返回的 JSON
+    result = []
+    for request in received_requests:
+        sender = User.query.get(request.user_id)
+        result.append({
+            'request_id': request.id,
+            'sender_id': sender.id,
+            'sender_username': sender.username,
+            'created_at': request.created_at.isoformat()
+        })
+
+    return jsonify(result), 200
+
+@auth_bp.route('/friend/requests/sent', methods=['GET'])
+@jwt_required()
+def get_sent_friend_requests():
+    current_user_id = get_jwt_identity()  # 获取当前用户 ID
+
+    # 查询当前用户发给别人的好友请求
+    sent_requests = Friendship.query.filter_by(user_id=current_user_id, status='pending').all()
+
+    # 构造返回的 JSON
+    result = []
+    for request in sent_requests:
+        receiver = User.query.get(request.friend_id)
+        result.append({
+            'request_id': request.id,
+            'receiver_id': receiver.id,
+            'receiver_username': receiver.username,
+            'created_at': request.created_at.isoformat()
+        })
+
+    return jsonify(result), 200
+
+
 
 
 @auth_bp.route("/")
