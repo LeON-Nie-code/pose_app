@@ -11,6 +11,31 @@ from flasgger import Swagger  # Import flasgger
 import time
 import logging
 
+import psutil
+
+def log_service_performance():
+    """Log performance metrics using psutil."""
+    process = psutil.Process()  # Current process
+    while True:
+        try:
+            cpu_usage = process.cpu_percent(interval=1)
+            memory_info = process.memory_info()
+            net_io = psutil.net_io_counters()
+            disk_io = psutil.disk_io_counters()
+
+            logging.info(f"CPU Usage: {cpu_usage}%")
+            logging.info(f"Memory Usage: {memory_info.rss / 1024 / 1024:.2f} MB")
+            logging.info(f"Network - Sent: {net_io.bytes_sent / 1024 / 1024:.2f} MB, "
+                         f"Received: {net_io.bytes_recv / 1024 / 1024:.2f} MB")
+            logging.info(f"Disk - Read: {disk_io.read_bytes / 1024 / 1024:.2f} MB, "
+                         f"Write: {disk_io.write_bytes / 1024 / 1024:.2f} MB")
+
+            # Sleep for a short period before logging the next set of metrics
+            time.sleep(5)
+        except Exception as e:
+            logging.error(f"Error logging performance metrics: {e}")
+            break
+
 # 获取当前文件的目录
 current_dir = os.path.dirname(os.path.abspath(__file__))
 print(current_dir)
@@ -518,4 +543,6 @@ def home():
     return "Welcome to Pose App!"
 
 if __name__ == "__main__":
+    # performance_thread = threading.Thread(target=log_service_performance, daemon=True)
+    # performance_thread.start()
     app.run(host='0.0.0.0', port=5000, debug=True)

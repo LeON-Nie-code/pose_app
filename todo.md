@@ -96,3 +96,15 @@
 
 1. 完善会议文档
 2. 完善API文档
+
+
+
+Traceback (most recent call last):
+  File "E:\Courses\SoftwareConstruction\pose_app\detect\venv\Lib\site-packages\werkzeug\wsgi.py", line 256, in __next__
+    return self._next()
+           ^^^^^^^^^^^^
+  File "E:\Courses\SoftwareConstruction\pose_app\detect\venv\Lib\site-packages\werkzeug\wrappers\response.py", line 32, in _iter_encoded
+    for item in iterable:
+  File "E:\Courses\SoftwareConstruction\pose_app\detect\app.py", line 253, in generate_video_feed
+    looking_at_screen = detect_eye_test(landmarks, w, h)
+                                        ^^^^^^^^^^^^^^^^

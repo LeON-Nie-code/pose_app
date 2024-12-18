@@ -1,0 +1,81 @@
+pose_app\detect\test on  main [$!?] via 🐍 v3.12.4 (venv) took 25s        
+❯ python .\videoTest.py
+Monitoring resources for 20 seconds...
+CPU Usage: 0.00%, Memory Usage: 48.80 MB
+CPU Usage: 0.00%, Memory Usage: 50.10 MB
+CPU Usage: 1.60%, Memory Usage: 60.86 MB
+CPU Usage: 0.80%, Memory Usage: 61.75 MB
+CPU Usage: 3.90%, Memory Usage: 62.57 MB
+CPU Usage: 0.80%, Memory Usage: 61.77 MB
+CPU Usage: 4.70%, Memory Usage: 61.78 MB
+CPU Usage: 1.60%, Memory Usage: 60.87 MB
+CPU Usage: 2.30%, Memory Usage: 61.82 MB
+CPU Usage: 1.60%, Memory Usage: 60.94 MB
+Failed to fetch frame.
+Fetched 2829 frames in 105.87 seconds.
+
+pose_app\detect\test on  main [$!?] via 🐍 v3.12.4 (venv) took 1m49s      
+❯ python .\videoTest.py
+Monitoring resources for 60 seconds...
+CPU Usage: 0.00%, Memory Usage: 48.73 MB
+CPU Usage: 0.00%, Memory Usage: 50.00 MB
+CPU Usage: 0.00%, Memory Usage: 50.00 MB
+CPU Usage: 0.00%, Memory Usage: 63.37 MB
+CPU Usage: 0.00%, Memory Usage: 63.37 MB
+CPU Usage: 1.60%, Memory Usage: 63.37 MB
+CPU Usage: 0.00%, Memory Usage: 63.37 MB
+CPU Usage: 0.00%, Memory Usage: 63.37 MB
+CPU Usage: 0.00%, Memory Usage: 63.37 MB
+CPU Usage: 0.00%, Memory Usage: 63.37 MB
+CPU Usage: 0.00%, Memory Usage: 63.37 MB
+CPU Usage: 1.60%, Memory Usage: 63.37 MB
+CPU Usage: 0.00%, Memory Usage: 63.37 MB
+CPU Usage: 1.60%, Memory Usage: 63.37 MB
+CPU Usage: 0.00%, Memory Usage: 63.37 MB
+CPU Usage: 0.00%, Memory Usage: 63.37 MB
+CPU Usage: 0.00%, Memory Usage: 63.37 MB
+CPU Usage: 0.00%, Memory Usage: 63.37 MB
+CPU Usage: 0.00%, Memory Usage: 62.57 MB
+CPU Usage: 0.00%, Memory Usage: 61.69 MB
+CPU Usage: 0.00%, Memory Usage: 62.59 MB
+CPU Usage: 0.00%, Memory Usage: 62.57 MB
+CPU Usage: 0.00%, Memory Usage: 62.59 MB
+CPU Usage: 0.00%, Memory Usage: 62.59 MB
+CPU Usage: 0.00%, Memory Usage: 62.59 MB
+CPU Usage: 0.00%, Memory Usage: 62.59 MB
+CPU Usage: 0.00%, Memory Usage: 62.59 MB
+CPU Usage: 4.70%, Memory Usage: 62.59 MB
+CPU Usage: 0.00%, Memory Usage: 62.59 MB
+CPU Usage: 0.00%, Memory Usage: 62.59 MB
+CPU Usage: 0.00%, Memory Usage: 62.62 MB
+CPU Usage: 0.00%, Memory Usage: 62.62 MB
+CPU Usage: 0.00%, Memory Usage: 62.62 MB
+CPU Usage: 0.00%, Memory Usage: 61.72 MB
+CPU Usage: 1.60%, Memory Usage: 62.62 MB
+CPU Usage: 1.60%, Memory Usage: 62.62 MB
+CPU Usage: 0.00%, Memory Usage: 62.62 MB
+CPU Usage: 0.00%, Memory Usage: 62.62 MB
+CPU Usage: 0.00%, Memory Usage: 62.62 MB
+CPU Usage: 0.00%, Memory Usage: 62.62 MB
+CPU Usage: 0.00%, Memory Usage: 62.62 MB
+CPU Usage: 1.60%, Memory Usage: 62.62 MB
+CPU Usage: 0.00%, Memory Usage: 62.62 MB
+CPU Usage: 0.00%, Memory Usage: 62.62 MB
+CPU Usage: 0.00%, Memory Usage: 62.62 MB
+CPU Usage: 0.00%, Memory Usage: 62.62 MB
+CPU Usage: 0.00%, Memory Usage: 62.62 MB
+CPU Usage: 0.00%, Memory Usage: 62.62 MB
+CPU Usage: 0.00%, Memory Usage: 62.62 MB
+CPU Usage: 1.60%, Memory Usage: 62.62 MB
+CPU Usage: 0.00%, Memory Usage: 62.63 MB
+CPU Usage: 1.60%, Memory Usage: 62.63 MB
+CPU Usage: 0.00%, Memory Usage: 62.63 MB
+CPU Usage: 0.00%, Memory Usage: 62.63 MB
+CPU Usage: 0.00%, Memory Usage: 62.63 MB
+CPU Usage: 0.00%, Memory Usage: 62.63 MB
+CPU Usage: 0.00%, Memory Usage: 62.63 MB
+CPU Usage: 1.60%, Memory Usage: 62.63 MB
+CPU Usage: 0.00%, Memory Usage: 62.63 MB
+CPU Usage: 0.00%, Memory Usage: 62.63 MB
+Failed to fetch frame.
+Fetched 2094 frames in 77.69 seconds.
