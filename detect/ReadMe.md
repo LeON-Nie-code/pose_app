@@ -13,6 +13,8 @@
 
 ## 依赖
 
+开发所使用的python 版本为3.12.4
+
 - Flask
 - Flask-CORS
 - OpenCV
@@ -29,26 +31,36 @@ git clone https://github.com/LeON-Nie-code/pose_app.git
 cd pose_app
 ```
 
-### 2. 安装依赖
+### 2. 创建并启动虚拟环境
 
+```bash
+python -m venv venv 
+```
+
+```bash
+venv\Scripts\activate
+```
+
+### 3. 安装依赖
 
 ```bash
 pip install -r requirements.txt
-
 ```
 
-### 3. 启动应用
+### 4. 启动应用
 
-pip install -r requirements.txt
 ```bash
 python app.py
 ```
 
 应用将在 http://0.0.0.0:5000 启动。
+
 ### 4. 访问 API
 
 使用浏览器或 API 测试工具（如 Postman）访问以下接口。
+
 ## API 说明
+
 ### 1. GET /cameras
 
 描述：获取当前设备上所有可用的摄像头索引。
@@ -63,6 +75,7 @@ python app.py
 
 
 cameras 数组包含所有可用摄像头的索引。
+
 ### 2. POST /select_camera
 
 描述：选择要使用的摄像头。传入摄像头的索引值，应用将切换到该摄像头。

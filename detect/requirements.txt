@@ -1,2 +1,11 @@
 flask==3.0.3
+flasgger==0.9.7.1
+Flask-Cors==5.0.0
 mediapipe==0.10.14
+opencv-contrib-python==4.10.0.84
+
+
+
+
+
+

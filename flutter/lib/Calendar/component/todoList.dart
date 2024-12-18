@@ -23,11 +23,41 @@ class _TodolistState extends State<Todolist> {
   DateTime _selectedDate = DateTime.now(); // 当前选择的日期
   List<Task> tasks = []; // 存储所有任务
   Color _avatarColor = const Color.fromRGBO(248, 187, 208, 1); // 默认头像颜色为红色
+  String access_token = '';
 
   @override
   void initState() {
     super.initState();
     _fetchTasks(); // 初始化时获取任务
+  }
+
+  Future<void> deleteTodo(int todo_id) async {
+    // 使用 Dio 发起 GET 请求
+    final dio = Dio();
+    print('todolist access token: $access_token');
+    try {
+      final response = await dio.delete(
+        'http://8.217.68.60/user/todos/$todo_id',
+        options: Options(
+          headers: {'Authorization': 'Bearer $access_token'},
+        ),
+      );
+      // 处理成功的响应
+      if (response.statusCode == 200) {
+        print("Delete success");
+      } else {
+        throw Exception(
+            "Failed to delete tasks, status code: ${response.statusCode}");
+      }
+    } on DioError catch (e) {
+      if (e.response?.statusCode == 404) {
+        // 处理404错误
+        print(e.response?.data);
+      } else {
+        // 处理其他DioError
+        print(e.message);
+      }
+    }
   }
 
   // 从 API 获取任务列表
@@ -39,6 +69,8 @@ class _TodolistState extends State<Todolist> {
       if (accessToken == null) {
         throw Exception("Access token is missing");
       }
+
+      access_token = accessToken;
 
       // 使用 Dio 发起 GET 请求
       final dio = Dio();
@@ -53,20 +85,24 @@ class _TodolistState extends State<Todolist> {
       if (response.statusCode == 200) {
         final data = response.data as List;
 
-        print(response.data);
+        // print(response.data);
 
         // 将 JSON 数据解析为 Task 列表
         setState(() {
           tasks = data.map((item) {
             return Task(
+              userName: item['user_id'],
               title: item['title'],
               note: item['note'],
               date: item['date']?.split('T')?.first, // 提取日期部分
               remind: item['remind_time']?.split('T')?.last, // 提取时间部分
               isCompleted: 0, // 默认值（API 无 isCompleted 字段）
+              id: item['id'],
             );
           }).toList();
         });
+
+        print("Fetched tasks: $tasks");
       } else {
         throw Exception(
             "Failed to load tasks, status code: ${response.statusCode}");
@@ -197,6 +233,8 @@ class _TodolistState extends State<Todolist> {
                     ),
                   ],
                 ),
+                FloatingActionButton(
+                    onPressed: _fetchTasks, child: Icon(Icons.refresh)),
                 MyButton(
                   label: "+ 添加",
                   onTap: () async {

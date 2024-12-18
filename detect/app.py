@@ -1,4 +1,5 @@
 import os
+import random
 import cv2
 from flask import Flask, jsonify, request, Response
 import mediapipe as mp
@@ -461,6 +462,11 @@ def get_posture_times():
     logging.info(f"Posture times: {posture_times_with_total}")
     return jsonify(posture_times_with_total)
 
+
+
+
+    
+
 @app.route('/session_record', methods=['GET'])
 def session_record():
     """
@@ -493,13 +499,18 @@ def session_record():
     eye_times_with_total["session_duration"] = session_duration
 
     logging.info(f"Session record: {posture_times_with_total}")
-    return jsonify({
-        "start_time": int(session_start_time),
-        "duration": int(session_duration),
-        "end_time": int(session_end_time),
+
+    result = {
+        "start_time": session_start_time,
+        "duration": session_duration,
+        "end_time": session_end_time,
         "posture_times": posture_times_with_total,
         "eye_times": eye_times_with_total
-    })
+    }
+
+    return jsonify(result)
+
+
 
 
 @app.route("/")

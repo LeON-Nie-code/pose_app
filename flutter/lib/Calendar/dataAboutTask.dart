@@ -5,11 +5,12 @@ class Task {
   int? isCompleted;
   String? date;
   String? remind;
+  int? id;
 
   //Task的字符串表示
   @override
   String toString() {
-    return 'Task{userName: $userName, title: $title, note: $note, isCompleted: $isCompleted, date: $date, remind: $remind}';
+    return 'Task{todo_id: $id ,userName: $userName, title: $title, note: $note, isCompleted: $isCompleted, date: $date, remind: $remind}';
   }
 
   Task({
@@ -19,6 +20,7 @@ class Task {
     this.isCompleted,
     this.date,
     this.remind,
+    this.id,
   });
 
   // 从 JSON 构造 Task 实例
@@ -42,6 +44,7 @@ class Task {
     data['isCompleted'] = isCompleted; // 保证字段名一致
     data['date'] = date;
     data['remind'] = remind;
+    data['id'] = id;
     return data;
   }
 }
