@@ -5,6 +5,8 @@
 // - 用户信息接口：包括用户名、头像路径
 // - 帖子列表接口：包括帖子内容、图片路径、发布时间、点赞数、评论数、转发数
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 class User {
@@ -29,6 +31,64 @@ class User {
   // }
 }
 
+// 定义 Comment 类来表示单条评论
+class Comment {
+  final String username;
+  final String content;
+  final String timestamp;
+  final int commentId;
+
+  Comment({
+    required this.username,
+    required this.content,
+    required this.timestamp,
+    required this.commentId,
+  });
+
+  // 从 JSON 映射到 Comment 对象
+  factory Comment.fromJson(Map<String, dynamic> json) {
+    return Comment(
+      commentId: json['comment_id'],
+      content: json['content'],
+      timestamp: json['date_posted'],
+      username: json['user_name'] ?? 'Anonymous', // 如果没有用户名则默认为 "Anonymous"
+    );
+  }
+
+// 函数：将 JSON 字符串转换为 Comment 列表
+  List<Comment> parseComments(String jsonString) {
+    final List<dynamic> commentsJson = json.decode(jsonString);
+
+    return commentsJson.map((commentJson) {
+      return Comment.fromJson(commentJson);
+    }).toList();
+  }
+
+  // 将 Comment 实例转换为 Map，用于序列化
+  Map<String, dynamic> toJson() {
+    return {
+      'username': username,
+      'content': content,
+      'timestamp': timestamp,
+    };
+  }
+
+  @override
+  String toString() {
+    return 'Comment{username: $username, content: $content, timestamp: $timestamp}';
+  }
+}
+
+// List<Comment> parseComments(List<Map<String, dynamic>>? json) {
+//   if (json == null) {
+//     // 如果输入为 null，则返回空的 List<Comment>
+//     return [];
+//   }
+
+//   // 使用 map 转换每个 JSON 对象为 Comment 实例，然后将其收集到 List<Comment> 中
+//   return json.map((commentJson) => Comment.fromJson(commentJson)).toList();
+// }
+
 class Post {
   final User user;
   final int post_id;
@@ -39,6 +99,7 @@ class Post {
   final int likes;
   final int comments;
   final int shares;
+  final List<Comment> commentsContent; // 改为 List<Comment>
 
   const Post({
     required this.user,
@@ -50,6 +111,7 @@ class Post {
     required this.comments,
     required this.shares,
     required this.post_id,
+    this.commentsContent = const [],
   });
 }
 

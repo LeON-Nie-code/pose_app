@@ -13,6 +13,7 @@ import 'package:pose_app/Community/dataAboutCommunity.dart';
 import 'package:pose_app/style/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:pose_app/Community/dataAboutCommunity.dart';
 
 // TODO: 后端接口需求
 // - 获取当前用户信息
@@ -143,16 +144,28 @@ class _CommunityState extends State<Community> {
             assetImages
                 .add('${documentPath}/post_${post['post_id']}_photo$i.jpg');
           }
+          // print("type of post[comments] is ${post['comments'].runtimeType}");
+          print("post[comments] is ${post['comments']}");
+          // 检查 post['comments'] 是否为 null，如果是 null 则传递一个空的列表
+          // final List<Map<String, dynamic>> comments = post['comments'] != null
+          //     ? List<Map<String, dynamic>>.from(post['comments'])
+          //     : [];
+
+          List<Comment> comments = [];
+          if (post['comments'] != null) {
+            comments = parseComments(jsonEncode(post['comments']));
+          }
+
           final newPost = Post(
-            user: currentUser,
-            caption: post['content'],
-            timeAgo: post['date_posted'],
-            assetImages: assetImages, // 使用实际图片数量
-            likes: 0,
-            comments: 0,
-            shares: 0,
-            post_id: post['post_id'],
-          );
+              user: currentUser,
+              caption: post['content'],
+              timeAgo: post['date_posted'],
+              assetImages: assetImages, // 使用实际图片数量
+              likes: 0,
+              comments: 0,
+              shares: 0,
+              post_id: post['post_id'],
+              commentsContent: comments);
           _posts.add(newPost);
           print("Post added: ${newPost.timeAgo}");
         }
@@ -245,5 +258,13 @@ class _CommunityState extends State<Community> {
         ),
       ],
     );
+  }
+
+  List<Comment> parseComments(String jsonString) {
+    final List<dynamic> commentsJson = json.decode(jsonString);
+
+    return commentsJson.map((commentJson) {
+      return Comment.fromJson(commentJson);
+    }).toList();
   }
 }

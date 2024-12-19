@@ -33,6 +33,7 @@ class _PostcontainerState extends State<Postcontainer> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _currentImageIndex);
+    getAccessToken();
   }
 
   void getAccessToken() async {
@@ -44,6 +45,41 @@ class _PostcontainerState extends State<Postcontainer> {
     // 更新本地状态
     access_token = storedAccessToken;
   }
+
+  // Future<void> postComment(
+  //     {required int post_id, required String comment}) async {
+  //   final dio = Dio();
+  //   String url = 'http://8.217.68.60/post/$post_id/comment';
+
+  //   try {
+  //     // 发送 POST 请求
+
+  //     final response = await dio.post(
+  //       url,
+  //       data: {
+  //         'content': comment, // 评论内容
+  //       },
+  //       options: Options(
+  //         headers: {
+  //           'Authorization': 'Bearer $access_token', // 携带 JWT token
+  //         },
+  //         // contentType: 'multipart/form-data', // 确保内容类型正确
+  //       ),
+  //     );
+
+  //     // 检查响应
+  //     if (response.statusCode == 201 || response.statusCode == 200) {
+  //       print('Post liked successfully!');
+  //     } else {
+  //       print('Failed to like post: ${response.data}');
+  //     }
+  //   } on DioException catch (e) {
+  //     print('Error occurred: ${e.response?.data ?? e.message}');
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('请求失败')),
+  //     );
+  //   }
+  // }
 
   Future<void> postLike({required int post_id}) async {
     final dio = Dio();
@@ -342,23 +378,161 @@ class _PostStats extends StatefulWidget {
 
 class _PostStatsState extends State<_PostStats> {
   int likeCount = 0; // 初始点赞数
-  List<String> comments = []; // 评论列表
+  List<Map<String, String>> comments = []; // 修改为存储评论内容和用户 ID 的列表
+  String access_token = '';
+  String? user_name = '';
 
   @override
   void initState() {
     super.initState();
     likeCount = widget.post.likes; // 设置初始值
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    // 先获取 AccessToken
+    await getAccessToken(); // 确保 getAccessToken 执行完成后再继续执行
+    fetchUserName().then((value) {
+      if (mounted) {
+        setState(() {
+          user_name = value;
+        });
+        loadComments();
+      }
+    });
+  }
+
+  void loadComments() async {
+    // 从post.commentsContent加载评论
+    for (var comment in widget.post.commentsContent) {
+      comments.add({
+        'content': comment.content,
+        'user_name': comment.username,
+      });
+    }
   }
 
   void _incrementLike() {
     setState(() {
       likeCount++;
     });
+    print(widget.post.commentsContent);
+  }
+
+  Future<void> getAccessToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final storedAccessToken = prefs.getString('accessToken');
+    if (storedAccessToken == null || storedAccessToken.isEmpty) {
+      throw Exception('Access Token not found');
+    }
+    // 更新本地状态
+    access_token = storedAccessToken;
+    // print('access_token in getAccessToken: $access_token');
+  }
+
+  Future<String?> fetchUserName() async {
+    final dio = Dio();
+    String url = 'http://8.217.68.60/user_info';
+    // print('access_token in fetchUserName: $access_token');
+    try {
+      final response = await dio.get(
+        url,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $access_token', // 携带 JWT token
+          },
+          // contentType: 'multipart/form-data', // 确保内容类型正确
+        ),
+      ); // 调用 GET 请求
+      if (response.statusCode == 200) {
+        final data = response.data; // 获取返回的 JSON 数据
+        // print('User name: ${data['username']}');
+        return data['username']; // 提取 `username`
+      } else {
+        print("Error: ${response.data}");
+        return null;
+      }
+    } on DioError catch (e) {
+      if (e.response != null) {
+        print("Dio error: ${e.response?.data}");
+      } else {
+        print("Error: ${e.message}");
+      }
+      return null;
+    }
+  }
+
+  Future<void> postComment({
+    required int post_id,
+    required String comment,
+  }) async {
+    final dio = Dio();
+    String url = 'http://8.217.68.60/post/$post_id/comment';
+
+    try {
+      // 发送 POST 请求
+      final response = await dio.post(
+        url,
+        data: {
+          'content': comment, // 评论内容
+        },
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $access_token', // 携带 JWT token
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+
+      // 检查响应
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        print('Post commented successfully!');
+        print('Response Data: ${response.data}');
+      } else {
+        print('Failed to comment post: ${response.data}');
+      }
+    } on DioException catch (e) {
+      print('Error occurred: ${e.response?.data ?? e.message}');
+      // 显示错误提示
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('请求失败')),
+      );
+    }
+  }
+
+  Future<void> postLike({required int post_id}) async {
+    final dio = Dio();
+    String url = 'http://8.217.68.60/post/$post_id/like'; // 替换为实际的 API 地址
+    try {
+      // 发送 POST 请求
+      final response = await dio.post(
+        url,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $access_token', // 携带 JWT token
+          },
+          // contentType: 'multipart/form-data', // 确保内容类型正确
+        ),
+      );
+
+      // 检查响应
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        print('Post liked successfully!');
+      } else {
+        print('Failed to like post: ${response.data}');
+      }
+    } on DioException catch (e) {
+      print('Error occurred: ${e.response?.data ?? e.message}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('请求失败')),
+      );
+    }
   }
 
   void _addComment(String comment) {
+    postComment(post_id: widget.post.post_id, comment: comment);
     setState(() {
-      comments.add(comment);
+      comments.add({'content': comment, 'user_name': user_name ?? ''}); // 使用默认值
     });
   }
 
@@ -445,7 +619,7 @@ class _PostStatsState extends State<_PostStats> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: comments.map((comment) {
                 return Text(
-                  "- $comment",
+                  "- ${comment['user_name']}: ${comment['content']}",
                   style: TextStyle(color: Colors.black, fontSize: 18),
                 );
               }).toList(),
