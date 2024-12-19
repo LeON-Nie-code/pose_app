@@ -27,14 +27,12 @@ class Postcontainer extends StatefulWidget {
 class _PostcontainerState extends State<Postcontainer> {
   int _currentImageIndex = 0; // 当前显示的图片索引
   late PageController _pageController;
-
   String access_token = '';
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _currentImageIndex);
-    getAccessToken();
   }
 
   void getAccessToken() async {
@@ -330,7 +328,7 @@ class _PostHeader extends StatelessWidget {
   }
 }
 
-class _PostStats extends StatelessWidget {
+class _PostStats extends StatefulWidget {
   final Post post;
 
   const _PostStats({
@@ -339,31 +337,81 @@ class _PostStats extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<_PostStats> createState() => _PostStatsState();
+}
+
+class _PostStatsState extends State<_PostStats> {
+  int likeCount = 0; // 初始点赞数
+  List<String> comments = []; // 评论列表
+
+  @override
+  void initState() {
+    super.initState();
+    likeCount = widget.post.likes; // 设置初始值
+  }
+
+  void _incrementLike() {
+    setState(() {
+      likeCount++;
+    });
+  }
+
+  void _addComment(String comment) {
+    setState(() {
+      comments.add(comment);
+    });
+  }
+
+  void _showCommentDialog(BuildContext context) {
+    String commentText = "";
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("添加评论"),
+          content: TextField(
+            onChanged: (value) {
+              commentText = value;
+            },
+            decoration: const InputDecoration(hintText: "发表评论"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("取消"),
+            ),
+            TextButton(
+              onPressed: () {
+                if (commentText.isNotEmpty) {
+                  _addComment(commentText);
+                }
+                Navigator.of(context).pop();
+              },
+              child: const Text("发送"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(4.0),
-              decoration: BoxDecoration(
-                color: AppColors.deppBeige,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.thumb_up,
-                size: 10.0,
-                color: Colors.white,
-              ),
+            Text(
+              'Likes: $likeCount',
+              style: TextStyle(color: Colors.grey[600]),
             ),
-            const SizedBox(width: 4.0),
-            Expanded(
-              child: Text(
-                '${post.likes}',
-                style: TextStyle(
-                  color: Colors.grey[600],
-                ),
-              ),
+            const Spacer(),
+            Text(
+              '${comments.length} Comments',
+              style: TextStyle(color: Colors.grey[600]),
             ),
           ],
         ),
@@ -377,7 +425,7 @@ class _PostStats extends StatelessWidget {
                 size: 20.0,
               ),
               label: 'Like',
-              onTap: () => print('Like'),
+              onTap: _incrementLike,
             ),
             _PostButton(
               icon: Icon(
@@ -386,10 +434,23 @@ class _PostStats extends StatelessWidget {
                 size: 20.0,
               ),
               label: 'Comment',
-              onTap: () => print('Comment'),
+              onTap: () => _showCommentDialog(context),
             ),
           ],
         ),
+        if (comments.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: comments.map((comment) {
+                return Text(
+                  "- $comment",
+                  style: TextStyle(color: Colors.black, fontSize: 18),
+                );
+              }).toList(),
+            ),
+          ),
       ],
     );
   }

@@ -7,6 +7,7 @@ import 'package:pose_app/homepage/component/rankingListTable.dart';
 import 'package:pose_app/homepage/component/sidemenu.dart';
 import 'package:pose_app/config/size_config.dart';
 import 'package:pose_app/homepage/component/startToStudyDetail.dart';
+import 'package:pose_app/homepage/component/todayTodoDialog.dart';
 import 'package:pose_app/style/colors.dart';
 import 'package:pose_app/StatisticsPage/statistics_page.dart';
 import 'package:pose_app/Calendar/calendar_page.dart';
@@ -49,7 +50,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    
     DateTime today = DateTime.now();
     DateTime sevenDaysAgo = today.subtract(Duration(days: 7));
     String dateRange =
@@ -85,8 +85,8 @@ class _HomePageState extends State<HomePage> {
                   index: _currentIndex,
                   children: [
                     SingleChildScrollView(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 30.0, horizontal: 30.0),
+                      padding: EdgeInsets.symmetric(
+                          vertical: 30.0, horizontal: 30.0),
                       child: Column(
                         children: [
                           Header(username: widget.username),
@@ -118,13 +118,14 @@ class _HomePageState extends State<HomePage> {
                                 rankingList(
                                   icon: 'assets/icons/todolist.svg',
                                   label: '今日代办',
-                                  amount: '任务1',
-                                  dialogContent: Center(
-                                    child: Text(
-                                      'Todo列表',
-                                      style: TextStyle(fontSize: 18),
-                                    ),
-                                  ),
+                                  amount: '点击查看',
+                                  dialogContent: TodayTodoDialog(),
+                                  //Center(
+                                  //   child: Text(
+                                  //     'Todo列表',
+                                  //     style: TextStyle(fontSize: 18),
+                                  //   ),
+                                  // ),
                                 ),
                               ],
                             ),
@@ -181,7 +182,9 @@ class _HomePageState extends State<HomePage> {
                     StatisticsPage(),
                     CalendarPage(),
                     CommunicationPage(),
-                    SettingPage(username: widget.username,),
+                    SettingPage(
+                      username: widget.username,
+                    ),
                     SignOutPage(),
                   ],
                 ),
@@ -195,7 +198,8 @@ class _HomePageState extends State<HomePage> {
                   width: double.infinity,
                   height: SizeConfig.screenHeight,
                   color: AppColors.deppBeige,
-                  padding: EdgeInsets.symmetric(vertical: 30.0, horizontal: 30.0),
+                  padding:
+                      EdgeInsets.symmetric(vertical: 30.0, horizontal: 30.0),
                   child: SingleChildScrollView(
                     padding:
                         EdgeInsets.symmetric(vertical: 30.0, horizontal: 30.0),

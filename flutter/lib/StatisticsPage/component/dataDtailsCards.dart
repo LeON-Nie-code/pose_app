@@ -23,6 +23,11 @@ class DataDetailsCard extends StatefulWidget {
 class _DataDetailsCardState extends State<DataDetailsCard> {
   // 在这里定义需要在状态中管理的变量
   List<dynamic> records = [];
+  DateTime? selectedDate;
+  Map<String, dynamic> selectedDateData = {
+    'targetDateRecords': 0,
+    'targetDateDuration': 0.0,
+  };
 
   @override
   void initState() {
@@ -36,18 +41,28 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
     initializaStudyDetails();
   }
 
+  void onDateSelected(DateTime date) {
+    setState(() {
+      selectedDate = date;
+      selectedDateData = analyzeData(records, selectedDate);
+    });
+  }
+
   bool isSameDay(DateTime date1, DateTime date2) {
     return date1.year == date2.year &&
         date1.month == date2.month &&
         date1.day == date2.day;
   }
 
-  Map<String, dynamic> analyzeData(List<dynamic> records) {
+  Map<String, dynamic> analyzeData(
+      List<dynamic> records, DateTime? targetDate) {
     Map<String, dynamic> result = {
       'totalRecords': 0,
       'todayRecords': 0,
       'totalDuration': 0.0,
       'todayDuration': 0.0,
+      'targetDateRecords': 0,
+      'targetDateDuration': 0.0,
     };
 
     // 获取今天的日期
@@ -73,28 +88,38 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
       // 解析记录的日期
       // recordDate = DateTime.parse(record['created_at']);
 
-      // 检查记录是否是今天的
+      // 累积总数据
+      result['totalRecords'] += 1;
+      result['totalDuration'] += record['duration'];
+
+      // 累积今日数据
       if (isSameDay(recordDate, today)) {
         result['todayRecords'] += 1;
         result['todayDuration'] += record['duration'];
       }
 
-      result['totalRecords'] += 1;
-      result['totalDuration'] += record['duration'];
+      // 累积指定日期的数据
+      if (targetDate != null && isSameDay(recordDate, targetDate)) {
+        result['targetDateRecords'] ??= 0;
+        result['targetDateDuration'] ??= 0.0;
+        result['targetDateRecords'] += 1;
+        result['targetDateDuration'] += record['duration'];
+        print('Updated targetDateDuration: ${result['targetDateDuration']}');
+      }
     }
 
     return result;
   }
 
   void initializaStudyDetails() {
-    Map<String, dynamic> data = {
-      'totalRecords': 0,
-      'todayRecords': 0,
-      'totalDuration': 0.0,
-      'todayDuration': 0.0,
-    };
+    // Map<String, dynamic> data = {
+    //   'totalRecords': 0,
+    //   'todayRecords': 0,
+    //   'totalDuration': 0.0,
+    //   'todayDuration': 0.0,
+    // };
 
-    data = analyzeData(records);
+    Map<String, dynamic> data = analyzeData(records, null);
 
     print('Data: $data');
 
@@ -157,6 +182,7 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context); // 初始化屏幕尺寸配置
+
     return Container(
       height: MediaQuery.of(context).size.height, // 设置父容器高度以支持滚动
       child: SingleChildScrollView(
@@ -356,7 +382,7 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
                   ),
                 ],
               ),
-              height: 400,
+              //height: 450,
               child: Row(
                 children: [
                   // 左侧部分
@@ -371,26 +397,29 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
                       ),
                       child: Column(
                         children: [
-                          Text(
-                            "专注时长分析",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          // Text(
+                          //   "专注时长分析",
+                          //   style: TextStyle(
+                          //     fontSize: 16,
+                          //     fontWeight: FontWeight.bold,
+                          //   ),
+                          // ),
                           SizedBox(height: SizeConfig.blockSizeVertical! * 2),
-                          MyPieChart(),
-                          SizedBox(height: SizeConfig.blockSizeVertical! * 2),
-                          Container(
-                            padding: EdgeInsets.all(defaultPadding),
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                  width: 2,
-                                  color: AppColors.secondary.withOpacity(0.15)),
-                              borderRadius: const BorderRadius.all(
-                                  Radius.circular(defaultPadding)),
-                            ),
+                          MyPieChart(
+                            selectedDate: selectedDate,
+                            data: selectedDateData,
                           ),
+                          //SizedBox(height: SizeConfig.blockSizeVertical! * 2),
+                          // Container(
+                          //   padding: EdgeInsets.all(defaultPadding),
+                          //   decoration: BoxDecoration(
+                          //     border: Border.all(
+                          //         width: 2,
+                          //         color: AppColors.secondary.withOpacity(0.15)),
+                          //     borderRadius: const BorderRadius.all(
+                          //         Radius.circular(defaultPadding)),
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
@@ -402,7 +431,17 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
                     child: Container(
                       padding: EdgeInsets.all(10.0),
                       //位于lib/StatisticsPage/component/calendarWidget.dart中
-                      child: CalendarWidget(),
+                      child: CalendarWidget(
+                        onDateSelected: (DateTime date) {
+                          setState(() {
+                            selectedDate = date;
+                            selectedDateData =
+                                analyzeData(records, selectedDate);
+                            print('Selected Date: $selectedDate');
+                            print('Selected Date Data: $selectedDateData');
+                          });
+                        },
+                      ),
                     ),
                   ),
                 ],
