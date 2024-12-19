@@ -18,6 +18,28 @@ class MyPieChart extends StatelessWidget {
   Widget build(BuildContext context) {
     // 获取选中日期的时长
     double targetDateDuration = data['targetDateDuration'] ?? 0.0;
+    double totalDuration = data['totalDuration'] ?? 0.0;
+
+    // 计算剩余时长
+    double remainingDuration = (totalDuration - targetDateDuration).clamp(0.0, double.infinity);
+
+    // 构建饼图数据
+    List<PieChartSectionData> pieChartSections = [
+      // 选中日期的总时长部分
+      PieChartSectionData(
+        value: targetDateDuration,
+        color: AppColors.pinkpg,
+        showTitle: false,
+        radius: 25,
+      ),
+      // 剩余部分
+      PieChartSectionData(
+        value: remainingDuration,
+        color: AppColors.iconGray.withOpacity(0.1),
+        showTitle: false,
+        radius: 25,
+      ),
+    ];
 
     return Card(
       color: Colors.white,
@@ -68,7 +90,7 @@ class MyPieChart extends StatelessWidget {
                       sectionsSpace: 0,
                       centerSpaceRadius: 70,
                       startDegreeOffset: -90,
-                      sections: pieChartSectionDatas,
+                      sections: pieChartSections,
                     ),
                   ),
                 ),
@@ -90,36 +112,3 @@ class MyPieChart extends StatelessWidget {
     );
   }
 }
-
-List<PieChartSectionData> pieChartSectionDatas = [
-  PieChartSectionData(
-    value: 40,
-    color: AppColors.pinkpg,
-    showTitle: false,
-    radius: 25,
-  ),
-  PieChartSectionData(
-    value: 5,
-    color: AppColors.secondary,
-    showTitle: false,
-    radius: 25,
-  ),
-  PieChartSectionData(
-    value: 15,
-    color: AppColors.warmOrange,
-    showTitle: false,
-    radius: 25,
-  ),
-  PieChartSectionData(
-    value: 15,
-    color: AppColors.bluegrey,
-    showTitle: false,
-    radius: 25,
-  ),
-  PieChartSectionData(
-    value: 15,
-    color: AppColors.iconGray.withOpacity(0.1),
-    showTitle: false,
-    radius: 25,
-  ),
-];
