@@ -88,7 +88,7 @@ class _CommunityState extends State<Community> {
 
   Future<void> getPostsAndSaveImages(String token) async {
     final dio = Dio();
-    const String url = 'http://8.217.68.60/posts'; // 替换为实际的 API 地址
+    const String url = 'http://8.217.68.60/all_posts'; // 获取所有posts的API
 
     setState(() {
       _posts.clear();
@@ -151,6 +151,7 @@ class _CommunityState extends State<Community> {
             likes: 0,
             comments: 0,
             shares: 0,
+            post_id: post['post_id'],
           );
           _posts.add(newPost);
           print("Post added: ${newPost.timeAgo}");

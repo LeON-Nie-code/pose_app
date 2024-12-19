@@ -11,7 +11,7 @@ class User {
   final String name;
   //final String? imageUrl;
   //final String? assetImage;
-  final Color avatarColor; 
+  final Color avatarColor;
   //到时候前后端对接的话改成提取十六进制的办法
   //final String avatarColorHex;
 
@@ -19,11 +19,11 @@ class User {
     required this.name,
     //this.imageUrl,
     //this.assetImage,
-    this.avatarColor=Colors.red, 
+    this.avatarColor = Colors.red,
     //required this.avatarColorHex,
   });
 
-    // 将十六进制颜色转换为 Color 对象
+  // 将十六进制颜色转换为 Color 对象
   // Color get avatarColor {
   //   return Color(int.parse(avatarColorHex.replaceFirst('#', '0xFF')));
   // }
@@ -31,6 +31,7 @@ class User {
 
 class Post {
   final User user;
+  final int post_id;
   final String caption;
   final String timeAgo;
   final List<String>? imageUrls; // 多个网络图片路径
@@ -48,6 +49,7 @@ class Post {
     required this.likes,
     required this.comments,
     required this.shares,
+    required this.post_id,
   });
 }
 
@@ -60,7 +62,6 @@ final User currentUser = User(
   avatarColor: Colors.blue,
 );
 
-
 final List<User> onlineUsers = [
   User(
     name: 'User2',
@@ -72,12 +73,13 @@ final List<User> onlineUsers = [
     name: 'User3',
     //imageUrl:
     //    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdY38b13sLgNh8HhJoTPS5JsvNBirQ5gzauA&s',
-    avatarColor: Colors.green,  
+    avatarColor: Colors.green,
   ),
 ];
 // TODO: 替换为从后端 API 获取的帖子列表
 final List<Post> posts = [
   Post(
+    post_id: 1,
     user: currentUser,
     caption: '内容11111',
     timeAgo: '58m',
@@ -90,6 +92,7 @@ final List<Post> posts = [
     shares: 96,
   ),
   Post(
+    post_id: 2,
     user: onlineUsers[1],
     caption: '内容33333',
     timeAgo: '3hr',

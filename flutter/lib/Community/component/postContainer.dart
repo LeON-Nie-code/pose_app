@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:pose_app/Community/component/full_screen_image.dart';
 import 'package:pose_app/Community/component/profile_avatar.dart';
 import 'package:pose_app/Community/dataAboutCommunity.dart';
 import 'package:pose_app/style/colors.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // TODO: 点赞、评论、分享等交互需要后端接口支持
 // TODO: 动态刷新点赞、评论数量时，需要请求后端更新数据
@@ -26,10 +28,52 @@ class _PostcontainerState extends State<Postcontainer> {
   int _currentImageIndex = 0; // 当前显示的图片索引
   late PageController _pageController;
 
+  String access_token = '';
+
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _currentImageIndex);
+    getAccessToken();
+  }
+
+  void getAccessToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final storedAccessToken = prefs.getString('accessToken');
+    if (storedAccessToken == null || storedAccessToken.isEmpty) {
+      throw Exception('Access Token not found');
+    }
+    // 更新本地状态
+    access_token = storedAccessToken;
+  }
+
+  Future<void> postLike({required int post_id}) async {
+    final dio = Dio();
+    String url = 'http://8.217.68.60/post/$post_id/like'; // 替换为实际的 API 地址
+    try {
+      // 发送 POST 请求
+      final response = await dio.post(
+        url,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $access_token', // 携带 JWT token
+          },
+          // contentType: 'multipart/form-data', // 确保内容类型正确
+        ),
+      );
+
+      // 检查响应
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        print('Post liked successfully!');
+      } else {
+        print('Failed to like post: ${response.data}');
+      }
+    } on DioException catch (e) {
+      print('Error occurred: ${e.response?.data ?? e.message}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('请求失败')),
+      );
+    }
   }
 
   @override

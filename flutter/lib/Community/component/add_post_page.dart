@@ -147,6 +147,7 @@ class _AddPostPageState extends State<AddPostPage> {
         likes: 0,
         comments: 0,
         shares: 0,
+        post_id: 999, // 临时 ID
       );
 
       // TODO: 调用后端提交帖子接口，将帖子内容和图片 URL 一起发送到后端
