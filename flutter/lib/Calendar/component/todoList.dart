@@ -212,11 +212,13 @@ class _TodolistState extends State<Todolist> {
           SizedBox(height: SizeConfig.blockSizeVertical! * 2),
 
           // 日期选择和新增任务按钮
+          // 日期选择和新增任务按钮
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // 日期显示部分
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -233,24 +235,34 @@ class _TodolistState extends State<Todolist> {
                     ),
                   ],
                 ),
-                FloatingActionButton(
-                    onPressed: _fetchTasks, child: Icon(Icons.refresh)),
-                MyButton(
-                  label: "+ 添加",
-                  onTap: () async {
-                    // 跳转到添加/编辑任务页面，并接收返回的任务
-                    Task? newTask = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            AddTaskPage(selectedDate: _selectedDate),
-                      ),
-                    );
-                    if (newTask != null) {
-                      addOrUpdateTask(newTask); // 添加新任务
-                      //TODO: 调用添加任务的 API 接口
-                    }
-                  },
+
+                // 按钮部分
+                Row(
+                  children: [
+                    FloatingActionButton(
+                      onPressed: _fetchTasks,
+                      child: Icon(Icons.refresh),
+                      backgroundColor: AppColors.warmOrange,
+                    ),
+                    SizedBox(width: 8), // 调整两按钮之间的间距
+                    MyButton(
+                      label: "+ 添加",
+                      onTap: () async {
+                        // 跳转到添加/编辑任务页面，并接收返回的任务
+                        Task? newTask = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                AddTaskPage(selectedDate: _selectedDate),
+                          ),
+                        );
+                        if (newTask != null) {
+                          addOrUpdateTask(newTask); // 添加新任务
+                          //TODO: 调用添加任务的 API 接口
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),

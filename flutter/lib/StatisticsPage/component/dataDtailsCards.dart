@@ -99,17 +99,15 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
         result['todayDuration'] += record['duration'];
       }
 
-    Map<String, dynamic> postureTimes = record['posture_times'] ?? {};
-    double postureAbnormalDuration = 
-    (postureTimes['lying down in the chair'] is num 
-        ? postureTimes['lying down in the chair'] 
-        : 0.0) +
-    (postureTimes['left tilt'] is num 
-        ? postureTimes['left tilt'] 
-        : 0.0) +
-    (postureTimes['right tilt'] is num 
-        ? postureTimes['right tilt'] 
-        : 0.0);
+      Map<String, dynamic> postureTimes = record['posture_times'] ?? {};
+      double postureAbnormalDuration = (postureTimes['lying down in the chair']
+                  is num
+              ? postureTimes['lying down in the chair']
+              : 0.0) +
+          (postureTimes['left tilt'] is num ? postureTimes['left tilt'] : 0.0) +
+          (postureTimes['right tilt'] is num
+              ? postureTimes['right tilt']
+              : 0.0);
 
       // 累积指定日期的数据
       if (targetDate != null && isSameDay(recordDate, targetDate)) {
@@ -118,7 +116,7 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
         result['targetDateRecords'] += 1;
         result['targetDateDuration'] += record['duration'];
         print('Updated targetDateDuration: ${result['targetDateDuration']}');
-         result['postureAbnormalDuration'] += postureAbnormalDuration;
+        result['postureAbnormalDuration'] += postureAbnormalDuration;
       }
     }
 
@@ -204,7 +202,8 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
       try {
         DateTime recordDate = format.parse(createdAt);
         // 确保键是标准化日期
-        DateTime normalizedDate = DateTime(recordDate.year, recordDate.month, recordDate.day);
+        DateTime normalizedDate =
+            DateTime(recordDate.year, recordDate.month, recordDate.day);
         _eventDates.putIfAbsent(normalizedDate, () => ["Recorded"]);
       } catch (e) {
         print('Error parsing date: $e');
@@ -222,6 +221,7 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
           children: [
             // 标题
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween, // 设置主轴对齐方式
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -438,8 +438,8 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
                           SizedBox(height: SizeConfig.blockSizeVertical! * 2),
                           MyPieChart(
                             //selectedDate: selectedDate,
-                              selectedDate: selectedDate,
-                              data: selectedDateData,
+                            selectedDate: selectedDate,
+                            data: selectedDateData,
                           ),
                           //SizedBox(height: SizeConfig.blockSizeVertical! * 2),
                           // Container(
@@ -464,17 +464,16 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
                       padding: EdgeInsets.all(10.0),
                       //位于lib/StatisticsPage/component/calendarWidget.dart中
                       child: CalendarWidget(
-                        onDateSelected: (DateTime date) {
-                          setState(() {
-                            selectedDate = date;
-                            selectedDateData =
-                                analyzeData(records, selectedDate);
-                            print('Selected Date: $selectedDate');
-                            print('Selected Date Data: $selectedDateData');
-                          });
-                        },
-                         events: _eventDates
-                      ),
+                          onDateSelected: (DateTime date) {
+                            setState(() {
+                              selectedDate = date;
+                              selectedDateData =
+                                  analyzeData(records, selectedDate);
+                              print('Selected Date: $selectedDate');
+                              print('Selected Date Data: $selectedDateData');
+                            });
+                          },
+                          events: _eventDates),
                     ),
                   ),
                 ],

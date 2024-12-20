@@ -157,7 +157,7 @@ def select_camera():
     logging.info(f"Selected camera with index {current_camera_index}")
     return jsonify({"status": "success", "camera_index": current_camera_index})
 
-def generate_video_feed():
+def generate_video_feed(draw_dots=True):
     """Stream video feed from the selected camera."""
     global cap, posture_start_time, current_posture,session_end_time, session_start_time, posture_times, current_eye_status, eye_start_time, eye_times
     try:
@@ -185,7 +185,8 @@ def generate_video_feed():
                 image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
                 if results_pose.pose_landmarks:
-                    mp_drawing.draw_landmarks(image, results_pose.pose_landmarks, mp_pose.POSE_CONNECTIONS)
+                    if draw_dots:
+                        mp_drawing.draw_landmarks(image, results_pose.pose_landmarks, mp_pose.POSE_CONNECTIONS)
                     landmarks = results_pose.pose_landmarks.landmark
                     h, w, _ = frame.shape
                     
@@ -227,7 +228,8 @@ def generate_video_feed():
                     thickness = 10
                     cv2.rectangle(image, (0, 0), (w, h), border_color, thickness)
 
-                    cv2.putText(image, posture, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                    if draw_dots:
+                        cv2.putText(image, posture, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
                 eye_status = "Looking at screen"
 
@@ -243,9 +245,10 @@ def generate_video_feed():
                         
                         
 
-                        # Draw circles around the eyes
-                        cv2.circle(image, left_eye_coords, 5, (255, 0, 0), -1)  # Blue dot for left eye
-                        cv2.circle(image, right_eye_coords, 5, (255, 0, 0), -1)  # Red dot for right eye
+                        if draw_dots:
+                            # Draw circles around the eyes
+                            cv2.circle(image, left_eye_coords, 5, (255, 0, 0), -1)  # Blue dot for left eye
+                            cv2.circle(image, right_eye_coords, 5, (255, 0, 0), -1)  # Red dot for right eye
 
                         # Eye gaze detection (checking if eyes are in the center of the screen)
                         eye_status = check_eye_position(left_eye_coords, right_eye_coords, w, h)
@@ -261,7 +264,8 @@ def generate_video_feed():
                         #     cv2.putText(image, "Good posture and eye gaze", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
 
-                        cv2.putText(image, eye_status, (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                        if draw_dots:
+                            cv2.putText(image, eye_status, (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
                 
                 # Update eye status time if eye status changes
                 if eye_status != current_eye_status:
@@ -467,6 +471,34 @@ def video_feed():
     # Start streaming video from the selected camera
     logging.info(f"Streaming video from camera index {camera_index}")
     return Response(generate_video_feed(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/video_feed_without_dots')
+def video_feed_without_dots():
+    
+
+    global session_start_time, session_end_time
+
+    # Record the start time of the session
+    session_start_time = time.time()
+
+    # Log the start of the video feed
+    logging.info("Video feed started at %s", time.ctime(session_start_time))
+
+    # Get the camera index from the query parameters, default to 0
+    camera_index = request.args.get('index', default=0, type=int)
+
+    # Stop and release the current camera
+    global cap
+    if cap:
+        cap.release()
+
+    # Set the new camera index
+    global current_camera_index
+    current_camera_index = camera_index
+
+    # Start streaming video from the selected camera
+    logging.info(f"Streaming video from camera index {camera_index}")
+    return Response(generate_video_feed(draw_dots=False), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/posture_times', methods=['GET'])
 def get_posture_times():

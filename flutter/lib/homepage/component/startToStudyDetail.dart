@@ -22,6 +22,7 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
   List<Map<String, dynamic>> recentActivities = [];
   List<Map<String, dynamic>> upcomingPayments = [];
   List<dynamic> records = [];
+  bool isSwitched = false; // 定义一个状态变量
 
   @override
   void initState() {
@@ -186,7 +187,7 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
           height: SizeConfig.blockSizeVertical! * 15, // 按钮上方的间距
         ),
 
-        // 按钮组件
+        // 开始按钮组件
         ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.white,
@@ -199,26 +200,51 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
               context: context,
               builder: (BuildContext context) {
                 // return VideoDialog();
-                String videoUrl = 'http://127.0.0.1:5000/video_feed';
-                return VideoWebViewDialog(
-                    videoUrl: videoUrl); // 使用命名参数 videoUrl
+                String videoUrl = '';
+                if (isSwitched) {
+                  videoUrl = 'http://127.0.0.1:5000/video_feed';
+                } else {
+                  videoUrl = 'http://127.0.0.1:5000/video_feed_without_dots';
+                }
+                return VideoWebViewDialog(videoUrl: videoUrl);
               },
             );
           },
           child: Text("开始"),
         ),
 
+        SizedBox(
+          height: SizeConfig.blockSizeVertical! * 7, // 按钮下方的间距
+        ),
+
+        // 切换按钮
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              "显示",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            ),
+            Switch(
+              value: isSwitched,
+              onChanged: (value) {
+                setState(() {
+                  isSwitched = value; // 更新状态
+                });
+              },
+            ),
+          ],
+        ),
+
         // 按钮下方的间距
         SizedBox(
-          height: SizeConfig.blockSizeVertical! * 15, // 调整此值来增加下方的间距
+          height: SizeConfig.blockSizeVertical! * 7, // 调整此值来增加下方的间距
         ),
 
         // 个人专注部分的记录列表
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            FloatingActionButton(
-                onPressed: fetchAndInitialize, child: Icon(Icons.refresh)),
             PrimaryText(
               text: '个人专注记录',
               size: 18,
@@ -230,6 +256,8 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
               fontWeight: FontWeight.w400,
               color: AppColors.secondary,
             ),
+            ElevatedButton(
+                onPressed: fetchAndInitialize, child: Icon(Icons.refresh)),
           ],
         ),
 
