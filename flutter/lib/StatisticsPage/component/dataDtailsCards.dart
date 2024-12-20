@@ -63,6 +63,7 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
       'todayDuration': 0.0,
       'targetDateRecords': 0,
       'targetDateDuration': 0.0,
+      'postureAbnormalDuration': 0.0,
     };
 
     // 获取今天的日期
@@ -98,6 +99,18 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
         result['todayDuration'] += record['duration'];
       }
 
+    Map<String, dynamic> postureTimes = record['posture_times'] ?? {};
+    double postureAbnormalDuration = 
+    (postureTimes['lying down in the chair'] is num 
+        ? postureTimes['lying down in the chair'] 
+        : 0.0) +
+    (postureTimes['left tilt'] is num 
+        ? postureTimes['left tilt'] 
+        : 0.0) +
+    (postureTimes['right tilt'] is num 
+        ? postureTimes['right tilt'] 
+        : 0.0);
+
       // 累积指定日期的数据
       if (targetDate != null && isSameDay(recordDate, targetDate)) {
         result['targetDateRecords'] ??= 0;
@@ -105,6 +118,7 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
         result['targetDateRecords'] += 1;
         result['targetDateDuration'] += record['duration'];
         print('Updated targetDateDuration: ${result['targetDateDuration']}');
+         result['postureAbnormalDuration'] += postureAbnormalDuration;
       }
     }
 
@@ -199,7 +213,7 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
 
     print("_eventDates: $_eventDates"); // 调试日志
 
-
+    String todayDateOfHeader = DateFormat('今天：MM月dd日').format(DateTime.now());
     return Container(
       height: MediaQuery.of(context).size.height, // 设置父容器高度以支持滚动
       child: SingleChildScrollView(
@@ -218,7 +232,7 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
                       fontWeight: FontWeight.w800,
                     ),
                     PrimaryText(
-                      text: '今天：xx月xx日',
+                      text: todayDateOfHeader,
                       size: 16,
                       fontWeight: FontWeight.w800,
                       color: AppColors.secondary,
@@ -423,8 +437,9 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
                           // ),
                           SizedBox(height: SizeConfig.blockSizeVertical! * 2),
                           MyPieChart(
-                            selectedDate: selectedDate,
-                            data: selectedDateData,
+                            //selectedDate: selectedDate,
+                              selectedDate: selectedDate,
+                              data: selectedDateData,
                           ),
                           //SizedBox(height: SizeConfig.blockSizeVertical! * 2),
                           // Container(

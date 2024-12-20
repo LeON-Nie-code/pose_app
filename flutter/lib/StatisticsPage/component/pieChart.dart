@@ -3,6 +3,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:pose_app/config/size_config.dart';
 import 'package:pose_app/style/colors.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MyPieChart extends StatelessWidget {
   final DateTime? selectedDate; // 新增选中日期参数
@@ -19,6 +20,7 @@ class MyPieChart extends StatelessWidget {
     // 获取选中日期的时长
     double targetDateDuration = data['targetDateDuration'] ?? 0.0;
     double totalDuration = data['totalDuration'] ?? 0.0;
+    double postureAbnormalDuration = data['postureAbnormalDuration'] ?? 0.0;
 
     // 如果 `totalDuration` 为 0，设置默认值，避免饼图报错
     if (totalDuration == 0) {
@@ -28,18 +30,26 @@ class MyPieChart extends StatelessWidget {
 
     // 计算剩余时长
     double remainingDuration =
-        (totalDuration - targetDateDuration).clamp(0.0, double.infinity);
+        (totalDuration - targetDateDuration - postureAbnormalDuration)
+            .clamp(0.0, double.infinity);
 
     // 构建饼图数据
     List<PieChartSectionData> pieChartSections = [
-      if (targetDateDuration > 0) // 仅当值大于0时添加这部分
+      if (targetDateDuration > 0) // 专注时长部分
         PieChartSectionData(
           value: targetDateDuration,
           color: AppColors.pinkpg,
           showTitle: false,
           radius: 25,
         ),
-      if (remainingDuration > 0) // 仅当值大于0时添加这部分
+      if (postureAbnormalDuration > 0) // 坐姿异常部分
+        PieChartSectionData(
+          value: postureAbnormalDuration,
+          color: AppColors.bluegrey,
+          showTitle: false,
+          radius: 25,
+        ),
+      if (remainingDuration > 0) // 其他时长部分
         PieChartSectionData(
           value: remainingDuration,
           color: AppColors.iconGray.withOpacity(0.1),
@@ -160,14 +170,44 @@ class MyPieChart extends StatelessWidget {
                   ),
                 ),
                 // 中心的总时长
-                if (selectedDate != null)
-                  Text(
-                    '${(targetDateDuration / 60).toStringAsFixed(2)} 分钟',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '总时长',
+                        style: GoogleFonts.notoSans(
+                        textStyle:TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.pinkpg.withOpacity(0.7)
+                        ),
+                      ),
+                      ),
+                      Text(
+                        '${(targetDateDuration / 60).toStringAsFixed(2)} 分钟',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.pinkpg.withOpacity(0.7),
+                        ),
+                      ),
+                      Text(
+                      '坐姿异常',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.bluegrey.withOpacity(0.7),
+                      ),
+                     ),
+                     Text(
+                      '${(postureAbnormalDuration / 60).toStringAsFixed(2)} 分钟',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.bluegrey.withOpacity(0.7),
+                      ),
+                     ),
+                    ],
                   ),
               ],
             ),

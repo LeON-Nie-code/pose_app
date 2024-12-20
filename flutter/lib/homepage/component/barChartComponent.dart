@@ -88,7 +88,7 @@ class _BarChartComponentState extends State<BarChartComponent> {
         borderData: FlBorderData(show: false),
         alignment: BarChartAlignment.spaceBetween,
         axisTitleData: FlAxisTitleData(leftTitle: AxisTitle(reservedSize: 20)),
-        gridData: FlGridData(drawHorizontalLine: true, horizontalInterval: 10),
+        gridData: FlGridData(drawHorizontalLine: true, horizontalInterval: 15),
         titlesData: FlTitlesData(
           leftTitles: SideTitles(
             reservedSize: 30,
