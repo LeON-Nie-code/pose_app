@@ -44,7 +44,17 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
     print('Initialize Recent Activities');
     // print('Records: $records');
     records.forEach((record) {
-      int startTime = record['start_time'];
+      int startTime;
+      var startTimeValue = record['start_time'];
+      if (startTimeValue is int) {
+        startTime = startTimeValue;
+      } else if (startTimeValue is double) {
+        startTime = startTimeValue.toInt();
+      } else {
+        throw Exception(
+            "Invalid type for start_time: ${startTimeValue.runtimeType}");
+      }
+
       double sessionDuration = record['eye_times']['session_duration'];
 
       // 将Unix时间戳转换为日期时间

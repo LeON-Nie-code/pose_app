@@ -170,45 +170,44 @@ class MyPieChart extends StatelessWidget {
                   ),
                 ),
                 // 中心的总时长
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '总时长',
-                        style: GoogleFonts.notoSans(
-                        textStyle:TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.pinkpg.withOpacity(0.7)
-                        ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '总时长',
+                      style: GoogleFonts.notoSans(
+                        textStyle: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.pinkpg.withOpacity(0.7)),
                       ),
+                    ),
+                    Text(
+                      '${(targetDateDuration / 60).toStringAsFixed(2)} 分钟',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.pinkpg.withOpacity(0.7),
                       ),
-                      Text(
-                        '${(targetDateDuration / 60).toStringAsFixed(2)} 分钟',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.pinkpg.withOpacity(0.7),
-                        ),
-                      ),
-                      Text(
+                    ),
+                    Text(
                       '坐姿异常',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w900,
                         color: AppColors.bluegrey.withOpacity(0.7),
                       ),
-                     ),
-                     Text(
+                    ),
+                    Text(
                       '${(postureAbnormalDuration / 60).toStringAsFixed(2)} 分钟',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w900,
                         color: AppColors.bluegrey.withOpacity(0.7),
                       ),
-                     ),
-                    ],
-                  ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ],
