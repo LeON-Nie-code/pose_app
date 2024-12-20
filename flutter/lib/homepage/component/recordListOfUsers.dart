@@ -7,12 +7,14 @@ class RecordListOfUsers extends StatefulWidget {
   final String? icon;
   final String? label;
   final String? amount;
+  final DateTime? selectedDate;
 
   const RecordListOfUsers({
     Key? key,
     @required this.icon,
     this.label,
     this.amount,
+    this.selectedDate,
   }) : super(key: key);
 
   @override
@@ -22,6 +24,22 @@ class RecordListOfUsers extends StatefulWidget {
 class _RecordListOfUsersState extends State<RecordListOfUsers> {
   // 这里可以定义一些状态变量，例如：
   String? _statusLabel; // 假设我们想要动态改变状态标签
+
+  static const List<String> month = [
+    '',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
+  ];
 
   @override
   void initState() {
@@ -61,7 +79,9 @@ class _RecordListOfUsersState extends State<RecordListOfUsers> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           PrimaryText(
-            text: 'Successfully',
+            text: widget.selectedDate != null
+                ? '${widget.selectedDate!.day} ${month[widget.selectedDate!.month]} ${widget.selectedDate!.year}'
+                : '02 Mar 20xx（例子）',
             size: 12.0,
             color: AppColors.secondary,
           ),

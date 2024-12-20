@@ -15,6 +15,8 @@ class VideoWebViewDialog extends StatefulWidget {
 class _VideoWebViewDialogState extends State<VideoWebViewDialog> {
   late WebviewController _controller;
   bool _isWebViewInitialized = false;
+  double dialogWidth = 800; // 初始宽度
+  double dialogHeight = 600; // 初始高度
 
   @override
   void initState() {
@@ -28,7 +30,26 @@ class _VideoWebViewDialogState extends State<VideoWebViewDialog> {
   Future<void> _initializeWebView() async {
     await _controller.initialize();
     await _controller.loadUrl(widget.videoUrl); // 加载视频流的 URL
+
+//     await _controller.executeScript('''
+//     document.body.style.backgroundColor = 'white'; // 设置整个页面的背景为白色
+//     var videos = document.getElementsByTagName('video');
+//     for (var i = 0; i < videos.length; i++) {
+//         videos[i].style.backgroundColor = 'white'; // 设置视频区域的背景为白色
+//         videos[i].style.objectFit = 'contain'; // 确保视频按比例显示并留白
+//     }
+// ''');
+//     await _controller.executeScript('''
+//     var videos = document.getElementsByTagName('video');
+//     for (var i = 0; i < videos.length; i++) {
+//         videos[i].style.objectFit = 'contain';
+//         videos[i].style.backgroundColor = 'white';
+//     }
+// ''');
+
     setState(() {
+      dialogWidth = 615;
+      dialogHeight = 510;
       _isWebViewInitialized = true;
     });
   }
@@ -46,6 +67,24 @@ class _VideoWebViewDialogState extends State<VideoWebViewDialog> {
         'http://127.0.0.1:5000/session_record',
       );
       print('Session Record: ${response.data}');
+
+      if (response.data['duration'] != null) {
+        print('Duration: ${response.data['duration']}');
+        if (response.data['duration'] < 10) {
+          print('Duration is less than 10 seconds');
+
+          // 如果会话持续时间小于10秒，则不插入记录
+          // 并显示警告消息
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('专注时间太短，此次活动不会被记录'),
+            ),
+          );
+
+          return;
+        }
+      }
+
       // 将response.data作为JSON数据传递给POST请求
       await insertRecord(response.data);
     } catch (e) {
@@ -97,8 +136,13 @@ class _VideoWebViewDialogState extends State<VideoWebViewDialog> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Container(
-        width: 800,
-        height: 600,
+        width: dialogWidth,
+        height: dialogHeight,
+        // width: 600,
+        // height: 500,
+        margin: EdgeInsets.zero, // 清除外部边距
+        padding: EdgeInsets.zero, // 清除内部边距
+        color: Colors.white, // 设置整个容器背景为白色
         child: Column(
           children: [
             // 只有在 WebView 初始化后才显示

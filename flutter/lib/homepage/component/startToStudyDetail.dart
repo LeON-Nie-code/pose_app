@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:pose_app/homepage/component/VideoDialog.dart';
 import 'package:pose_app/homepage/component/recordListOfUsers.dart';
 import 'package:pose_app/homepage/component/WebViewDialog.dart';
 import 'package:pose_app/config/size_config.dart';
@@ -36,13 +35,14 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
     await getUserRecords();
     initializeRecentActivities();
     initializaUpcomingPayments();
+    setState(() {});
   }
 
   void initializeRecentActivities() {
     recentActivities.clear();
     print('recentActivities count: ${recentActivities.length}');
     print('Initialize Recent Activities');
-    // print('Records: $records');
+    print('Records: $records');
     records.forEach((record) {
       int startTime;
       var startTimeValue = record['start_time'];
@@ -70,22 +70,27 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
       int minutes_int = minutes.toInt();
       int seconds_int = seconds.toInt();
 
+      print('minutes: $minutes_int, seconds: $seconds_int');
+
       recentActivities.add({
         "icon": "assets/icons/User.svg",
         "label": "专注任务",
         "amount": "$minutes_int 分 $seconds_int 秒",
+        "selectedDate": dateTime,
       });
 
       // 打印格式化后的数据
       // print(
       //     'Start Time: $formattedDateTime, Session Duration: $minutes min $seconds sec');
     });
-    // setState(() {
-    //   recentActivities = [
-    //     {"icon": "assets/icons/User.svg", "label": "专注任务1", "amount": "25分钟"},
-    //     {"icon": "assets/icons/User.svg", "label": "专注任务2", "amount": "30分钟"},
-    //   ];
-    // });
+
+    //将recentActivities顺序反转
+
+    Future.delayed(Duration(milliseconds: 50), () {
+      setState(() {
+        recentActivities = recentActivities.reversed.toList();
+      });
+    });
   }
 
   void initializaUpcomingPayments() {
@@ -121,6 +126,7 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
         "icon": Icons.work,
         "label": "新任务",
         "amount": "20分钟",
+        "selectedDate": DateTime.now(),
       });
     });
   }
@@ -212,7 +218,7 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             FloatingActionButton(
-                onPressed: fetchAndInitialize, child: Icon(Icons.add)),
+                onPressed: fetchAndInitialize, child: Icon(Icons.refresh)),
             PrimaryText(
               text: '个人专注记录',
               size: 18,
@@ -238,6 +244,7 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
               icon: recentActivities[index]["icon"],
               label: recentActivities[index]["label"],
               amount: recentActivities[index]["amount"],
+              selectedDate: recentActivities[index]["selectedDate"],
             ),
           ),
         ),
