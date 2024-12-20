@@ -183,6 +183,23 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
   Widget build(BuildContext context) {
     SizeConfig().init(context); // 初始化屏幕尺寸配置
 
+    Map<DateTime, List<String>> _eventDates = {};
+    for (var record in records) {
+      String createdAt = record['created_at'];
+      DateFormat format = DateFormat("EEE, dd MMM yyyy HH:mm:ss 'GMT'");
+      try {
+        DateTime recordDate = format.parse(createdAt);
+        // 确保键是标准化日期
+        DateTime normalizedDate = DateTime(recordDate.year, recordDate.month, recordDate.day);
+        _eventDates.putIfAbsent(normalizedDate, () => ["Recorded"]);
+      } catch (e) {
+        print('Error parsing date: $e');
+      }
+    }
+
+    print("_eventDates: $_eventDates"); // 调试日志
+
+
     return Container(
       height: MediaQuery.of(context).size.height, // 设置父容器高度以支持滚动
       child: SingleChildScrollView(
@@ -441,6 +458,7 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
                             print('Selected Date Data: $selectedDateData');
                           });
                         },
+                         events: _eventDates
                       ),
                     ),
                   ),

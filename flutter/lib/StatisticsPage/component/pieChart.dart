@@ -20,25 +20,32 @@ class MyPieChart extends StatelessWidget {
     double targetDateDuration = data['targetDateDuration'] ?? 0.0;
     double totalDuration = data['totalDuration'] ?? 0.0;
 
+    // 如果 `totalDuration` 为 0，设置默认值，避免饼图报错
+    if (totalDuration == 0) {
+      totalDuration = 1;
+      targetDateDuration = 0; // 防止 0 的部分渲染
+    }
+
     // 计算剩余时长
-    double remainingDuration = (totalDuration - targetDateDuration).clamp(0.0, double.infinity);
+    double remainingDuration =
+        (totalDuration - targetDateDuration).clamp(0.0, double.infinity);
 
     // 构建饼图数据
     List<PieChartSectionData> pieChartSections = [
-      // 选中日期的总时长部分
-      PieChartSectionData(
-        value: targetDateDuration,
-        color: AppColors.pinkpg,
-        showTitle: false,
-        radius: 25,
-      ),
-      // 剩余部分
-      PieChartSectionData(
-        value: remainingDuration,
-        color: AppColors.iconGray.withOpacity(0.1),
-        showTitle: false,
-        radius: 25,
-      ),
+      if (targetDateDuration > 0) // 仅当值大于0时添加这部分
+        PieChartSectionData(
+          value: targetDateDuration,
+          color: AppColors.pinkpg,
+          showTitle: false,
+          radius: 25,
+        ),
+      if (remainingDuration > 0) // 仅当值大于0时添加这部分
+        PieChartSectionData(
+          value: remainingDuration,
+          color: AppColors.iconGray.withOpacity(0.1),
+          showTitle: false,
+          radius: 25,
+        ),
     ];
 
     return Card(
@@ -77,7 +84,65 @@ class MyPieChart extends StatelessWidget {
                   ),
                 ),
               ),
-            SizedBox(height: 15),
+            SizedBox(height: 8),
+            Row(
+              children: [
+                Container(
+                  width: 20,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: AppColors.pinkpg,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                SizedBox(width: 10),
+                const Text(
+                  '专注时长',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(width: 10),
+                Container(
+                  width: 20,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: AppColors.bluegrey,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                SizedBox(width: 10),
+                const Text(
+                  '坐姿异常',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(width: 10),
+                Container(
+                  width: 20,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: AppColors.iconGray.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                SizedBox(width: 10),
+                const Text(
+                  '其他',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(width: 10),
+              ],
+            ),
             // 饼图及中心文字
             Stack(
               alignment: Alignment.center,

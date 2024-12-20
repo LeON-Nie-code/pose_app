@@ -5,8 +5,9 @@ import 'package:table_calendar/table_calendar.dart';
 
 class CalendarWidget extends StatefulWidget {
   final Function(DateTime) onDateSelected; // 回调函数，用于通知主页面选中的日期
+  final Map<DateTime, List<String>> events;
 
-  CalendarWidget({Key? key, required this.onDateSelected}) : super(key: key);
+  CalendarWidget({Key? key, required this.onDateSelected,required this.events}) : super(key: key);
 
   @override
   _CalendarWidgetState createState() => _CalendarWidgetState();
@@ -17,10 +18,10 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   DateTime? _selectedDay; // 用于存储当前选中的日期
 
   // 模拟定义一个简单的事件模型（到时候要断成有记录的日期）
-  final Map<DateTime, List<String>> _events = {
-    DateTime.utc(2024, 12, 22): ["Event 1"],
-    DateTime.utc(2024, 12, 12): ["Event 2"],
-  };
+  // final Map<DateTime, List<String>> _events = {
+  //   DateTime.utc(2024, 12, 22): ["Event 1"],
+  //   DateTime.utc(2024, 12, 12): ["Event 2"],
+  // };
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +114,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                   shape: BoxShape.circle,
                 )),
             eventLoader: (day) {
-              return _events[day] ?? [];
+            DateTime normalizedDay = DateTime(day.year, day.month, day.day); // 确保格式一致
+            return widget.events[normalizedDay] ?? [];
             },
           ),
         ],
