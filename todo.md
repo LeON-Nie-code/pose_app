@@ -98,6 +98,22 @@
 2. 完善API文档
 
 
+### 前端
+1. 完善数据统计，对专注记录的分析
+2. 将刷新结合到左侧导航栏
+3. 排行榜（先使用具体数据，后续补API）
+4. 主页右侧专注任务，实现通过点击展示具体数据
+5. Flutter测试
+6. 整体样式，颜色的统一
+
+
+### 部署
+1. 对于后端API的压测，单元测试，集成测试等
+2. 打包成exe自动安装程序
+3. 完善文档
+
+
+
 
 Traceback (most recent call last):
   File "E:\Courses\SoftwareConstruction\pose_app\detect\venv\Lib\site-packages\werkzeug\wsgi.py", line 256, in __next__

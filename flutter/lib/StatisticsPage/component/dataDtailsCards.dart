@@ -100,23 +100,29 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
       }
 
       Map<String, dynamic> postureTimes = record['posture_times'] ?? {};
-      double postureAbnormalDuration = (postureTimes['lying down in the chair']
-                  is num
-              ? postureTimes['lying down in the chair']
-              : 0.0) +
-          (postureTimes['left tilt'] is num ? postureTimes['left tilt'] : 0.0) +
-          (postureTimes['right tilt'] is num
-              ? postureTimes['right tilt']
-              : 0.0);
+
+      double sessionDuration =
+          postureTimes['session_duration'] ?? record['duration'];
+
+      // 计算坐姿异常总时长
+      double postureAbnormalDuration =
+          ((postureTimes['lying down in the chair'] ?? 0.0) +
+                  (postureTimes['left tilt'] ?? 0.0) +
+                  (postureTimes['right tilt'] ?? 0.0))
+              .clamp(0.0, sessionDuration);
 
       // 累积指定日期的数据
       if (targetDate != null && isSameDay(recordDate, targetDate)) {
-        result['targetDateRecords'] ??= 0;
-        result['targetDateDuration'] ??= 0.0;
+        // result['targetDateRecords'] ??= 0;
+        // result['targetDateDuration'] ??= 0.0;
         result['targetDateRecords'] += 1;
         result['targetDateDuration'] += record['duration'];
         print('Updated targetDateDuration: ${result['targetDateDuration']}');
-        result['postureAbnormalDuration'] += postureAbnormalDuration;
+
+        //计算坐姿异常
+        result['postureAbnormalDuration'] =
+            (result['postureAbnormalDuration'] + postureAbnormalDuration)
+                .clamp(0.0, result['targetDateDuration']);
       }
     }
 
@@ -221,7 +227,6 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
           children: [
             // 标题
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween, // 设置主轴对齐方式
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
