@@ -11,8 +11,8 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 
 from . import constraint, models
-from .models import Friendship, User
 from .SendCode import send
+from .models import Friendship, User, Profile
 
 
 def register(request):
@@ -46,7 +46,8 @@ def register(request):
         request.session.save()
         return HttpResponse(status=200)
     else:
-        User.objects.create_user(username=data.username, password=data.password, mobile=data.mobile)
+        new_user = User.objects.create_user(username=data.username, password=data.password, mobile=data.mobile)
+        Profile.objects.create(user=new_user)
         return HttpResponse(status=200)
 
 
@@ -70,7 +71,10 @@ def login(request):
     auth.login(request, the_user)
     the_user.online = True
     the_user.save()
-    return JsonResponse({})
+    return JsonResponse({
+        'login': reverse('login'),
+        'session_id': request.session.session_key,
+    })
 
 
 @login_required
@@ -155,9 +159,10 @@ def friend(request, userid=None):
 
         elif request.method == 'POST':
             try:
-                friendship = (user.friendships_asA.all() | user.friendships_asB.all()).get(
+                friendship = user.friendships_asB.all().get(
                     Q(userA=other) | Q(userB=other), waiting=True)
                 friendship.waiting = False
+                friendship.save()
                 return HttpResponse(status=200)
             except Friendship.DoesNotExist:
                 return HttpResponse(status=400)

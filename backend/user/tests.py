@@ -1,6 +1,5 @@
 import json
 from http import HTTPStatus
-from http.client import responses
 
 from django.conf import settings
 from django.test import TestCase, Client
@@ -99,23 +98,23 @@ class TestFriends(TestCase):
 
         self.client.login(username='victor', password='vector')
         # 进入待通过好友列表
-        response = self.client.get('user/friend')
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('neo', json.loads(response.content['applying']))
+        response = self.client.get(reverse('friend'))
+        self.assertEqual(response.status_code, 200, msg=response.context)
+        self.assertIn('neo', json.loads(response.content)['applying'])
         # 未受邀便试图通过
-        response = self.client.post('user/friend/knuth')
+        response = self.client.post(reverse('friend_user', args=['knuth']))
         self.assertEqual(response.status_code, 404)
         # 成功通过，更新好友列表
-        response = self.client.put('user/friend/victor')
+        response = self.client.post(reverse('friend_user', args=['neo']))
         self.assertEqual(response.status_code, 200)
-        response = self.client.get('user/friend')
-        self.assertIn('neo', json.loads(response.content['offline']))
+        response = self.client.get(reverse('friend'))
+        self.assertIn('neo', json.loads(response.content)['offline'])
         self.client.logout()
 
         self.client.login(username='neo', password='one')
         # 申请通过，更新好友列表
-        response = self.client.get('user/friend')
-        self.assertIn('victor', json.loads(response.content['offline']))
+        response = self.client.get(reverse('friend'))
+        self.assertIn('victor', json.loads(response.content)['offline'])
         self.client.logout()
 
     def test_break(self):
@@ -156,16 +155,17 @@ class TestProfile(TestCase):
         profile.gender = data['gender']
         profile.email = data['email']
         profile.save()
-        response = self.client.get('user/profile')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.content), data)
+        response = self.client.get(reverse('profile'))
+        self.assertEqual(response.status_code, 200, msg=response.context)
+        resp_body = json.loads(response.content)
+        self.assertTrue(all(resp_body[k] == data[k] for k in data))
 
     def test_update(self):
-        data = self.client.patch(
-            '/user/profile',
+        response = self.client.patch(
+            reverse('profile'),
             {'school': 'Bilibili'},
             content_type='application/json'
         )
-        self.assertEqual(data.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         profile = Profile.objects.get(user=User.objects.get(username='neo'))
-        self.assertEqual(profile.school, 'Bilibili')
+        self.assertEqual(profile.institution, 'Bilibili')

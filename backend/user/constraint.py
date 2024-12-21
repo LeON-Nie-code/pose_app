@@ -49,11 +49,15 @@ class ProfileMsg(dict):
     def __init__(self, raw: dict):
         super(ProfileMsg, self).__init__()
 
-        if name_pattern.fullmatch(val := raw.get('name')):
-            self['name'] = val
-        if email_pattern.fullmatch(val := raw.get('email')):
-            self['email'] = val
-        if school_pattern.fullmatch(val := raw.get('school')):
-            self['school'] = val
-        if gender_pattern.fullmatch(val := raw.get('gender')):
-            self['gender'] = val
+        if val := raw.get('name'):
+            if name_pattern.fullmatch(val):
+                self['nickname'] = val
+        if val := raw.get('email'):
+            if email_pattern.fullmatch(val):
+                self['email'] = val
+        if val := raw.get('school'):
+            if school_pattern.fullmatch(val):
+                self['institution'] = val
+        if val := raw.get('gender'):
+            if gender_pattern.fullmatch(val):
+                self['gender'] = val
