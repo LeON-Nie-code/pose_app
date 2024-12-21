@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 # This file is auto-generated, don't edit it. Thanks.
-import os
 import sys
-
 from typing import List
 
+from alibabacloud_dysmsapi20170525 import models as dysmsapi_20170525_models
 from alibabacloud_dysmsapi20170525.client import Client as Dysmsapi20170525Client
 from alibabacloud_tea_openapi import models as open_api_models
-from alibabacloud_dysmsapi20170525 import models as dysmsapi_20170525_models
 from alibabacloud_tea_util import models as util_models
 from alibabacloud_tea_util.client import Client as UtilClient
 
@@ -23,24 +21,25 @@ def create_client() -> Dysmsapi20170525Client:
     config = open_api_models.Config(
         # 必填，请确保代码运行环境设置了环境变量 ALIBABA_CLOUD_ACCESS_KEY_ID。,
         # access_key_id=os.environ['ALIBABA_CLOUD_ACCESS_KEY_ID'],
-        access_key_id= ALIBABA_CLOUD_ACCESS_KEY_ID,
+        access_key_id=ALIBABA_CLOUD_ACCESS_KEY_ID,
 
         # 必填，请确保代码运行环境设置了环境变量 ALIBABA_CLOUD_ACCESS_KEY_SECRET。,
         # access_key_secret=os.environ['ALIBABA_CLOUD_ACCESS_KEY_SECRET']
-        access_key_secret= ALIBABA_CLOUD_ACCESS_KEY_SECRET
+        access_key_secret=ALIBABA_CLOUD_ACCESS_KEY_SECRET
     )
     # Endpoint 请参考 https://api.aliyun.com/product/Dysmsapi
     config.endpoint = f'dysmsapi.aliyuncs.com'
     return Dysmsapi20170525Client(config)
 
+
 @staticmethod
 def main(
-    args: List[str],
+        args: List[str],
 ) -> None:
     client = create_client()
     send_sms_request = dysmsapi_20170525_models.SendSmsRequest(
         sign_name='阿里云短信测试',
-        template_code= TEMPLATE_CODE,
+        template_code=TEMPLATE_CODE,
         phone_numbers='19837000193',
         template_param='{"code":"1234"}'
     )
@@ -56,9 +55,10 @@ def main(
         print(error.data.get("Recommend"))
         UtilClient.assert_as_string(error.message)
 
+
 @staticmethod
 async def main_async(
-    args: List[str],
+        args: List[str],
 ) -> None:
     client = create_client()
     send_sms_request = dysmsapi_20170525_models.SendSmsRequest(
@@ -79,18 +79,19 @@ async def main_async(
         print(error.data.get("Recommend"))
         UtilClient.assert_as_string(error.message)
 
+
 def SendCode(code, phone_numbers):
     client = create_client()
     send_sms_request = dysmsapi_20170525_models.SendSmsRequest(
         sign_name='坐姿检测清华软工作业',
         template_code=TEMPLATE_CODE,
-        phone_numbers= phone_numbers,
-        template_param= f'{{"code":"{code}"}}'
+        phone_numbers=phone_numbers,
+        template_param=f'{{"code":"{code}"}}'
     )
     runtime = util_models.RuntimeOptions()
     try:
         # 复制代码运行请自行打印 API 的返回值
-        result =  client.send_sms_with_options(send_sms_request, runtime)
+        result = client.send_sms_with_options(send_sms_request, runtime)
         return result
     except Exception as error:
         # 此处仅做打印展示，请谨慎对待异常处理，在工程项目中切勿直接忽略异常。

@@ -5,6 +5,9 @@ services:
     build: .
     restart: always
 
+    volumes:
+      - ./db:/home/server/db
+
     ports:
       - '8080:8080'
     command: [ "bash", "-c", "

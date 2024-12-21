@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-0h$5*0r%4x%+l)2^=4rpjp_q&@^68z_lg39g318y(v^l2&+5gr
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -51,6 +51,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'pose_remote.urls'
+LOGIN_URL = '/user/login'
 
 TEMPLATES = [
     {
@@ -77,11 +78,11 @@ WSGI_APPLICATION = 'pose_remote.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / 'db' / 'db.sqlite3',
     }
 }
 
-MEDIA_ROOT = BASE_DIR / 'db_files'
+MEDIA_ROOT = BASE_DIR / 'db' / 'db_files'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
