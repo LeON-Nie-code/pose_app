@@ -5,13 +5,17 @@ info:
     通过下列REST风格API访问用户、动态、专注记录等资源，并操作。
     
     注意！当下使用的是django自带认证框架，该框架使用会话对象来管理网络请求，因此前端需要保留cookie信息，可能得维护客户端对象。
-  version: '0.2'
+  version: '0.3'
   contact:
     name: THSS本科生们
     url: https://github.com/LeON-Nie-code/pose_app/issues
 
 servers:
   - url: http://118.89.124.30:8080
+
+security:
+  - { }
+  - session_id: [ ]
 
 paths:
   /user/verify:
@@ -42,6 +46,8 @@ paths:
   /user/register:
     description: 提供必要信息，开始注册 #前端接下来应在60秒内发送验证码。
     post:
+      security:
+        - { }
       requestBody:
         required: true
         content:
@@ -73,6 +79,8 @@ paths:
   /user/login:
     description: 用户名-密码登录。
     post:
+      security:
+        - { }
       requestBody:
         required: true
         content:
@@ -87,10 +95,19 @@ paths:
       responses:
         200:
           description: 登录成功！可能返回一些有用的信息。
+          headers:
+            Set-Cookie:
+              description: django后端返回sessionid
           content:
             application/json:
               schema:
                 type: object
+                properties:
+                  login:
+                    type: string
+                    format: uri
+                  session_id:
+                    type: string
         400:
           description: 登录失败，返回简短说明。
           content:
@@ -473,8 +490,8 @@ components:
         gender:
           type: string
           enum:
-            - M
-            - F
+            - Male
+            - Female
           description: 性别
         email:
           type: string
@@ -546,3 +563,10 @@ components:
         text/plain:
           schema:
             type: string
+
+  securitySchemes:
+    session_id:
+      type: apiKey
+      description: django框架用来标识会话的串
+      in: cookie
+      name: sessionid
