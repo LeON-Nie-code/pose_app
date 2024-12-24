@@ -46,41 +46,6 @@ class _PostcontainerState extends State<Postcontainer> {
     access_token = storedAccessToken;
   }
 
-  // Future<void> postComment(
-  //     {required int post_id, required String comment}) async {
-  //   final dio = Dio();
-  //   String url = 'http://8.217.68.60/post/$post_id/comment';
-
-  //   try {
-  //     // 发送 POST 请求
-
-  //     final response = await dio.post(
-  //       url,
-  //       data: {
-  //         'content': comment, // 评论内容
-  //       },
-  //       options: Options(
-  //         headers: {
-  //           'Authorization': 'Bearer $access_token', // 携带 JWT token
-  //         },
-  //         // contentType: 'multipart/form-data', // 确保内容类型正确
-  //       ),
-  //     );
-
-  //     // 检查响应
-  //     if (response.statusCode == 201 || response.statusCode == 200) {
-  //       print('Post liked successfully!');
-  //     } else {
-  //       print('Failed to like post: ${response.data}');
-  //     }
-  //   } on DioException catch (e) {
-  //     print('Error occurred: ${e.response?.data ?? e.message}');
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(content: Text('请求失败')),
-  //     );
-  //   }
-  // }
-
   Future<void> postLike({required int post_id}) async {
     final dio = Dio();
     String url = 'http://8.217.68.60/post/$post_id/like'; // 替换为实际的 API 地址
@@ -413,6 +378,8 @@ class _PostStatsState extends State<_PostStats> {
   }
 
   void _incrementLike() {
+    postLike(post_id: widget.post.post_id);
+    print(widget.post.likes);
     setState(() {
       likeCount++;
     });
@@ -530,6 +497,18 @@ class _PostStatsState extends State<_PostStats> {
   }
 
   void _addComment(String comment) {
+    if (user_name == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('请先登录')),
+      );
+      return;
+    }
+    if (comment.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('评论不能为空')),
+      );
+      return;
+    }
     postComment(post_id: widget.post.post_id, comment: comment);
     setState(() {
       comments.add({'content': comment, 'user_name': user_name ?? ''}); // 使用默认值
@@ -560,6 +539,10 @@ class _PostStatsState extends State<_PostStats> {
               onPressed: () {
                 if (commentText.isNotEmpty) {
                   _addComment(commentText);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('评论不能为空')),
+                  );
                 }
                 Navigator.of(context).pop();
               },

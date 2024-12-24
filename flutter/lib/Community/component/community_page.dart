@@ -33,6 +33,7 @@ class _CommunityState extends State<Community> {
   String access_token = '';
 
   String documentPath = '';
+  bool _isLoading = true; // 添加加载状态
 
   @override
   void initState() {
@@ -42,9 +43,15 @@ class _CommunityState extends State<Community> {
   }
 
   void initThePost() async {
+    setState(() {
+      _isLoading = true; // 开始加载
+    });
     await createDocumentFolder();
     await getAccessToken();
     await getPostsAndSaveImages(access_token);
+    setState(() {
+      _isLoading = false; // 加载完成
+    });
   }
 
   Future<void> loadPosts() async {
@@ -161,7 +168,7 @@ class _CommunityState extends State<Community> {
               caption: post['content'],
               timeAgo: post['date_posted'],
               assetImages: assetImages, // 使用实际图片数量
-              likes: 0,
+              likes: post['likes']?.toInt() ?? 0,
               comments: 0,
               shares: 0,
               post_id: post['post_id'],
@@ -220,7 +227,7 @@ class _CommunityState extends State<Community> {
           title: const Text(
             '朋友圈',
             style: TextStyle(
-              color: AppColors.black,
+              color: Colors.black,
               fontSize: 28.0,
               fontWeight: FontWeight.bold,
               letterSpacing: -1.2,
@@ -246,16 +253,25 @@ class _CommunityState extends State<Community> {
           //child: AboutMyContainer(currentUser: currentUser),
           child: AboutMyContainer(),
         ),
-        // 动态列表展示
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              final Post post = _posts[index];
-              return Postcontainer(post: post);
-            },
-            childCount: _posts.length,
+        if (_isLoading)
+          SliverToBoxAdapter(
+            child: Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 20.0),
+                child: CircularProgressIndicator(), // 加载指示器
+              ),
+            ),
+          )
+        else
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                final Post post = _posts[index];
+                return Postcontainer(post: post);
+              },
+              childCount: _posts.length,
+            ),
           ),
-        ),
       ],
     );
   }
