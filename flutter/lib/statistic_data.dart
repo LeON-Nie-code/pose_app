@@ -14,12 +14,14 @@ class StudyDetails {
       : aboutTotalData = [
           StudyDataModel(title: "次数", data: {"value": "0"}), // 累积次数默认 0
           StudyDataModel(title: "时长", data: {"totalHour": "0"}), // 累积时长默认 0
-          StudyDataModel(title: "日均时长", data: {"totalAverage": "0"}), // 累积日均时长默认 0
+          StudyDataModel(
+              title: "次均时长", data: {"totalAverage": "0"}), // 累积日均时长默认 0
         ],
         aboutTodayData = [
           StudyDataModel(title: "次数", data: {"todayValue": "0"}), // 当天次数默认 0
           StudyDataModel(title: "时长", data: {"todayHour": "0"}), // 当天时长默认 0
-          StudyDataModel(title: "日均时长", data: {"todayAverage": "0"}), // 当天日均时长默认 0
+          StudyDataModel(
+              title: "次均时长", data: {"todayAverage": "0"}), // 当天日均时长默认 0
         ];
 }
 

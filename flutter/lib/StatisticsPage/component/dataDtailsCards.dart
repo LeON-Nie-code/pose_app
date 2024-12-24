@@ -40,8 +40,8 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
     await getUserRecords(); // 等待记录获取完成
     //initializaStudyDetails(); // 数据拉取后初始化StudyDetails
     setState(() {
-    initializaStudyDetails();
-  });
+      initializaStudyDetails();
+    });
   }
 
   void onDateSelected(DateTime date) {
@@ -141,7 +141,6 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
     // };
     print('!!!!!!!!!!!!!!Initializing Study Details with records: $records');
 
-
     Map<String, dynamic> data = analyzeData(records, null);
 
     print('Data: $data');
@@ -152,21 +151,39 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
     setState(() {
       widget.studyDetails.aboutTotalData[0] = StudyDataModel(
         title: "次数",
-        data: {"value": data['totalRecords'].toString()},
+        data: {"value": "${data['totalRecords'].toString()} 次"},
       );
       widget.studyDetails.aboutTotalData[1] = StudyDataModel(
         title: "时长",
-        data: {"totalHour": (data['totalDuration'] / 60).toStringAsFixed(2)},
+        data: {
+          "totalHour": "${(data['totalDuration'] / 60).toStringAsFixed(2)} 分钟"
+        },
+      );
+      widget.studyDetails.aboutTotalData[2] = StudyDataModel(
+        title: "次均时长",
+        data: {
+          "totalAverage":
+              "${(data['totalDuration'] / (60 * data['totalRecords'])).toStringAsFixed(2)} 分钟"
+        },
       );
 
       // 更新今日数据
       widget.studyDetails.aboutTodayData[0] = StudyDataModel(
         title: "次数",
-        data: {"todayValue": data['todayRecords'].toString()},
+        data: {"todayValue": "${data['todayRecords'].toString()} 次"},
       );
       widget.studyDetails.aboutTodayData[1] = StudyDataModel(
         title: "时长",
-        data: {"todayHour": (data['todayDuration'] / 60).toStringAsFixed(2)},
+        data: {
+          "todayHour": "${(data['todayDuration'] / 60).toStringAsFixed(2)} 分钟"
+        },
+      );
+      widget.studyDetails.aboutTodayData[2] = StudyDataModel(
+        title: "次均时长",
+        data: {
+          "todayAverage":
+              "${(data['todayDuration'] / (60 * data['todayRecords'])).toStringAsFixed(2)} 分钟"
+        },
       );
     });
   }
