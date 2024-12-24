@@ -78,6 +78,7 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
         "label": "专注任务",
         "amount": "$minutes_int 分 $seconds_int 秒",
         "selectedDate": dateTime,
+        "record": record,
       });
 
       // 打印格式化后的数据
@@ -128,6 +129,7 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
         "label": "新任务",
         "amount": "20分钟",
         "selectedDate": DateTime.now(),
+        "record": "record",
       });
     });
   }
@@ -273,6 +275,7 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
               label: recentActivities[index]["label"],
               amount: recentActivities[index]["amount"],
               selectedDate: recentActivities[index]["selectedDate"],
+              record: recentActivities[index]["record"],
             ),
           ),
         ),
@@ -310,6 +313,7 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
               icon: upcomingPayments[index]["icon"],
               label: upcomingPayments[index]["label"],
               amount: upcomingPayments[index]["amount"],
+              record: upcomingPayments[index]["record"],
             ),
           ),
         ),
