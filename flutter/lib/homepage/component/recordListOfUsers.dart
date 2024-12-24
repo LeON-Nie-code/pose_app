@@ -1,3 +1,4 @@
+import 'dart:convert'; // 用于格式化JSON
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pose_app/style/colors.dart';
@@ -8,6 +9,7 @@ class RecordListOfUsers extends StatefulWidget {
   final String? label;
   final String? amount;
   final DateTime? selectedDate;
+  final Map<String, dynamic>? record; // 修改类型为 Map<String, dynamic>
 
   const RecordListOfUsers({
     Key? key,
@@ -15,6 +17,7 @@ class RecordListOfUsers extends StatefulWidget {
     this.label,
     this.amount,
     this.selectedDate,
+    this.record,
   }) : super(key: key);
 
   @override
@@ -22,8 +25,7 @@ class RecordListOfUsers extends StatefulWidget {
 }
 
 class _RecordListOfUsersState extends State<RecordListOfUsers> {
-  // 这里可以定义一些状态变量，例如：
-  String? _statusLabel; // 假设我们想要动态改变状态标签
+  String? _statusLabel;
 
   static const List<String> month = [
     '',
@@ -44,16 +46,35 @@ class _RecordListOfUsersState extends State<RecordListOfUsers> {
   @override
   void initState() {
     super.initState();
-    // 初始化状态
-    _statusLabel = widget.amount; // 初始状态可以是从属性中获取的值
-    // 可以添加更多的初始化逻辑，比如网络请求等
+    _statusLabel = widget.amount;
   }
 
-  // 提供更改状态的接口，例如一个方法来更新状态Label
-  void updateStatusLabel(String newLabel) {
-    setState(() {
-      _statusLabel = newLabel;
-    });
+  void _showRecordDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Record Details'),
+          content: SingleChildScrollView(
+            child: Text(
+              widget.record != null
+                  ? JsonEncoder.withIndent('  ')
+                      .convert(widget.record) // 格式化JSON
+                  : 'No Record Available',
+              style: TextStyle(fontSize: 14.0),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // 关闭对话框
+              },
+              child: Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -86,13 +107,14 @@ class _RecordListOfUsersState extends State<RecordListOfUsers> {
             color: AppColors.secondary,
           ),
           PrimaryText(
-            text: _statusLabel ?? widget.amount!, // 使用状态变量或属性值
+            text: _statusLabel ?? widget.amount!,
             size: 16.0,
             color: AppColors.secondary,
             fontWeight: FontWeight.w600,
           ),
         ],
       ),
+      onTap: _showRecordDialog, // 添加点击回调
     );
   }
 }
