@@ -17,7 +17,7 @@ import 'package:pose_app/Community/dataAboutCommunity.dart';
 
 // TODO: 后端接口需求
 // - 获取当前用户信息
-// - 获取帖子列表
+// - 获取帖子列表（支持分页）
 // - 提交新帖子（带图片）
 
 class Community extends StatefulWidget {
@@ -34,11 +34,13 @@ class _CommunityState extends State<Community> {
 
   String documentPath = '';
   bool _isLoading = true; // 添加加载状态
+  int currentPage = 1; // 当前页码
+  int totalPages = 1; // 总页数
 
   @override
   void initState() {
     super.initState();
-    // 初始化状态
+// 初始化状态
     initThePost();
   }
 
@@ -48,7 +50,7 @@ class _CommunityState extends State<Community> {
     });
     await createDocumentFolder();
     await getAccessToken();
-    await getPostsAndSaveImages(access_token);
+    await getPostsAndSaveImages(access_token, currentPage);
     setState(() {
       _isLoading = false; // 加载完成
     });
@@ -59,22 +61,13 @@ class _CommunityState extends State<Community> {
   }
 
   Future<void> createDocumentFolder() async {
-    // 获取应用的文档目录
     final directory = await getApplicationDocumentsDirectory();
-    print("application document directory: ${directory.path}");
-
-    // 定义新文件夹的名称
     String newFolderName = 'pose_app';
-
-    // 创建新文件夹的完整路径
     String newFolderPath = '${directory.path}/$newFolderName';
-
-    // 创建Directory对象
     Directory newFolder = Directory(newFolderPath);
 
-    // 检查文件夹是否已经存在
     if (!await newFolder.exists()) {
-      // 如果文件夹不存在，则创建文件夹
+// 如果文件夹不存在，则创建文件夹
       await newFolder.create(recursive: true);
       print('New folder created at: $newFolderPath');
     } else {
@@ -90,20 +83,20 @@ class _CommunityState extends State<Community> {
     if (storedAccessToken == null || storedAccessToken.isEmpty) {
       throw Exception('Access Token not found');
     }
-    // 更新本地状态
+// 更新本地状态
     access_token = storedAccessToken;
   }
 
-  Future<void> getPostsAndSaveImages(String token) async {
+  Future<void> getPostsAndSaveImages(String token, int page) async {
     final dio = Dio();
-    const String url = 'http://8.217.68.60/all_posts'; // 获取所有posts的API
+    final String url = 'http://8.217.68.60/all_posts?page=$page'; // 添加分页参数
 
     setState(() {
-      _posts.clear();
+      _posts.clear(); // 清空现有帖子
     });
 
     try {
-      // 发送 GET 请求
+// 发送 GET 请求
       final response = await dio.get(
         url,
         options: Options(
@@ -113,20 +106,17 @@ class _CommunityState extends State<Community> {
         ),
       );
 
-      // 检查响应
       if (response.statusCode == 200) {
-        List<dynamic> posts = response.data;
-
-        // 遍历帖子数据
+        List<dynamic> posts = response.data['posts']; // 获取帖子列表
         for (var post in posts) {
-          print('Post: ${post['title']}');
+          print('Post content: ${post['content']}');
           int post_img_count = 0;
 
           // 处理每张图片
           for (int i = 1; i <= 3; i++) {
             String? encodedPhoto = post['photo$i'];
             if (encodedPhoto != null) {
-              // 提取 Base64 编码的图片
+// 提取 Base64 编码的图片
               String base64Image =
                   encodedPhoto.replaceFirst('data:image/jpeg;base64,', '');
 
@@ -145,13 +135,13 @@ class _CommunityState extends State<Community> {
             }
           }
 
-          // 创建新帖子对象，根据实际图片数量创建
+// 创建新帖子对象，根据实际图片数量创建
           List<String> assetImages = [];
           for (int i = 1; i <= post_img_count; i++) {
             assetImages
                 .add('${documentPath}/post_${post['post_id']}_photo$i.jpg');
           }
-          // print("type of post[comments] is ${post['comments'].runtimeType}");
+// print("type of post[comments] is ${post['comments'].runtimeType}");
           print("post[comments] is ${post['comments']}");
           // 检查 post['comments'] 是否为 null，如果是 null 则传递一个空的列表
           // final List<Map<String, dynamic>> comments = post['comments'] != null
@@ -180,12 +170,15 @@ class _CommunityState extends State<Community> {
         print('Posts loaded successfully!');
 
         setState(() {
-          // 排序 _posts 列表，最新的帖子在最前面
+// 排序 _posts 列表，最新的帖子在最前面
           _posts.sort((post1, post2) {
             return (parseDateTime(post2.timeAgo))
                 .compareTo(parseDateTime(post1.timeAgo));
           });
         });
+
+        // 更新分页信息（假设后端返回分页数据）
+        totalPages = response.data['total_pages'];
       } else {
         print('Failed to load posts: ${response.statusCode}');
       }
@@ -194,15 +187,33 @@ class _CommunityState extends State<Community> {
     }
   }
 
-  // 自定义解析函数
+// 自定义解析函数
   DateTime parseDateTime(String dateString) {
     return DateFormat('EEE, dd MMM yyyy HH:mm:ss ')
         .parse(dateString)
         .add(Duration(hours: 8)); // 添加3小时以考虑GMT
   }
 
-  // TODO: 将新帖子提交至后端数据库并刷新前端显示
+// TODO: 将新帖子提交至后端数据库并刷新前端显示
   void _addNewPost(Post newPost) {
+    setState(() {
+      currentPage = 1;
+      _isLoading = true;
+    });
+
+    //延迟0.5秒
+    Future.delayed(Duration(milliseconds: 500), () {
+      setState(() {
+        _isLoading = false;
+      });
+    });
+
+    getPostsAndSaveImages(access_token, currentPage).then((_) {
+      setState(() {
+        _isLoading = false;
+      });
+    });
+
     setState(() {
       _posts.insert(0, newPost); // 将新帖子添加到顶部
     });
@@ -215,6 +226,46 @@ class _CommunityState extends State<Community> {
         builder: (context) => AddPostPage(onPostAdded: _addNewPost),
       ),
     );
+  }
+
+  void _loadNextPage() {
+    if (currentPage < totalPages) {
+      setState(() {
+        currentPage++;
+        _isLoading = true;
+      });
+      getPostsAndSaveImages(access_token, currentPage).then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
+    }
+  }
+
+  void _loadPreviousPage() {
+    if (currentPage > 1) {
+      setState(() {
+        currentPage--;
+        _isLoading = true;
+      });
+      getPostsAndSaveImages(access_token, currentPage).then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
+    }
+  }
+
+  void _goToPage(int page) {
+    setState(() {
+      currentPage = page;
+      _isLoading = true;
+    });
+    getPostsAndSaveImages(access_token, currentPage).then((_) {
+      setState(() {
+        _isLoading = false;
+      });
+    });
   }
 
   @override
@@ -239,7 +290,6 @@ class _CommunityState extends State<Community> {
             CircleButton(
               icon: Icons.refresh,
               iconSize: 30.0,
-              // onPressed: () => print('SearchMyFollow'),
               onPressed: () => initThePost(),
             ),
             CircleButton(
@@ -250,7 +300,6 @@ class _CommunityState extends State<Community> {
           ],
         ),
         SliverToBoxAdapter(
-          //child: AboutMyContainer(currentUser: currentUser),
           child: AboutMyContainer(),
         ),
         if (_isLoading)
@@ -258,7 +307,7 @@ class _CommunityState extends State<Community> {
             child: Center(
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 20.0),
-                child: CircularProgressIndicator(), // 加载指示器
+                child: CircularProgressIndicator(),
               ),
             ),
           )
@@ -272,13 +321,32 @@ class _CommunityState extends State<Community> {
               childCount: _posts.length,
             ),
           ),
+        // 添加分页按钮
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 20.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  onPressed: _loadPreviousPage,
+                ),
+                Text('Page $currentPage of $totalPages'),
+                IconButton(
+                  icon: Icon(Icons.arrow_forward),
+                  onPressed: _loadNextPage,
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }
 
   List<Comment> parseComments(String jsonString) {
     final List<dynamic> commentsJson = json.decode(jsonString);
-
     return commentsJson.map((commentJson) {
       return Comment.fromJson(commentJson);
     }).toList();
