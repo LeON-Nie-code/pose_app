@@ -36,9 +36,12 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
     fetchAndInitialize();
   }
 
-  void fetchAndInitialize() {
-    getUserRecords();
+  Future<void> fetchAndInitialize() async {
+    await getUserRecords(); // 等待记录获取完成
+    //initializaStudyDetails(); // 数据拉取后初始化StudyDetails
+    setState(() {
     initializaStudyDetails();
+  });
   }
 
   void onDateSelected(DateTime date) {
@@ -136,6 +139,8 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
     //   'totalDuration': 0.0,
     //   'todayDuration': 0.0,
     // };
+    print('!!!!!!!!!!!!!!Initializing Study Details with records: $records');
+
 
     Map<String, dynamic> data = analyzeData(records, null);
 
@@ -166,7 +171,7 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
     });
   }
 
-  void getUserRecords() async {
+  Future<void> getUserRecords() async {
     final prefs = await SharedPreferences.getInstance();
     final storedAccessToken = prefs.getString('accessToken');
     if (storedAccessToken == null || storedAccessToken.isEmpty) {
