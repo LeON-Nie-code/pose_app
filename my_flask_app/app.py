@@ -5,8 +5,10 @@ from routes import auth_bp
 import config
 from flask_migrate import Migrate
 from gevent import pywsgi
+from flasgger import Swagger, swag_from
 
 app = Flask(__name__)
+Swagger(app)
 
 # 配置应用
 app.config.from_object(config.Config)

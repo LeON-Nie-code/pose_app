@@ -1,6 +1,6 @@
 ## Command
 
-python3 -m venv 
+python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 
@@ -21,7 +21,7 @@ flask db upgrade
 nohup python3 app.py &
 
 netstat -tulnp | grep 8889
-
+sudo lsof -i :8889
 
 
 {

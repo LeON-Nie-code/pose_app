@@ -10,7 +10,13 @@ from alibabacloud_tea_openapi import models as open_api_models
 from alibabacloud_dysmsapi20170525 import models as dysmsapi_20170525_models
 from alibabacloud_tea_util import models as util_models
 from alibabacloud_tea_util.client import Client as UtilClient
+from dotenv import load_dotenv
 
+load_dotenv()  # 默认会加载根目录下的.env文件
+
+ALIBABA_CLOUD_ACCESS_KEY_ID = os.getenv("ALIBABA_CLOUD_ACCESS_KEY_ID")
+ALIBABA_CLOUD_ACCESS_KEY_SECRET = os.getenv("ALIBABA_CLOUD_ACCESS_KEY_SECRET")
+TEMPLATE_CODE = os.getenv("TEMPLATE_CODE")
 
 
 
