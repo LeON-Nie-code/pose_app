@@ -7,6 +7,7 @@ import 'package:pose_app/Community/dataAboutCommunity.dart';
 import 'package:pose_app/style/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:pose_app/config/config.dart';
 
 // 添加新帖子的页面
 // TODO: 后端接口需求
@@ -79,7 +80,7 @@ class _AddPostPageState extends State<AddPostPage> {
     List<String>? imagePaths, // 图片文件路径列表
   }) async {
     final dio = Dio();
-    const String url = 'http://8.217.68.60/post'; // 替换为实际的 API 地址
+    const String url = '${Config.baseUrl}/post'; // 替换为实际的 API 地址
 
     try {
       // 构造表单数据

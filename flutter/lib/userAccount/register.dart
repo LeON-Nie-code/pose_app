@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:pose_app/style/colors.dart';
+import 'package:pose_app/config/config.dart';
 
 import 'dart:io';
 
@@ -103,7 +104,7 @@ class _RegisterAccountState extends State<RegisterAccount> {
       // 向后端发送请求
       final response = await Dio().post(
         // 'http://118.89.124.30:8080/user/register',
-        'http://8.217.68.60/register_no_code',
+        '${Config.baseUrl}/register_no_code',
         data: {
           "phone_number": email,
           "username": username,

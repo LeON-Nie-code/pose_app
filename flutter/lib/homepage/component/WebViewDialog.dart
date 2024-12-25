@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webview_windows/webview_windows.dart';
+import 'package:pose_app/config/config.dart';
 
 class VideoWebViewDialog extends StatefulWidget {
   final String videoUrl;
@@ -116,7 +117,7 @@ class _VideoWebViewDialogState extends State<VideoWebViewDialog> {
       Map<String, dynamic> data = sessionData;
       print('Data: $data');
       Response response = await dio.post(
-        'http://8.217.68.60/insert_record',
+        '${Config.baseUrl}/insert_record',
         data: data,
         options: Options(headers: {
           'Content-Type': 'application/json',

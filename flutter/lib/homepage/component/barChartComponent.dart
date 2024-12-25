@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pose_app/style/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:pose_app/config/config.dart';
 
 class BarChartComponent extends StatefulWidget {
   @override
@@ -31,7 +31,7 @@ class _BarChartComponentState extends State<BarChartComponent> {
       }
       final Dio dio = Dio();
       Response response = await dio.get(
-        'http://8.217.68.60/records',
+        '${Config.baseUrl}/records',
         options: Options(headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $storedAccessToken',
@@ -80,7 +80,8 @@ class _BarChartComponentState extends State<BarChartComponent> {
     final today = DateTime.now();
     final List<String> last7DaysLabels = List.generate(
       7,
-      (index) => DateFormat('MM/dd').format(today.subtract(Duration(days: 6 - index))),
+      (index) =>
+          DateFormat('MM/dd').format(today.subtract(Duration(days: 6 - index))),
     );
 
     return BarChart(
@@ -92,7 +93,8 @@ class _BarChartComponentState extends State<BarChartComponent> {
         titlesData: FlTitlesData(
           leftTitles: SideTitles(
             reservedSize: 30,
-            getTextStyles: (value) => const TextStyle(color: Colors.grey, fontSize: 12),
+            getTextStyles: (value) =>
+                const TextStyle(color: Colors.grey, fontSize: 12),
             showTitles: true,
             getTitles: (value) {
               if (value == 0) {
@@ -110,7 +112,8 @@ class _BarChartComponentState extends State<BarChartComponent> {
           ),
           bottomTitles: SideTitles(
             showTitles: true,
-            getTextStyles: (value) => const TextStyle(color: Colors.grey, fontSize: 12),
+            getTextStyles: (value) =>
+                const TextStyle(color: Colors.grey, fontSize: 12),
             getTitles: (value) {
               if (value >= 0 && value < last7DaysLabels.length) {
                 return last7DaysLabels[value.toInt()];
@@ -126,7 +129,9 @@ class _BarChartComponentState extends State<BarChartComponent> {
             barRods: [
               BarChartRodData(
                 y: durations[index],
-                colors: [index == 6 ? AppColors.pinkpg : AppColors.warmOrange], // 今日为特殊颜色
+                colors: [
+                  index == 6 ? AppColors.pinkpg : AppColors.warmOrange
+                ], // 今日为特殊颜色
                 borderRadius: BorderRadius.circular(0),
                 width: 40,
                 backDrawRodData: BackgroundBarChartRodData(

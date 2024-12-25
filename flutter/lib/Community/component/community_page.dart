@@ -14,6 +14,7 @@ import 'package:pose_app/style/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pose_app/Community/dataAboutCommunity.dart';
+import 'package:pose_app/config/config.dart';
 
 // TODO: 后端接口需求
 // - 获取当前用户信息
@@ -89,7 +90,7 @@ class _CommunityState extends State<Community> {
 
   Future<void> getPostsAndSaveImages(String token, int page) async {
     final dio = Dio();
-    final String url = 'http://8.217.68.60/all_posts?page=$page'; // 添加分页参数
+    final String url = '${Config.baseUrl}/all_posts?page=$page'; // 添加分页参数
 
     setState(() {
       _posts.clear(); // 清空现有帖子

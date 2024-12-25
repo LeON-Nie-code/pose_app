@@ -7,6 +7,7 @@ import 'package:pose_app/style/colors.dart';
 import 'package:pose_app/style/style.dart';
 import 'package:pose_app/Calendar/dataAboutTask.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pose_app/config/config.dart';
 
 class AddTaskPage extends StatefulWidget {
   final DateTime selectedDate; // 选中的日期
@@ -246,7 +247,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
       try {
         // 发送POST请求
         final response = await _dio.post(
-          'http://8.217.68.60/user/todos',
+          '${Config.baseUrl}/user/todos',
           data: {
             "title": newTask['title'],
             "date": newTask['date'],

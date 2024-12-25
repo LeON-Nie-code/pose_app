@@ -10,6 +10,7 @@ import 'package:pose_app/StatisticsPage/component/pieChart.dart';
 import 'package:pose_app/style/style.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:pose_app/config/config.dart';
 
 class DataDetailsCard extends StatefulWidget {
   final StudyDetails studyDetails; // 将成员变量作为构造函数参数传递
@@ -203,7 +204,7 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
     try {
       Dio dio = Dio();
       Response response = await dio.get(
-        'http://8.217.68.60/records',
+        '${Config.baseUrl}/records',
         options: Options(headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $access_token', // 在请求头中添加 accessToken

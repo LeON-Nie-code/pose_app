@@ -11,6 +11,7 @@ import 'package:pose_app/style/style.dart';
 import 'package:intl/intl.dart';
 import 'package:pose_app/Calendar/dataAboutTask.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pose_app/config/config.dart';
 
 class Todolist extends StatefulWidget {
   const Todolist({super.key});
@@ -37,7 +38,7 @@ class _TodolistState extends State<Todolist> {
     print('todolist access token: $access_token');
     try {
       final response = await dio.delete(
-        'http://8.217.68.60/user/todos/$todo_id',
+        '${Config.baseUrl}/user/todos/$todo_id',
         options: Options(
           headers: {'Authorization': 'Bearer $access_token'},
         ),
@@ -75,7 +76,7 @@ class _TodolistState extends State<Todolist> {
       // 使用 Dio 发起 GET 请求
       final dio = Dio();
       final response = await dio.get(
-        'http://8.217.68.60/user/todos',
+        '${Config.baseUrl}/user/todos',
         options: Options(
           headers: {'Authorization': 'Bearer $accessToken'},
         ),

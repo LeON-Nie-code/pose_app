@@ -7,6 +7,7 @@ import 'package:pose_app/Community/component/profile_avatar.dart';
 import 'package:pose_app/Community/dataAboutCommunity.dart';
 import 'package:pose_app/style/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pose_app/config/config.dart';
 
 // TODO: 点赞、评论、分享等交互需要后端接口支持
 // TODO: 动态刷新点赞、评论数量时，需要请求后端更新数据
@@ -48,7 +49,7 @@ class _PostcontainerState extends State<Postcontainer> {
 
   Future<void> postLike({required int post_id}) async {
     final dio = Dio();
-    String url = 'http://8.217.68.60/post/$post_id/like'; // 替换为实际的 API 地址
+    String url = '${Config.baseUrl}/post/$post_id/like'; // 替换为实际的 API 地址
     try {
       // 发送 POST 请求
       final response = await dio.post(
@@ -399,7 +400,7 @@ class _PostStatsState extends State<_PostStats> {
 
   Future<String?> fetchUserName() async {
     final dio = Dio();
-    String url = 'http://8.217.68.60/user_info';
+    String url = '${Config.baseUrl}/user_info';
     // print('access_token in fetchUserName: $access_token');
     try {
       final response = await dio.get(
@@ -434,7 +435,7 @@ class _PostStatsState extends State<_PostStats> {
     required String comment,
   }) async {
     final dio = Dio();
-    String url = 'http://8.217.68.60/post/$post_id/comment';
+    String url = '${Config.baseUrl}/post/$post_id/comment';
 
     try {
       // 发送 POST 请求
@@ -469,7 +470,7 @@ class _PostStatsState extends State<_PostStats> {
 
   Future<void> postLike({required int post_id}) async {
     final dio = Dio();
-    String url = 'http://8.217.68.60/post/$post_id/like'; // 替换为实际的 API 地址
+    String url = '${Config.baseUrl}/post/$post_id/like'; // 替换为实际的 API 地址
     try {
       // 发送 POST 请求
       final response = await dio.post(

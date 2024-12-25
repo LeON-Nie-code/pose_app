@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:pose_app/homepage/homepage.dart' as homepage;
 import 'package:pose_app/style/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pose_app/config/config.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -62,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
 
       final response = await Dio().post(
         // 'http://118.89.124.30:8080/user/login',
-        'http://8.217.68.60/login_username',
+        '${Config.baseUrl}/login_username',
         data: {
           "username": username,
           "password": password,
