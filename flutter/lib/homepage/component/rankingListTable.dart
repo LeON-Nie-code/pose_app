@@ -1,16 +1,82 @@
-//主页第一个container的窗口内容
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pose_app/config/size_config.dart';
-import 'package:pose_app/rankingData.dart';
 import 'package:pose_app/style/colors.dart';
 import 'package:pose_app/style/style.dart';
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pose_app/config/config.dart';
 
-class rankingListTable extends StatelessWidget {
-  const rankingListTable({
-    super.key,
-  });
+class RankingListTable extends StatefulWidget {
+  const RankingListTable({super.key});
+
+  @override
+  _RankingListTableState createState() => _RankingListTableState();
+}
+
+class _RankingListTableState extends State<RankingListTable> {
+  List<dynamic> rankingData = [];
+  bool isLoading = true;
+  String errorMessage = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchRankingData();
+  }
+
+  Future<void> fetchRankingData() async {
+    try {
+      // 初始化 SharedPreferences 并获取 accessToken
+      final prefs = await SharedPreferences.getInstance();
+      final accessToken = prefs.getString('accessToken');
+      if (accessToken == null) {
+        throw Exception("Access token is missing");
+      }
+
+      // 设置 Dio 实例
+      Dio dio = Dio();
+      final String url = '${Config.baseUrl}/users/top-durations'; // 添加分页参数
+
+      // 发起请求
+      // final response = await dio.get('${Config.baseUrl}/users/top-durations');
+
+      print("accessToken: $accessToken");
+
+      final response = await dio.get(
+        url,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken', // 携带 JWT token
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          rankingData = response.data['data'];
+          isLoading = false;
+        });
+      } else {
+        throw Exception('Failed to fetch data');
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = e.toString();
+        isLoading = false;
+      });
+    }
+  }
+
+  DataRow rankingListDataRow(dynamic fileInfo) {
+    return DataRow(
+      cells: [
+        DataCell(Text(fileInfo['rank'].toString())),
+        DataCell(Text(fileInfo['username'] ?? 'N/A')),
+        DataCell(Text('${fileInfo['total_duration']}s')),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +88,7 @@ class rankingListTable extends StatelessWidget {
       child: ConstrainedBox(
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(context).size.height * 0.8, // 限制最大高度
-          maxWidth: 600,  // 限制宽度
+          maxWidth: 600, // 限制宽度
         ),
         child: Padding(
           padding: EdgeInsets.all(defaultPadding),
@@ -48,53 +114,36 @@ class rankingListTable extends StatelessWidget {
                   ],
                 ),
               ),
-              Expanded(
-                child: ListView(
-                  shrinkWrap: true,
-                  children: [
-                    DataTable(
-                      columnSpacing: defaultPadding,
-                      columns: [
-                        DataColumn(label: Text('排名')),
-                        DataColumn(label: Text('用户名')),
-                        DataColumn(label: Text('总时间')),
-                      ],
-                      rows: List.generate(
-                        demoRecentFiles.length,
-                        (index) => rankingListDataRow(demoRecentFiles[index]),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : errorMessage.isNotEmpty
+                      ? Center(child: Text(errorMessage))
+                      : Expanded(
+                          child: ListView(
+                            shrinkWrap: true,
+                            children: [
+                              DataTable(
+                                columnSpacing: defaultPadding,
+                                columns: [
+                                  DataColumn(label: Text('排名')),
+                                  DataColumn(label: Text('用户名')),
+                                  DataColumn(label: Text('总时间')),
+                                ],
+                                rows: rankingData.isEmpty
+                                    ? []
+                                    : List.generate(
+                                        rankingData.length,
+                                        (index) => rankingListDataRow(
+                                            rankingData[index]),
+                                      ),
+                              ),
+                            ],
+                          ),
+                        ),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  DataRow rankingListDataRow(RecentFile fileInfo) {
-    return DataRow(
-      cells: [
-        DataCell(
-          Row(
-            children: [
-              SvgPicture.asset(
-                fileInfo.icon ?? 'assets/icons/example_user.svg',
-                height: 30,
-                width: 30,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
-                child: Text(fileInfo.rank ?? 'N/A'),
-              )
-            ],
-          ),
-        ),
-        DataCell(Text(fileInfo.userName ?? 'N/A')),
-        DataCell(Text(fileInfo.hour ?? 'N/A')),
-      ],
     );
   }
 }
