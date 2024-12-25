@@ -10,6 +10,7 @@ import 'package:pose_app/data.dart';
 import 'package:pose_app/style/colors.dart';
 import 'package:pose_app/style/style.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pose_app/config/config.dart';
 
 class StartToStudyDetail extends StatefulWidget {
   const StartToStudyDetail({Key? key}) : super(key: key);
@@ -164,7 +165,7 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
     try {
       Dio dio = Dio();
       Response response = await dio.get(
-        'http://8.217.68.60/records',
+        '${Config.baseUrl}/records',
         options: Options(headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $access_token', // 在请求头中添加 accessToken

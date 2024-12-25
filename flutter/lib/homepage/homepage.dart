@@ -102,7 +102,7 @@ class _HomePageState extends State<HomePage> {
                                   icon: 'assets/icons/ranking.svg',
                                   label: '专注排行榜',
                                   amount: '1名/20',
-                                  dialogContent: rankingListTable(),
+                                  dialogContent: RankingListTable(),
                                 ),
                                 rankingList(
                                   icon: 'assets/icons/online.svg',

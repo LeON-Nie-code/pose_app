@@ -4,6 +4,7 @@ import 'package:pose_app/Calendar/dataAboutTask.dart';
 import 'package:pose_app/Calendar/component/taskBar.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pose_app/config/config.dart';
 
 class TodayTodoDialog extends StatefulWidget {
   @override
@@ -33,7 +34,7 @@ class _TodayTodoDialogState extends State<TodayTodoDialog> {
       // 请求任务数据
       final dio = Dio();
       final response = await dio.get(
-        'http://8.217.68.60/user/todos',
+        '${Config.baseUrl}/user/todos',
         options: Options(
           headers: {'Authorization': 'Bearer $accessToken'},
         ),

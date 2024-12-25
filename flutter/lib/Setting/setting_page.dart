@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:pose_app/style/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pose_app/config/config.dart';
 
 class SettingPage extends StatefulWidget {
   final String username;
@@ -26,7 +27,7 @@ class _SettingPageState extends State<SettingPage> {
   final Dio _dio = Dio(
     BaseOptions(
       // baseUrl: 'http://118.89.124.30:8080',
-      baseUrl: 'http://8.217.68.60',
+      baseUrl: '${Config.baseUrl}',
 
       //connectTimeout: 5000,
       //receiveTimeout: 3000,

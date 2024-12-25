@@ -6,6 +6,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:pose_app/Community/dataAboutCommunity.dart';
 import 'package:pose_app/style/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
+import 'package:pose_app/config/config.dart';
 
 // 添加新帖子的页面
 // TODO: 后端接口需求
@@ -78,7 +80,7 @@ class _AddPostPageState extends State<AddPostPage> {
     List<String>? imagePaths, // 图片文件路径列表
   }) async {
     final dio = Dio();
-    const String url = 'http://8.217.68.60/post'; // 替换为实际的 API 地址
+    const String url = '${Config.baseUrl}/post'; // 替换为实际的 API 地址
 
     try {
       // 构造表单数据
@@ -137,17 +139,22 @@ class _AddPostPageState extends State<AddPostPage> {
 
       // 检查响应状态
 
+      final now = DateTime.now().toUtc(); // 获取当前时间并转为 UTC
+      final DateFormat formatter =
+          DateFormat('EEE, dd MMM yyyy HH:mm:ss'); // 自定义格式
+
       final newPost = Post(
         user: currentUser,
         caption: _descriptionController.text,
-        timeAgo: '刚刚',
+        //让时间戳为当前时间，格式为Tue, 24 Dec 2024 12:14:11 GMT
+        timeAgo: formatter.format(now) + ' GMT',
         imageUrls: null,
         assetImages:
             _selectedFiles.map((file) => file.path).toList(), // 存储多个本地路径
         likes: 0,
         comments: 0,
         shares: 0,
-        post_id: 999, // 临时 ID
+        post_id: 1, // 临时 ID
       );
 
       // TODO: 调用后端提交帖子接口，将帖子内容和图片 URL 一起发送到后端

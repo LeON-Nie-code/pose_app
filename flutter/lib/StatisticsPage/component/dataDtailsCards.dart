@@ -10,6 +10,7 @@ import 'package:pose_app/StatisticsPage/component/pieChart.dart';
 import 'package:pose_app/style/style.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:pose_app/config/config.dart';
 
 class DataDetailsCard extends StatefulWidget {
   final StudyDetails studyDetails; // 将成员变量作为构造函数参数传递
@@ -40,8 +41,8 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
     await getUserRecords(); // 等待记录获取完成
     //initializaStudyDetails(); // 数据拉取后初始化StudyDetails
     setState(() {
-    initializaStudyDetails();
-  });
+      initializaStudyDetails();
+    });
   }
 
   void onDateSelected(DateTime date) {
@@ -141,7 +142,6 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
     // };
     print('!!!!!!!!!!!!!!Initializing Study Details with records: $records');
 
-
     Map<String, dynamic> data = analyzeData(records, null);
 
     print('Data: $data');
@@ -152,21 +152,59 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
     setState(() {
       widget.studyDetails.aboutTotalData[0] = StudyDataModel(
         title: "次数",
-        data: {"value": data['totalRecords'].toString()},
+        data: {"value": "${data['totalRecords'].toString()} 次"},
       );
       widget.studyDetails.aboutTotalData[1] = StudyDataModel(
         title: "时长",
-        data: {"totalHour": (data['totalDuration'] / 60).toStringAsFixed(2)},
+        data: {
+          "totalHour": "${(data['totalDuration'] / 60).toStringAsFixed(2)} 分钟"
+        },
+      );
+      widget.studyDetails.aboutTotalData[2] = StudyDataModel(
+        title: "次均时长",
+        data: {
+          "totalAverage": (() {
+            // 检查数据有效性
+            if (data['totalDuration'] != null &&
+                data['totalRecords'] != null &&
+                data['totalRecords'] > 0) {
+              // 计算次均时长
+              return "${(data['totalDuration'] / (60 * data['totalRecords'])).toStringAsFixed(2)} 分钟";
+            } else {
+              // 数据无效时返回默认值
+              return "数据不足";
+            }
+          })(),
+        },
       );
 
       // 更新今日数据
       widget.studyDetails.aboutTodayData[0] = StudyDataModel(
         title: "次数",
-        data: {"todayValue": data['todayRecords'].toString()},
+        data: {"todayValue": "${data['todayRecords'].toString()} 次"},
       );
       widget.studyDetails.aboutTodayData[1] = StudyDataModel(
         title: "时长",
-        data: {"todayHour": (data['todayDuration'] / 60).toStringAsFixed(2)},
+        data: {
+          "todayHour": "${(data['todayDuration'] / 60).toStringAsFixed(2)} 分钟"
+        },
+      );
+      widget.studyDetails.aboutTodayData[2] = StudyDataModel(
+        title: "次均时长",
+        data: {
+          "todayAverage": (() {
+            // 检查数据有效性
+            if (data['todayDuration'] != null &&
+                data['todayRecords'] != null &&
+                data['todayRecords'] > 0) {
+              // 计算次均时长
+              return "${(data['todayDuration'] / (60 * data['todayRecords'])).toStringAsFixed(2)} 分钟";
+            } else {
+              // 数据无效时返回默认值
+              return "数据不足";
+            }
+          })(),
+        },
       );
     });
   }
@@ -186,7 +224,7 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
     try {
       Dio dio = Dio();
       Response response = await dio.get(
-        'http://8.217.68.60/records',
+        '${Config.baseUrl}/records',
         options: Options(headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $access_token', // 在请求头中添加 accessToken

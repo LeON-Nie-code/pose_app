@@ -1,32 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:pose_app/StatisticsPage/component/dataDtailsCards.dart';
-// import 'package:pose_app/config/size_config.dart';
-// import 'package:pose_app/homepage/component/header.dart';
-// import 'package:pose_app/statistic_data.dart';
-// import 'package:pose_app/style/colors.dart';
-
-// class StatisticsPage extends StatelessWidget {
-//   const StatisticsPage({Key? key}) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     SizeConfig().init(context);
-//     // 创建StudyDetails的实例
-//     final studyDetails = StudyDetails(); // 确保StudyDetails类已正确导入
-
-//     return SingleChildScrollView(
-//       padding: EdgeInsets.symmetric(horizontal: 16.0),
-//       child: Column(
-//         children: [
-//           SizedBox(height: 18),
-//           //位于lib/StatisticsPage/component/dataDtailsCards
-
-//           DataDetailsCard(studyDetails: studyDetails),
-//         ],
-//       ),
-//     );
-//   }
-// }
 import 'package:flutter/material.dart';
 import 'package:pose_app/StatisticsPage/component/dataDtailsCards.dart';
 import 'package:pose_app/config/size_config.dart';
@@ -34,6 +5,7 @@ import 'package:pose_app/statistic_data.dart';
 import 'package:pose_app/style/colors.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pose_app/config/config.dart';
 
 class StatisticsPage extends StatefulWidget {
   const StatisticsPage({Key? key}) : super(key: key);
@@ -58,25 +30,24 @@ class _StatisticsPageState extends State<StatisticsPage> {
     return details;
   }
 
-Future<List<dynamic>> getUserRecords() async {
-  final prefs = await SharedPreferences.getInstance();
-  final storedAccessToken = prefs.getString('accessToken');
-  if (storedAccessToken == null || storedAccessToken.isEmpty) {
-    throw Exception('Access Token not found');
+  Future<List<dynamic>> getUserRecords() async {
+    final prefs = await SharedPreferences.getInstance();
+    final storedAccessToken = prefs.getString('accessToken');
+    if (storedAccessToken == null || storedAccessToken.isEmpty) {
+      throw Exception('Access Token not found');
+    }
+
+    Dio dio = Dio();
+    Response response = await dio.get(
+      '${Config.baseUrl}/records',
+      options: Options(headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $storedAccessToken',
+      }),
+    );
+
+    return response.data;
   }
-
-  Dio dio = Dio();
-  Response response = await dio.get(
-    'http://8.217.68.60/records',
-    options: Options(headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $storedAccessToken',
-    }),
-  );
-
-  return response.data;
-}
-
 
   void analyzeAndUpdateDetails(List<dynamic> records, StudyDetails details) {
     Map<String, dynamic> data = analyzeData(records, null);
@@ -94,7 +65,8 @@ Future<List<dynamic>> getUserRecords() async {
       List<dynamic> records, DateTime? targetDate) {
     Map<String, dynamic> result = {
       'totalRecords': records.length,
-      'totalDuration': records.fold(0.0, (sum, record) => sum + record['duration']),
+      'totalDuration':
+          records.fold(0.0, (sum, record) => sum + record['duration']),
     };
     return result;
   }
