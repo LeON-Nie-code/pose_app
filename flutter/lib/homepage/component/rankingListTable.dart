@@ -69,11 +69,23 @@ class _RankingListTableState extends State<RankingListTable> {
   }
 
   DataRow rankingListDataRow(dynamic fileInfo) {
+    String formatDuration(double durationInSeconds) {
+      if (durationInSeconds < 60) {
+        return '${durationInSeconds.toStringAsFixed(0)}s'; // 小于 60 秒，单位为秒
+      } else if (durationInSeconds < 3600) {
+        double minutes = durationInSeconds / 60;
+        return '${minutes.toStringAsFixed(1)}m'; // 小于 1 小时，单位为分钟
+      } else {
+        double hours = durationInSeconds / 3600;
+        return '${hours.toStringAsFixed(2)}h'; // 1 小时或以上，单位为小时
+      }
+    }
+
     return DataRow(
       cells: [
         DataCell(Text(fileInfo['rank'].toString())),
         DataCell(Text(fileInfo['username'] ?? 'N/A')),
-        DataCell(Text('${fileInfo['total_duration']}s')),
+        DataCell(Text(formatDuration(fileInfo['total_duration']))), // 使用转换后的时间
       ],
     );
   }
