@@ -89,11 +89,20 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
 
     //将recentActivities顺序反转
 
-    Future.delayed(Duration(milliseconds: 50), () {
-      setState(() {
-        recentActivities = recentActivities.reversed.toList();
-      });
+    // recentActivities = recentActivities.reversed.toList();
+    // 反转列表并更新UI
+    setState(() {
+      recentActivities = recentActivities.reversed.toList();
     });
+
+    // Future.delayed(Duration(milliseconds: 200), () {
+    //   if (mounted) {
+    //     setState(() {
+    //       recentActivities = List.from(recentActivities.reversed);
+    //       print('UI updated with reversed activities:');
+    //     });
+    //   }
+    // });
   }
 
   void initializaUpcomingPayments() {
@@ -215,11 +224,8 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
           },
           child: Text(
             "开始",
-            style: TextStyle(
-              fontFamily: 'Hei',
-              fontWeight: FontWeight.w400
-            ),
-            ),
+            style: TextStyle(fontFamily: 'Hei', fontWeight: FontWeight.w400),
+          ),
         ),
 
         SizedBox(
@@ -260,7 +266,9 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
               size: 18,
               fontWeight: FontWeight.w800,
             ),
-            SizedBox(height: 5,),
+            SizedBox(
+              height: 5,
+            ),
             PrimaryText(
               text: '02 Mar 20xx（例子）',
               size: 14,
@@ -268,14 +276,16 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
               color: AppColors.secondary,
             ),
             SizedBox(
-          height: SizeConfig.blockSizeVertical! * 2,
-        ),
+              height: SizeConfig.blockSizeVertical! * 2,
+            ),
             ElevatedButton(
                 onPressed: fetchAndInitialize,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.refreshButton
-                ), 
-                child: Icon(Icons.refresh, color: AppColors.white,)),
+                    backgroundColor: AppColors.refreshButton),
+                child: Icon(
+                  Icons.refresh,
+                  color: AppColors.white,
+                )),
           ],
         ),
 
@@ -283,15 +293,17 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
           height: SizeConfig.blockSizeVertical! * 2,
         ),
 
-        Column(
-          children: List.generate(
-            recentActivities.length,
-            (index) => RecordListOfUsers(
-              icon: recentActivities[index]["icon"],
-              label: recentActivities[index]["label"],
-              amount: recentActivities[index]["amount"],
-              selectedDate: recentActivities[index]["selectedDate"],
-              record: recentActivities[index]["record"],
+        SingleChildScrollView(
+          child: Column(
+            children: List.generate(
+              recentActivities.length,
+              (index) => RecordListOfUsers(
+                icon: recentActivities[index]["icon"],
+                label: recentActivities[index]["label"],
+                amount: recentActivities[index]["amount"],
+                selectedDate: recentActivities[index]["selectedDate"],
+                record: recentActivities[index]["record"],
+              ),
             ),
           ),
         ),
