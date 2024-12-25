@@ -602,9 +602,55 @@ class _PostStatsState extends State<_PostStats> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: comments.map((comment) {
-                return Text(
-                  "- ${comment['user_name']}: ${comment['content']}",
-                  style: TextStyle(color: Colors.black, fontSize: 18),
+                return Align(
+                  alignment: Alignment.centerLeft,
+                  child: FractionallySizedBox(
+                    widthFactor: 0.56, // 设置宽度占父容器 80%
+                    child: Card(
+                      margin: const EdgeInsets.symmetric(vertical: 4.0),
+                      elevation: 2,
+                      color: Colors.grey[100],
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CircleAvatar(
+                              radius: 20,
+                              backgroundColor: Colors.grey[300],
+                              child: Icon(
+                                Icons.person,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    comment['user_name']!,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    comment['content']!,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[800],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 );
               }).toList(),
             ),

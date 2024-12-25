@@ -215,9 +215,9 @@ class _CommunityState extends State<Community> {
       });
     });
 
-    setState(() {
-      _posts.insert(0, newPost); // 将新帖子添加到顶部
-    });
+    // setState(() {
+    //   _posts.insert(0, newPost); // 将新帖子添加到顶部
+    // });
   }
 
   void _navigateToAddPostPage() {

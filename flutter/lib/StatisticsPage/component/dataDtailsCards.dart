@@ -163,8 +163,18 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
       widget.studyDetails.aboutTotalData[2] = StudyDataModel(
         title: "次均时长",
         data: {
-          "totalAverage":
-              "${(data['totalDuration'] / (60 * data['totalRecords'])).toStringAsFixed(2)} 分钟"
+          "totalAverage": (() {
+            // 检查数据有效性
+            if (data['totalDuration'] != null &&
+                data['totalRecords'] != null &&
+                data['totalRecords'] > 0) {
+              // 计算次均时长
+              return "${(data['totalDuration'] / (60 * data['totalRecords'])).toStringAsFixed(2)} 分钟";
+            } else {
+              // 数据无效时返回默认值
+              return "数据不足";
+            }
+          })(),
         },
       );
 
@@ -182,8 +192,18 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
       widget.studyDetails.aboutTodayData[2] = StudyDataModel(
         title: "次均时长",
         data: {
-          "todayAverage":
-              "${(data['todayDuration'] / (60 * data['todayRecords'])).toStringAsFixed(2)} 分钟"
+          "todayAverage": (() {
+            // 检查数据有效性
+            if (data['todayDuration'] != null &&
+                data['todayRecords'] != null &&
+                data['todayRecords'] > 0) {
+              // 计算次均时长
+              return "${(data['todayDuration'] / (60 * data['todayRecords'])).toStringAsFixed(2)} 分钟";
+            } else {
+              // 数据无效时返回默认值
+              return "数据不足";
+            }
+          })(),
         },
       );
     });
