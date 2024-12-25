@@ -155,7 +155,7 @@ void _showRecordDialog() {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(height: 35,),
+                          SizedBox(height: 5,),
                           Row(
                             children: [
                               Icon(Icons.label, color: AppColors.secondary),
@@ -217,7 +217,7 @@ void _showRecordDialog() {
                   ],
                 ),
               ),
-              SizedBox(height: 20),
+             
               Align(
                 alignment: Alignment.centerRight,
                 child: ElevatedButton(
