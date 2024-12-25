@@ -229,10 +229,14 @@ class _TodolistState extends State<Todolist> {
                       size: 20.0,
                       color: AppColors.secondary,
                     ),
-                    PrimaryText(
-                      text: "Today",
-                      size: 18.0,
-                      fontWeight: FontWeight.w800,
+                    SizedBox(height: 10,),
+                    Text(
+                      "T o d a y",
+                      style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'Baloo'
+                      )
                     ),
                   ],
                 ),
@@ -242,10 +246,12 @@ class _TodolistState extends State<Todolist> {
                   children: [
                     FloatingActionButton(
                       onPressed: _fetchTasks,
-                      child: Icon(Icons.refresh),
-                      backgroundColor: AppColors.warmOrange,
+                      child: Icon(
+                        Icons.refresh,
+                        color: Colors.white,),
+                      backgroundColor: AppColors.refreshButton,
                     ),
-                    SizedBox(width: 8), // 调整两按钮之间的间距
+                    SizedBox(width: defaultPadding,), // 调整两按钮之间的间距
                     MyButton(
                       label: "+ 添加",
                       onTap: () async {

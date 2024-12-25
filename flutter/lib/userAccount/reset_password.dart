@@ -53,7 +53,12 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 Navigator.of(context).pop();
                 Navigator.pushNamed(context, '/');
               },
-              child: const Text("返回登录"),
+              child: const Text(
+                "返回登录",
+                style: TextStyle(
+                  fontFamily: 'Hei',
+                ),
+                ),
             ),
           ],
         );
@@ -91,7 +96,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                   '重置密码',
                   style: TextStyle(
                     fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'Hei',
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -173,6 +179,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     style: TextStyle(
                       color: Colors.black54,
                       decoration: TextDecoration.underline,
+                      fontFamily: 'Hei',
                     ),
                   ),
                 ),
@@ -194,6 +201,9 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       width: width,
       child: TextField(
         controller: controller,
+        style: TextStyle(
+          fontFamily: 'Hei',
+        ),
         decoration: InputDecoration(
           prefixIcon: Padding(
             padding: const EdgeInsets.all(8.0),

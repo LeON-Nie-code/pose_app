@@ -1,6 +1,7 @@
 // 圆形按钮组件，用于社区页面顶部菜单操作按钮
 
 import 'package:flutter/material.dart';
+import 'package:pose_app/style/colors.dart';
 
 class CircleButton extends StatelessWidget {
   
@@ -20,13 +21,13 @@ class CircleButton extends StatelessWidget {
     return Container(
               margin: const EdgeInsets.all(6.0),
               decoration: BoxDecoration(
-                color: Colors.grey[200],
+                color: AppColors.refreshButton,
                 shape: BoxShape.circle,
               ),
               child: IconButton(               
                 icon: Icon(icon),
                 iconSize: iconSize,
-                color: Colors.black,
+                color: AppColors.white,
                 onPressed: onPressed,
               
               ),

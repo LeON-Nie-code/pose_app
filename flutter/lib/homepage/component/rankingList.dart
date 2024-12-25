@@ -76,15 +76,22 @@ class rankingList extends StatelessWidget {
           SizedBox(
             height: SizeConfig.blockSizeVertical! * 2,
           ),
-          PrimaryText(
-            text: label!,
+          Text(
+            label!,
+            style: TextStyle(
             fontWeight: FontWeight.w700,
-            size: 17.0,
+            fontSize: 17.0,
+            fontFamily: 'Gen-light',
+            ),
           ),
-          PrimaryText(
-            text: amount!,
+          SizedBox(height: 5,),
+          Text(
+            amount!,
+            style: TextStyle(
             color: AppColors.secondary,
-            size: 16.0,
+            fontSize: 15.0,
+            fontFamily: 'Gen-light',
+            ),
           ),
         ],
       ),

@@ -22,8 +22,10 @@ class MyButton extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
+              fontSize: 16,
               color: Colors.white, 
-              fontWeight: FontWeight.bold
+              fontWeight: FontWeight.w800,
+              fontFamily: 'Gen-light',
             ),
           ),
         ),

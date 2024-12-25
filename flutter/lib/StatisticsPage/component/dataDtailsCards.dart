@@ -287,10 +287,14 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
                     ),
                   ],
                 ),
+                SizedBox(width: 27,),
                 FloatingActionButton(
                   onPressed: fetchAndInitialize,
-                  child: Icon(Icons.refresh),
-                  backgroundColor: AppColors.warmOrange,
+                  child: Icon(
+                    Icons.refresh,
+                    color: Colors.white,
+                    ),
+                  backgroundColor: AppColors.refreshButton,
                 ),
               ],
             ),
@@ -342,9 +346,10 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
                                 child: Text(
                                   model.title,
                                   style: const TextStyle(
-                                    fontSize: 13,
+                                    fontSize: 12,
                                     color: AppColors.warmOrange,
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.w800,
+                                    fontFamily: 'Gen-light',
                                   ),
                                 ),
                               ),
@@ -353,7 +358,7 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
                                 child: Text(
                                   model.data.values.first,
                                   style: const TextStyle(
-                                    fontSize: 15,
+                                    fontSize: 14,
                                     color: AppColors.warmOrange,
                                     fontWeight: FontWeight.w800,
                                   ),
@@ -417,9 +422,10 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
                                 child: Text(
                                   model.title,
                                   style: const TextStyle(
-                                    fontSize: 13,
+                                    fontSize: 12,
                                     color: AppColors.warmOrange,
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.w800,
+                                    fontFamily: 'Gen-light',
                                   ),
                                 ),
                               ),
@@ -428,7 +434,7 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
                                 child: Text(
                                   model.data.values.first,
                                   style: const TextStyle(
-                                    fontSize: 15,
+                                    fontSize: 14,
                                     color: AppColors.warmOrange,
                                     fontWeight: FontWeight.w800,
                                   ),

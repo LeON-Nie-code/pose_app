@@ -19,6 +19,7 @@ class _SettingPageState extends State<SettingPage> {
   String gender = '暂无';
   String email = '暂无';
   String age = '暂无';
+  String phone = '暂无';
   String access_token = '';
 
   bool isReminderEnabled = true;
@@ -98,6 +99,7 @@ class _SettingPageState extends State<SettingPage> {
         school = response.data['school'] ?? '暂无';
         gender = response.data['gender'] ?? '暂无';
         email = response.data['email'] ?? '暂无';
+        phone = response.data['phone_number'] ?? '暂无';
         isLoading = false;
       });
     } catch (e) {
@@ -131,6 +133,11 @@ class _SettingPageState extends State<SettingPage> {
       print('response.data[\'institution\']: ${response.data['institution']}');
       print('response.data[\'gender\']: ${response.data['gender']}');
 
+      print('response.data[\'email\']: ${response.data['email']}');
+      print('response.data[\'age\']: ${response.data['age']}');
+      print(
+          'response.data[\'phone_number\']: ${response.data['phone_number']}');
+
       // 更新用户信息到本地状态
       setState(() {
         name = response.data['full_name'] ?? '暂无';
@@ -138,6 +145,7 @@ class _SettingPageState extends State<SettingPage> {
         gender = response.data['gender'] ?? '暂无';
         email = response.data['email'] ?? '暂无';
         age = response.data['age']?.toString() ?? '暂无';
+        phone = response.data['phone_number'] ?? '暂无';
 
         isLoading = false;
       });
@@ -153,7 +161,7 @@ class _SettingPageState extends State<SettingPage> {
 
   // 调用后端接口更新用户信息
   Future<void> _saveProfile(String tempName, String tempSchool,
-      String tempGender, String tempAge) async {
+      String tempGender, String tempAge, String tempphone) async {
     try {
       await _dio.put(
         '/user_info',
@@ -162,6 +170,7 @@ class _SettingPageState extends State<SettingPage> {
           'institution': tempSchool,
           'gender': tempGender,
           'age': tempAge,
+          'phone_number': tempphone,
         },
         options: Options(headers: {
           'Authorization': 'Bearer $access_token', // 在请求头中添加 accessToken
@@ -173,6 +182,7 @@ class _SettingPageState extends State<SettingPage> {
         school = tempSchool;
         gender = tempGender;
         age = tempAge;
+        phone = tempphone;
       });
 
       Navigator.pop(context);
@@ -190,7 +200,10 @@ class _SettingPageState extends State<SettingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('我的'),
+        title: const Text(
+          '我的',
+          style: TextStyle(fontFamily: 'Hei', fontWeight: FontWeight.w700),
+        ),
         centerTitle: true,
         backgroundColor: AppColors.deppBeige,
       ),
@@ -227,6 +240,7 @@ class _SettingPageState extends State<SettingPage> {
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
+                                  fontFamily: 'Gen-light',
                                 ),
                               ),
                               TextButton(
@@ -240,8 +254,10 @@ class _SettingPageState extends State<SettingPage> {
                                 child: const Text(
                                   '编辑',
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 15,
                                     color: AppColors.warmOrange,
+                                    fontFamily: 'Gen-light',
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
@@ -253,7 +269,8 @@ class _SettingPageState extends State<SettingPage> {
                           _buildInfoSection('学校/公司', school),
                           _buildInfoSection('性别', gender),
                           _buildInfoSection('邮箱', email),
-                          _buildInfoSection('年龄', age)
+                          _buildInfoSection('年龄', age),
+                          _buildInfoSection('手机号码', phone),
                         ],
                       ),
                     ),
@@ -278,15 +295,16 @@ class _SettingPageState extends State<SettingPage> {
                           const Text(
                             '设置',
                             style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Gen-light'),
                           ),
                           const SizedBox(height: 10),
                           ListTile(
                             leading: const Icon(Icons.notifications),
                             title: const Text('提醒设置',
-                                style: TextStyle(fontSize: 16)),
+                                style: TextStyle(
+                                    fontSize: 16, fontFamily: 'Gen-light')),
                             trailing: Switch(
                               value: isReminderEnabled,
                               activeColor: AppColors.warmOrange,
@@ -312,9 +330,14 @@ class _SettingPageState extends State<SettingPage> {
     String tempSchool = school;
     String tempGender = gender;
     String tempAge = age;
+    String tempphone = phone;
 
     return AlertDialog(
-      title: const Text('编辑个人信息'),
+      backgroundColor: AppColors.beige,
+      title: const Text(
+        '编辑个人信息',
+        style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'Gen-light'),
+      ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -330,18 +353,41 @@ class _SettingPageState extends State<SettingPage> {
           _buildTextField('年龄', tempAge, (value) {
             tempAge = value;
           }),
+          // _buildTextField('手机号码', tempphone, (value) {
+          //   tempphone = value;
+          // }),
         ],
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('取消'),
+          child: const Text(
+            '取消',
+            style: TextStyle(
+              color: Colors.black,
+              fontFamily: 'Gen-light',
+              fontWeight: FontWeight.w800,
+            ),
+          ),
         ),
         ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.deppBeige,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+          ),
           onPressed: () {
-            _saveProfile(tempName, tempSchool, tempGender, tempAge);
+            _saveProfile(tempName, tempSchool, tempGender, tempAge, tempphone);
           },
-          child: const Text('保存'),
+          child: const Text(
+            '保存',
+            style: TextStyle(
+              color: Colors.black,
+              fontFamily: 'Gen-light',
+              fontWeight: FontWeight.w800,
+            ),
+          ),
         ),
       ],
     );
@@ -370,8 +416,11 @@ class _SettingPageState extends State<SettingPage> {
           Text(title, style: const TextStyle(fontSize: 14, color: Colors.grey)),
           const SizedBox(width: 20),
           Text(value,
-              style:
-                  const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Gen-light',
+              )),
         ],
       ),
     );

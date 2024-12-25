@@ -174,7 +174,8 @@ class _RegisterAccountState extends State<RegisterAccount> {
                   '注册账号',
                   style: TextStyle(
                     fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'Hei',
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -224,7 +225,7 @@ class _RegisterAccountState extends State<RegisterAccount> {
                           )
                         : const Text(
                             '注册',
-                            style: TextStyle(color: Colors.white, fontSize: 18),
+                            style: TextStyle(color: Colors.white, fontSize: 18,fontFamily: 'Hei',),
                           ),
                   ),
                 ),
@@ -238,6 +239,7 @@ class _RegisterAccountState extends State<RegisterAccount> {
                     style: TextStyle(
                       color: Colors.black54,
                       decoration: TextDecoration.underline,
+                      fontFamily: 'Hei',
                     ),
                   ),
                 ),
@@ -261,6 +263,9 @@ class _RegisterAccountState extends State<RegisterAccount> {
       child: TextField(
         controller: controller,
         obscureText: obscureText,
+        style: TextStyle(
+          fontFamily: 'Hei',
+        ),
         decoration: InputDecoration(
           prefixIcon: Padding(
             padding: const EdgeInsets.all(8.0),

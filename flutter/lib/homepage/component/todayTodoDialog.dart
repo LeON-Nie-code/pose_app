@@ -84,7 +84,10 @@ class _TodayTodoDialogState extends State<TodayTodoDialog> {
                 ? Center(
                     child: Text(
                       "今天暂时没有任务",
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'Baloo',
+                        ),
                     ),
                   )
                 : ListView.builder(

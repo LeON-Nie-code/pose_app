@@ -159,7 +159,7 @@ def select_camera():
 
 def generate_video_feed(draw_dots=True):
     """Stream video feed from the selected camera."""
-    global cap, posture_start_time, current_posture,session_end_time, session_start_time, posture_times, current_eye_status, eye_start_time, eye_times
+    global cap, posture_start_time, current_posture, session_end_time, session_start_time, posture_times, current_eye_status, eye_start_time, eye_times
     try:
 
         cap = cv2.VideoCapture(current_camera_index)
@@ -184,12 +184,13 @@ def generate_video_feed(draw_dots=True):
                 # Convert back to BGR for display
                 image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
+                landmarks = None  # Ensure landmarks is initialized
                 if results_pose.pose_landmarks:
                     if draw_dots:
                         mp_drawing.draw_landmarks(image, results_pose.pose_landmarks, mp_pose.POSE_CONNECTIONS)
                     landmarks = results_pose.pose_landmarks.landmark
                     h, w, _ = frame.shape
-                    
+
                     # Detect posture by analyzing key points
                     posture = detect_posture(landmarks, w, h)
 
@@ -202,7 +203,6 @@ def generate_video_feed(draw_dots=True):
                                 logging.info(f"New posture detected: {current_posture}")
                                 posture_times[current_posture] = 0
                             if elapsed_time > 1:
-                                # print(f"Adding {elapsed_time} seconds to {current_posture}")
                                 posture_times[current_posture] += elapsed_time
                         current_posture = posture
                         if current_posture not in posture_times:
@@ -210,21 +210,11 @@ def generate_video_feed(draw_dots=True):
                         posture_start_time = time.time()
                     else:
                         if posture_start_time and time.time() - posture_start_time > 1:
-                            # print(f"Adding 1 second to {current_posture}")
                             posture_times[current_posture] += time.time() - posture_start_time
                             posture_start_time = time.time()
-    
-                            
-                    
-                    # print(posture_times)
 
                     # Draw border around the frame based on posture
-                    if posture == "normal":
-                        border_color = (0, 255, 0)  # Green border for correct posture
-                    else:
-                        border_color = (0, 0, 255)  # Red border for incorrect posture
-
-                    # Draw a border around the frame
+                    border_color = (0, 255, 0) if posture == "normal" else (0, 0, 255)  # Green for normal, red otherwise
                     thickness = 10
                     cv2.rectangle(image, (0, 0), (w, h), border_color, thickness)
 
@@ -257,7 +247,7 @@ def generate_video_feed(draw_dots=True):
                         if not looking_at_screen:
                             eye_status = 'Not looking at screen'
 
-                        if posture == "bow" or posture == "looking up":
+                        if posture in ["bow", "looking up"]:
                             eye_status = "Not looking at screen"
 
                         # if posture == "normal" and eye_status == "Looking at screen":
@@ -284,7 +274,6 @@ def generate_video_feed(draw_dots=True):
                     eye_start_time = time.time()
                 else:
                     if eye_start_time and time.time() - eye_start_time > 1:
-                        # print(f"Adding 1 second to {current_eye_status}")
                         eye_times[current_eye_status] += time.time() - eye_start_time
                         eye_start_time = time.time()
 
@@ -294,16 +283,17 @@ def generate_video_feed(draw_dots=True):
 
                 # Return the frame as a stream
                 yield (b'--frame\r\n'
-                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
     finally:
         # Record the end time of the session
         end_time = time.time()
-        # Release the camera
         if cap:
             cap.release()
-        # Log the end of the video feed
         logging.info("Video feed has ended at %s", time.ctime(end_time))
             
+            
+    cap.release()
+
     cap.release()
 
 def check_eye_position(left_eye_coords, right_eye_coords, frame_width, frame_height):
@@ -390,6 +380,10 @@ def detect_posture(landmarks, width, height):
 
 def detect_eye_test(landmarks, width, height):
     """Analyze pose landmarks and determine posture conditions."""
+    if landmarks is None:
+        logging.debug("No landmarks detected")
+        return True  
+    
     # Extract key points
     left_ear = landmarks[mp_pose.PoseLandmark.LEFT_EAR]
     right_ear = landmarks[mp_pose.PoseLandmark.RIGHT_EAR]
