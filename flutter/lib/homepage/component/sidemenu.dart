@@ -10,7 +10,7 @@ class SideMenu extends StatelessWidget {
   final VoidCallback onNavigateToCalendar;
   final VoidCallback onNavigateToCommunication;
   final VoidCallback onNavigateToSettings;
-  final VoidCallback onNavigateToSignOut;
+  //final VoidCallback onNavigateToSignOut;
   final String username;
 
   const SideMenu({
@@ -20,7 +20,7 @@ class SideMenu extends StatelessWidget {
     required this.onNavigateToCalendar,
     required this.onNavigateToCommunication,
     required this.onNavigateToSettings,
-    required this.onNavigateToSignOut,
+    //required this.onNavigateToSignOut,
     required this.username,
   }) : super(key: key);
 
@@ -92,13 +92,13 @@ class SideMenu extends StatelessWidget {
                 padding: EdgeInsets.symmetric(vertical: 20.0),
               ),
               // 退出按钮
-              IconButton(
-                onPressed: onNavigateToSignOut,
-                icon: SvgPicture.asset('assets/icons/signout.svg',
-                    color: AppColors.iconGray),
-                iconSize: 20,
-                padding: EdgeInsets.symmetric(vertical: 20.0),
-              ),
+              // IconButton(
+              //   onPressed: onNavigateToSignOut,
+              //   icon: SvgPicture.asset('assets/icons/signout.svg',
+              //       color: AppColors.iconGray),
+              //   iconSize: 20,
+              //   padding: EdgeInsets.symmetric(vertical: 20.0),
+              // ),
             ],
           ),
         ),
@@ -147,7 +147,8 @@ class SideMenu extends StatelessWidget {
                         "用户名: $username",
                         style: TextStyle(
                           fontSize: 15,
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w800,
+                          fontFamily: 'Gen-light',
                         ),
                       ),
                       Spacer(),
@@ -165,12 +166,14 @@ class SideMenu extends StatelessWidget {
                                   builder: (context) => LoginPage()),
                             );
                             // Navigator.of(context).pop();
-                            onNavigateToSignOut();
+                            //onNavigateToSignOut();
                           },
                           child: Text(
                             "退出账号",
                             style: TextStyle(
                               color: AppColors.warmOrange,
+                              fontFamily: 'Gen-light',
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),

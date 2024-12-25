@@ -212,7 +212,13 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
               },
             );
           },
-          child: Text("开始"),
+          child: Text(
+            "开始",
+            style: TextStyle(
+              fontFamily: 'Hei',
+              fontWeight: FontWeight.w400
+            ),
+            ),
         ),
 
         SizedBox(
@@ -229,6 +235,7 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
             ),
             Switch(
               value: isSwitched,
+              activeColor: AppColors.warmOrange,
               onChanged: (value) {
                 setState(() {
                   isSwitched = value; // 更新状态
@@ -252,14 +259,22 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
               size: 18,
               fontWeight: FontWeight.w800,
             ),
+            SizedBox(height: 5,),
             PrimaryText(
               text: '02 Mar 20xx（例子）',
               size: 14,
               fontWeight: FontWeight.w400,
               color: AppColors.secondary,
             ),
+            SizedBox(
+          height: SizeConfig.blockSizeVertical! * 2,
+        ),
             ElevatedButton(
-                onPressed: fetchAndInitialize, child: Icon(Icons.refresh)),
+                onPressed: fetchAndInitialize,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.refreshButton
+                ), 
+                child: Icon(Icons.refresh, color: AppColors.white,)),
           ],
         ),
 

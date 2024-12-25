@@ -71,7 +71,7 @@ class _HomePageState extends State<HomePage> {
                 onNavigateToCalendar: () => _navigateToPage(2),
                 onNavigateToCommunication: () => _navigateToPage(3),
                 onNavigateToSettings: () => _navigateToPage(4),
-                onNavigateToSignOut: () => _navigateToPage(5),
+                //onNavigateToSignOut: () => _navigateToPage(5),
               ),
             ),
             // Middle section
@@ -117,7 +117,7 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 rankingList(
                                   icon: 'assets/icons/todolist.svg',
-                                  label: '今日代办',
+                                  label: '今日待办',
                                   amount: '点击查看',
                                   dialogContent: TodayTodoDialog(),
                                   //Center(
@@ -141,7 +141,7 @@ class _HomePageState extends State<HomePage> {
                                   PrimaryText(
                                     text: dateRange,
                                     size: 16,
-                                    fontWeight: FontWeight.w800,
+                                    fontWeight: FontWeight.w600,
                                     color: AppColors.secondary,
                                   ),
                                   PrimaryText(

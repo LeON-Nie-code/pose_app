@@ -189,7 +189,12 @@ class _SettingPageState extends State<SettingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('我的'),
+        title: const Text(
+          '我的',
+          style: TextStyle(
+            fontFamily: 'Hei',
+            fontWeight: FontWeight.w700
+          ),),
         centerTitle: true,
         backgroundColor: AppColors.deppBeige,
       ),
@@ -226,6 +231,7 @@ class _SettingPageState extends State<SettingPage> {
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
+                                  fontFamily: 'Gen-light',
                                 ),
                               ),
                               TextButton(
@@ -239,8 +245,10 @@ class _SettingPageState extends State<SettingPage> {
                                 child: const Text(
                                   '编辑',
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 15,
                                     color: AppColors.warmOrange,
+                                    fontFamily: 'Gen-light',
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
@@ -279,13 +287,14 @@ class _SettingPageState extends State<SettingPage> {
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
+                              fontFamily: 'Gen-light'
                             ),
                           ),
                           const SizedBox(height: 10),
                           ListTile(
                             leading: const Icon(Icons.notifications),
                             title: const Text('提醒设置',
-                                style: TextStyle(fontSize: 16)),
+                                style: TextStyle(fontSize: 16,fontFamily: 'Gen-light')),
                             trailing: Switch(
                               value: isReminderEnabled,
                               activeColor: AppColors.warmOrange,
@@ -313,7 +322,13 @@ class _SettingPageState extends State<SettingPage> {
     String tempAge = age;
 
     return AlertDialog(
-      title: const Text('编辑个人信息'),
+      backgroundColor: AppColors.beige,
+      title: const Text(
+        '编辑个人信息',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontFamily: 'Gen-light'
+        ),),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -334,13 +349,33 @@ class _SettingPageState extends State<SettingPage> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('取消'),
+          child: const Text(
+            '取消',
+            style: TextStyle(
+              color: Colors.black,
+              fontFamily: 'Gen-light',
+              fontWeight: FontWeight.w800,
+            ),
+            ),
         ),
         ElevatedButton(
+          style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.deppBeige,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
           onPressed: () {
             _saveProfile(tempName, tempSchool, tempGender, tempAge);
           },
-          child: const Text('保存'),
+          child: const Text(
+            '保存',
+            style: TextStyle(
+              color: Colors.black,
+              fontFamily: 'Gen-light',
+              fontWeight: FontWeight.w800,
+            ),
+            ),
         ),
       ],
     );
@@ -370,7 +405,11 @@ class _SettingPageState extends State<SettingPage> {
           const SizedBox(width: 20),
           Text(value,
               style:
-                  const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const TextStyle(
+                    fontSize: 16, 
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Gen-light',
+                    )),
         ],
       ),
     );

@@ -99,12 +99,25 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: Poppins
+    - family: Gen-Bold
       fonts:
-        - asset: fonts/Poppins-Regular.ttf
-        - asset: fonts/Poppins-Medium.ttf
-        - asset: fonts/Poppins-SemiBold.ttf
-        - asset: fonts/Poppins-Bold.ttf
+        - asset: assets/fonts/Gen_Jyuu_Gothic_Bold.ttf
+    - family: Gen-Light   
+      fonts: 
+        - asset: assets/fonts/Gen_Jyuu_Gothic_Light.ttf
+    - family: Gen-Regular
+      fonts:    
+        - asset: assets/fonts/Gen_Jyuu_Gothic_Regular.ttf
+        
+    - family: Hei
+      fonts:    
+        - asset: assets/fonts/FZHei-B01S_Regular.ttf
+    - family: Baloo
+      fonts:    
+        - asset: assets/fonts/BalooBhai.ttf   
+    - family: Song
+      fonts:    
+        - asset: assets/fonts/FZFangSong-Z02S_Regular.ttf
   # fonts:
   #   - family: Schyler
   #     fonts:

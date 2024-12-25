@@ -16,6 +16,6 @@ class AppColors {
   static const pinkpg = Color(0xFFE99278);
   static const bluegrey = Color(0xFF67A1AC);
   static const yellowBr = Color(0xFFFFC300);
-
+  static const refreshButton = Color.fromARGB(255, 237, 177, 98);
 
 }

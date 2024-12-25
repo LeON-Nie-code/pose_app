@@ -249,10 +249,14 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
                     ),
                   ],
                 ),
+                SizedBox(width: 27,),
                 FloatingActionButton(
                   onPressed: fetchAndInitialize,
-                  child: Icon(Icons.refresh),
-                  backgroundColor: AppColors.warmOrange,
+                  child: Icon(
+                    Icons.refresh,
+                    color: Colors.white,
+                    ),
+                  backgroundColor: AppColors.refreshButton,
                 ),
               ],
             ),
@@ -283,7 +287,7 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
                     alignment: Alignment.centerLeft,
                     child: PrimaryText(
                       text: "累计专注",
-                      size: 14.0,
+                      size: 16.0,
                       fontWeight: FontWeight.w800,
                       color: AppColors.warmOrange,
                     ),
@@ -306,7 +310,8 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
                                   style: const TextStyle(
                                     fontSize: 13,
                                     color: AppColors.warmOrange,
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.w800,
+                                    fontFamily: 'Gen-light',
                                   ),
                                 ),
                               ),
@@ -358,7 +363,7 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
                     alignment: Alignment.centerLeft,
                     child: PrimaryText(
                       text: "今日专注",
-                      size: 14.0,
+                      size: 16.0,
                       fontWeight: FontWeight.w800,
                       color: AppColors.warmOrange,
                     ),
@@ -381,7 +386,8 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
                                   style: const TextStyle(
                                     fontSize: 13,
                                     color: AppColors.warmOrange,
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.w800,
+                                    fontFamily: 'Gen-light',
                                   ),
                                 ),
                               ),

@@ -18,67 +18,85 @@ class _AboutMyContainerState extends State<AboutMyContainer> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 0.0),
-      color: Colors.white,
-      child: Column(
-        children: [
-          Row(
-            children: [
-              ProfileAvatar(
-                avatarColor: _avatarColor,
-                isActive: false,
-                hasBorder: true,
-                onTap: () {
-                  ProfileAvatar.showColorPicker(
-                    context: context,
-                    currentColor: _avatarColor,
-                    onColorSelected: (selectedColor) {
-                      setState(() {
-                        _avatarColor = selectedColor;
-                      });
-                    },
-                  );
-                },
-              ),
-              const SizedBox(width: 8.0),
-              Expanded(
-                child: TextField(
-                  decoration: InputDecoration.collapsed(
-                    hintText: '欢迎！',
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const Divider(height: 10.0, thickness: 0.5),
-          Container(
-            height: 40.0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      child: Container(
+        padding: EdgeInsets.all(10.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          // border: Border.all(
+          //   color: Colors.grey.withOpacity(0.2),
+          //   width: 1.0
+          // ),
+          borderRadius: BorderRadius.circular(5.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 1,
+              blurRadius: 4,
+              offset: Offset(0, 3)
+            )
+          ]  
+        ),
+        child: Column(
+          children: [
+            Row(
               children: [
-                GestureDetector(
-                  onTapDown: (TapDownDetails details) =>
-                      _showFriendListPopup(context, details),
-                  child: TextButton.icon(
-                    onPressed: () {}, // 按钮默认行为为空
-                    icon: const Icon(Icons.list, color: Colors.red),
-                    label: const Text('FollowMe'),
-                  ),
+                ProfileAvatar(
+                  avatarColor: _avatarColor,
+                  isActive: false,
+                  hasBorder: true,
+                  onTap: () {
+                    ProfileAvatar.showColorPicker(
+                      context: context,
+                      currentColor: _avatarColor,
+                      onColorSelected: (selectedColor) {
+                        setState(() {
+                          _avatarColor = selectedColor;
+                        });
+                      },
+                    );
+                  },
                 ),
-                const VerticalDivider(width: 8.0),
-                TextButton.icon(
-                  onPressed: () => print('MyMoment'),
-                  icon: const Icon(
-                    Icons.photo_library,
-                    color: Colors.green,
+                const SizedBox(width: 8.0),
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration.collapsed(
+                      hintText: '欢迎！',
+                    ),
                   ),
-                  label: const Text('MyMoment'),
                 ),
               ],
             ),
-          ),
-        ],
+            const Divider(height: 10.0, thickness: 0.5),
+            Container(
+              height: 40.0,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  GestureDetector(
+                    onTapDown: (TapDownDetails details) =>
+                        _showFriendListPopup(context, details),
+                    child: TextButton.icon(
+                      onPressed: () {}, // 按钮默认行为为空
+                      icon: const Icon(Icons.list, color: Colors.red),
+                      label: const Text('FollowMe'),
+                    ),
+                  ),
+                  const VerticalDivider(width: 8.0),
+                  TextButton.icon(
+                    onPressed: () => print('MyMoment'),
+                    icon: const Icon(
+                      Icons.photo_library,
+                      color: Colors.green,
+                    ),
+                    label: const Text('MyMoment'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

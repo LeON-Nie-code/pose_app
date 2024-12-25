@@ -24,8 +24,20 @@ class _LoginPageState extends State<LoginPage> {
       barrierDismissible: false, // 禁止手动关闭弹框
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('登录成功！'),
-          content: const Text('欢迎回来'),
+          title: const Text(
+            '登录成功！',
+            style:TextStyle(
+              fontFamily: 'Gen-light',
+              fontWeight: FontWeight.w800,
+            ),
+            ),
+          content: const Text(
+            '欢迎回来',
+            style:TextStyle(
+              fontFamily: 'Gen-light',
+              fontWeight: FontWeight.w800,
+            ),
+            ),
           backgroundColor: AppColors.beige,
         );
       },
@@ -177,7 +189,12 @@ class _LoginPageState extends State<LoginPage> {
                       ? const CircularProgressIndicator(color: Colors.white)
                       : const Text(
                           '登录',
-                          style: TextStyle(color: Colors.white, fontSize: 18),
+                          style: TextStyle(
+                            color: Colors.white, 
+                            fontSize: 18,
+                            fontFamily: 'Hei',
+                            fontWeight: FontWeight.w400
+                            ),
                         ),
                 ),
               ),
@@ -203,6 +220,7 @@ class _LoginPageState extends State<LoginPage> {
                       child: const Text(
                         '忘记密码？',
                         style: TextStyle(
+                          fontFamily: 'Hei',
                           color: Colors.black54,
                           decoration: TextDecoration.underline,
                         ),
@@ -216,6 +234,7 @@ class _LoginPageState extends State<LoginPage> {
                       child: const Text(
                         '新用户注册',
                         style: TextStyle(
+                          fontFamily: 'Hei',
                           color: Colors.black54,
                           decoration: TextDecoration.underline,
                         ),
@@ -246,6 +265,11 @@ class _LoginPageState extends State<LoginPage> {
       child: TextField(
         controller: controller,
         obscureText: obscureText,
+        style: TextStyle(
+          fontFamily: 'Hei',
+          color: Colors.black,
+          fontWeight: FontWeight.w300
+        ),
         decoration: InputDecoration(
           prefixIcon: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -273,7 +297,7 @@ class _LoginPageState extends State<LoginPage> {
       children: [
         const Text(
           '其他登录方式',
-          style: TextStyle(color: Colors.grey, fontSize: 14),
+          style: TextStyle(color: Colors.grey, fontSize: 14, fontFamily: 'Hei',),
         ),
         const SizedBox(height: 10),
         Row(

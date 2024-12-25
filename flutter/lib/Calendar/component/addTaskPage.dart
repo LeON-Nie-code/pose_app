@@ -121,6 +121,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 Expanded(child: SizedBox()),
                 CircleAvatar(
                   backgroundImage: AssetImage('assets/icons/userIcon.png'),
+                  backgroundColor: Colors.white,
                   radius: 20,
                 ),
               ],
@@ -159,7 +160,22 @@ class _AddTaskPageState extends State<AddTaskPage> {
                             context: context,
                             initialDate: _selectedDate,
                             firstDate: DateTime(2020),
-                            lastDate: DateTime(2030),
+                            lastDate: DateTime(2030),  builder: (BuildContext context, Widget? child) {
+                            return Theme(
+                              data: ThemeData.light().copyWith(
+                                primaryColor: AppColors.warmOrange, 
+                                scaffoldBackgroundColor:AppColors.beige, 
+                                dialogBackgroundColor: AppColors.beige, 
+                                colorScheme: ColorScheme.light(
+                                  primary: AppColors.warmOrange, 
+                                  onPrimary: Colors.white, // 顶部选中日期的文字颜色
+                                  surface: Colors.white,  // 日期选择背景颜色
+                                  onSurface: Colors.black, // 日期文字颜色
+                                ),
+                              ),
+                              child: child!,
+                            );
+                          },
                           );
 
                           if (_pickerDate != null) {
@@ -176,7 +192,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                     ),
                     SizedBox(height: 5),
                     InputContent(
-                      hint: "$_selectedRemind minutes early",
+                      hint: "$_selectedRemind 分钟前提醒",
                       widget: DropdownButton(
                         icon: Icon(
                           Icons.keyboard_arrow_down,

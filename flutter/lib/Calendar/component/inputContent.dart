@@ -26,6 +26,7 @@ class InputContent extends StatelessWidget {
               color:Colors.black,
               fontWeight: FontWeight.bold,
               fontSize: 17,
+              fontFamily: 'Gen-light',
             ),
           ),
           Container(
@@ -51,6 +52,7 @@ class InputContent extends StatelessWidget {
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                       color: Colors.grey[600],
+                      fontFamily: 'Gen-light',
                     ),
                     decoration: InputDecoration(
                       hintText: hint,

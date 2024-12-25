@@ -77,6 +77,7 @@ class MyPieChart extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
+                    fontFamily: 'Gen-light',
                   ),
                 ),
               ],
@@ -109,9 +110,10 @@ class MyPieChart extends StatelessWidget {
                 const Text(
                   '专注时长',
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 11,
                     fontWeight: FontWeight.w800,
                     color: Colors.black,
+                    fontFamily: 'Gen-light',
                   ),
                 ),
                 SizedBox(width: 10),
@@ -127,9 +129,10 @@ class MyPieChart extends StatelessWidget {
                 const Text(
                   '坐姿异常',
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 11,
                     fontWeight: FontWeight.w800,
                     color: Colors.black,
+                    fontFamily: 'Gen-light',
                   ),
                 ),
                 SizedBox(width: 10),
@@ -145,9 +148,10 @@ class MyPieChart extends StatelessWidget {
                 const Text(
                   '其他',
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 11,
                     fontWeight: FontWeight.w800,
                     color: Colors.black,
+                    fontFamily: 'Gen-light',
                   ),
                 ),
                 SizedBox(width: 10),

@@ -11,6 +11,7 @@ import 'package:pose_app/Community/component/postContainer.dart';
 import 'package:pose_app/Community/component/add_post_page.dart';
 import 'package:pose_app/Community/dataAboutCommunity.dart';
 import 'package:pose_app/style/colors.dart';
+import 'package:pose_app/style/style.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pose_app/Community/dataAboutCommunity.dart';
@@ -222,16 +223,17 @@ class _CommunityState extends State<Community> {
     return CustomScrollView(
       slivers: [
         SliverAppBar(
+           toolbarHeight: 100.0,
           systemOverlayStyle: SystemUiOverlayStyle.light,
-          backgroundColor: Colors.white,
-          title: const Text(
-            '朋友圈',
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 28.0,
-              fontWeight: FontWeight.bold,
-              letterSpacing: -1.2,
-            ),
+          //expandedHeight: 80.0,
+          backgroundColor: AppColors.beige,
+          flexibleSpace: FlexibleSpaceBar(
+          titlePadding: EdgeInsets.symmetric(vertical: 30.0, horizontal: 30.0),
+          title: PrimaryText(
+            text: '朋友圈',
+            size: 30,
+            fontWeight: FontWeight.w800,
+          ),
           ),
           centerTitle: false,
           floating: true,
