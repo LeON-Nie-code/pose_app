@@ -28,7 +28,7 @@ class RecordListOfUsers extends StatefulWidget {
 class _RecordListOfUsersState extends State<RecordListOfUsers> {
   String? _statusLabel;
 
-    String formatDuration(dynamic durationInSeconds) {
+  String formatDuration(dynamic durationInSeconds) {
     if (durationInSeconds == null) return '0分0秒';
     if (durationInSeconds is! num) return '0分0秒';
     int minutes = (durationInSeconds / 60).floor();
@@ -49,10 +49,6 @@ class _RecordListOfUsersState extends State<RecordListOfUsers> {
     }
   }
 
-
-
-  
-
   static const List<String> month = [
     '',
     'Jan',
@@ -72,186 +68,210 @@ class _RecordListOfUsersState extends State<RecordListOfUsers> {
   @override
   void initState() {
     super.initState();
-    _statusLabel = widget.amount;
+    // _statusLabel = widget.amount;
   }
 
-void _showRecordDialog() {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.0),
-        ),
-        elevation: 12,
-        backgroundColor: AppColors.beige,
-        child: Container(
-          padding: EdgeInsets.all(20),
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.7,
-            maxWidth: 630,
+  void _showRecordDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.article, color: AppColors.primary, size: 28),
-                      SizedBox(width: 8),
-                      Text(
-                        '记录详情',
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
-                          fontFamily: 'Gen-light'
-                        ),
-                      ),
-                    ],
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.close, color: Colors.grey),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              ),
-              SizedBox(height: 10),
-              Divider(),
-              Expanded(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          elevation: 12,
+          backgroundColor: AppColors.beige,
+          child: Container(
+            padding: EdgeInsets.all(20),
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.7,
+              maxWidth: 630,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      flex: 2,
-                      child: Container(
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppColors.deppBeige,
-                          borderRadius: BorderRadius.circular(10),
+                    Row(
+                      children: [
+                        Icon(Icons.article, color: AppColors.primary, size: 28),
+                        SizedBox(width: 8),
+                        Text(
+                          '记录详情',
+                          style: TextStyle(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                              fontFamily: 'Gen-light'),
                         ),
-                        child: SingleChildScrollView(
-                          child: Text(
-                            widget.record != null
-                                ? JsonEncoder.withIndent('  ').convert(widget.record)
-                                : 'No Record Available',
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              color: AppColors.black,
-                              fontWeight: FontWeight.w700,
+                      ],
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.close, color: Colors.grey),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10),
+                Divider(),
+                Expanded(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: AppColors.deppBeige,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: SingleChildScrollView(
+                            child: Text(
+                              widget.record != null
+                                  ? JsonEncoder.withIndent('  ')
+                                      .convert(widget.record)
+                                  : 'No Record Available',
+                              style: TextStyle(
+                                fontSize: 14.0,
+                                color: AppColors.black,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    SizedBox(width: 20),
-                    Expanded(
-                      flex: 1,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: 35,),
-                          Row(
-                            children: [
-                              Icon(Icons.label, color: AppColors.secondary),
-                              SizedBox(width: 8),
-                              Text('创建时间：\n ${formatCreatedAt(widget.record?['created_at'])}',
-                                  style: TextStyle(fontSize: 16, fontFamily: 'Gen-light',fontWeight: FontWeight.w800)),
-                            ],
-                          ), 
-                          Divider(),
-                          Row(
-                            children: [
-                              Icon(Icons.label, color: AppColors.pinkpg),
-                              SizedBox(width: 8),
-
-                              Text('专注总时长：${formatDuration(widget.record?['eye_times']?['session_duration'])}',
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, fontFamily: 'Gen-light')),
-                            ],
-                          ),
-                          Divider(),
-                          Row(
-                            children: [
-                               Icon(Icons.label, color: AppColors.warmOrange),
+                      SizedBox(width: 20),
+                      Expanded(
+                        flex: 1,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              height: 35,
+                            ),
+                            Row(
+                              children: [
+                                Icon(Icons.label, color: AppColors.secondary),
                                 SizedBox(width: 8),
-                              Text('弯腰：${formatDuration(widget.record?['posture_times']?['bow'])}',
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800,fontFamily: 'Gen-light')),
-                            ],
-                          ),
-                          Divider(),
-                          Row(
-                            children: [
-                              Icon(Icons.label, color: AppColors.yellowBr),
-                              SizedBox(width: 8),
-                              Text('左倾斜：${formatDuration(widget.record?['posture_times']?['left tilt'])}',
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800,fontFamily: 'Gen-light')),
-                            ],
-                          ),
-                          Divider(),
-                          Row(
-                            children: [
-                              Icon(Icons.label, color: AppColors.bluegrey),
-                              SizedBox(width: 8),
-                              Text('右倾斜：${formatDuration(widget.record?['posture_times']?['right tilt'])}',
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800,fontFamily: 'Gen-light')),
-                            ],
-                          ),
-                          Divider(),
-                          Row(
-                            children: [
-                              Icon(Icons.label, color: Colors.purple[200]),
-                              SizedBox(width: 8),
-                              Text('躺下：${formatDuration(widget.record?['posture_times']?['lying down in the chair'])}',
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, fontFamily: 'Gen-light')),
-                            ],
-                          ),
-                          //Divider(),
-                        ],
+                                Text(
+                                    '创建时间：\n ${formatCreatedAt(widget.record?['created_at'])}',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontFamily: 'Gen-light',
+                                        fontWeight: FontWeight.w800)),
+                              ],
+                            ),
+                            Divider(),
+                            Row(
+                              children: [
+                                Icon(Icons.label, color: AppColors.pinkpg),
+                                SizedBox(width: 8),
+                                Text(
+                                    '专注总时长：${formatDuration(widget.record?['eye_times']?['session_duration'])}',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w800,
+                                        fontFamily: 'Gen-light')),
+                              ],
+                            ),
+                            Divider(),
+                            Row(
+                              children: [
+                                Icon(Icons.label, color: AppColors.warmOrange),
+                                SizedBox(width: 8),
+                                Text(
+                                    '弯腰：${formatDuration(widget.record?['posture_times']?['bow'])}',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w800,
+                                        fontFamily: 'Gen-light')),
+                              ],
+                            ),
+                            Divider(),
+                            Row(
+                              children: [
+                                Icon(Icons.label, color: AppColors.yellowBr),
+                                SizedBox(width: 8),
+                                Text(
+                                    '左倾斜：${formatDuration(widget.record?['posture_times']?['left tilt'])}',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w800,
+                                        fontFamily: 'Gen-light')),
+                              ],
+                            ),
+                            Divider(),
+                            Row(
+                              children: [
+                                Icon(Icons.label, color: AppColors.bluegrey),
+                                SizedBox(width: 8),
+                                Text(
+                                    '右倾斜：${formatDuration(widget.record?['posture_times']?['right tilt'])}',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w800,
+                                        fontFamily: 'Gen-light')),
+                              ],
+                            ),
+                            Divider(),
+                            Row(
+                              children: [
+                                Icon(Icons.label, color: Colors.purple[200]),
+                                SizedBox(width: 8),
+                                Text(
+                                    '躺下：${formatDuration(widget.record?['posture_times']?['lying down in the chair'])}',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w800,
+                                        fontFamily: 'Gen-light')),
+                              ],
+                            ),
+                            //Divider(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.warmOrange,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 20),
-              Align(
-                alignment: Alignment.centerRight,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.warmOrange,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    child: Text(
-                      '关闭',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        fontFamily: 'Gen-light'
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
+                      child: Text(
+                        '关闭',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            fontFamily: 'Gen-light'),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      );
-    },
-  );
-}
-
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

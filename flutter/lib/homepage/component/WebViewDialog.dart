@@ -160,7 +160,9 @@ class _VideoWebViewDialogState extends State<VideoWebViewDialog> {
               child: ElevatedButton(
                 onPressed: () async {
                   await getSessionRecord(); // 发送 POST 请求
-                  Navigator.of(context).pop();
+                  if (mounted) {
+                    Navigator.of(context).pop();
+                  }
                 },
                 child: Text('Close'),
               ),

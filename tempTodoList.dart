@@ -32,7 +32,7 @@ class _TodolistState extends State<Todolist> {
     _fetchTasks(); // 初始化时获取任务
   }
 
-  Future<void> deleteTodo(int? todo_id) async {
+  Future<void> deleteTodo(int todo_id) async {
     // 使用 Dio 发起 GET 请求
     final dio = Dio();
     print('todolist access token: $access_token');
@@ -313,15 +313,11 @@ class _TodolistState extends State<Todolist> {
                   key: Key(filteredTasks[index].title ?? index.toString()),
                   direction: DismissDirection.horizontal,
                   onDismissed: (_) async {
-                    // 调用删除任务的 API 接口
-                    await deleteTodo(filteredTasks[index].id);
-
-                    // 删除任务
+                    // _confirmDeleteTask(
+                    //     index); // Confirm and delete task from API and list
                     setState(() {
-                      tasks.remove(filteredTasks[index]); // 从任务列表中删除该任务
+                      tasks.removeAt(index); // Remove task from the local list
                     });
-
-                    // TODO: 处理删除任务后的UI更新
                   },
                   background: Row(
                     mainAxisAlignment: MainAxisAlignment.start,

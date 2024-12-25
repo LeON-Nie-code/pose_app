@@ -93,6 +93,11 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
     // 反转列表并更新UI
     setState(() {
       recentActivities = recentActivities.reversed.toList();
+      print('UI updated with reversed activities:');
+      //循环打印recentActivities
+      recentActivities.forEach((element) {
+        print(element);
+      });
     });
 
     // Future.delayed(Duration(milliseconds: 200), () {
