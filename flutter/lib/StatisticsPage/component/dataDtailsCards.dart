@@ -140,7 +140,7 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
     //   'totalDuration': 0.0,
     //   'todayDuration': 0.0,
     // };
-    print('!!!!!!!!!!!!!!Initializing Study Details with records: $records');
+    // print('!!!!!!!!!!!!!!Initializing Study Details with records: $records');
 
     Map<String, dynamic> data = analyzeData(records, null);
 
@@ -287,13 +287,15 @@ class _DataDetailsCardState extends State<DataDetailsCard> {
                     ),
                   ],
                 ),
-                SizedBox(width: 27,),
+                SizedBox(
+                  width: 27,
+                ),
                 FloatingActionButton(
                   onPressed: fetchAndInitialize,
                   child: Icon(
                     Icons.refresh,
                     color: Colors.white,
-                    ),
+                  ),
                   backgroundColor: AppColors.refreshButton,
                 ),
               ],

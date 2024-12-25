@@ -109,9 +109,21 @@ class _HomePageState extends State<HomePage> {
                                   label: '好友在线',
                                   amount: '用户1',
                                   dialogContent: Center(
-                                    child: Text(
-                                      '是否好友在线',
-                                      style: TextStyle(fontSize: 18),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize
+                                          .min, // 让 Column 自动适应其内容的高度
+                                      children: [
+                                        Image.asset(
+                                          'assets/icons/logo.png',
+                                          width: 150, // 调整logo大小
+                                          height: 120, // 调整logo大小
+                                        ),
+                                        SizedBox(height: 16), // 图标和文本之间的间距
+                                        Text(
+                                          '更多功能敬请期待',
+                                          style: TextStyle(fontSize: 18),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),

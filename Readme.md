@@ -199,8 +199,3 @@ docker-compose up
 
 1. https://www.uclahealth.org/safety/ergonomics/office-ergonomics/good-posture
 2. https://ergonomictrends.com/proper-sitting-posture-computer-experts/
-
-
-
-
-

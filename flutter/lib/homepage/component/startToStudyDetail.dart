@@ -185,7 +185,7 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
           'Authorization': 'Bearer $access_token', // 在请求头中添加 accessToken
         }), // 将 accessToken 添加到请求头
       );
-      print('Session Record: ${response.data}');
+      // print('Session Record: ${response.data}');
       print(response.data.runtimeType);
       print('record count: ${response.data.length}');
       records = response.data;
@@ -200,8 +200,22 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Logo
+        Row(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(right: 0), // 调整左侧的偏移量
+              child: Image.asset(
+                'assets/icons/logo.png',
+                width: 120, // 调整logo大小
+                height: 120, // 调整logo大小
+              ),
+            ),
+          ],
+        ),
+
         SizedBox(
-          height: SizeConfig.blockSizeVertical! * 15, // 按钮上方的间距
+          height: SizeConfig.blockSizeVertical! * 5, // 按钮上方的间距
         ),
 
         // 开始按钮组件
