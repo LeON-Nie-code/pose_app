@@ -14,48 +14,63 @@ class rankingListTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(height: SizeConfig.blockSizeVertical! * 4),
-        Container(
+    return Dialog(
+      backgroundColor: AppColors.beige,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.8, // 限制最大高度
+          maxWidth: 600,  // 限制宽度
+        ),
+        child: Padding(
           padding: EdgeInsets.all(defaultPadding),
-          decoration: BoxDecoration(
-            color: AppColors.beige,
-            borderRadius: const BorderRadius.all(Radius.circular(10)),
-          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              PrimaryText(
-                text: '排行榜',
-                size: 30,
-                fontWeight: FontWeight.w800,
-                color: AppColors.black,
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    PrimaryText(
+                      text: '排行榜',
+                      size: 30,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.black,
+                    ),
+                    PrimaryText(
+                      text: '20xx/xx/xx',
+                      size: 16.0,
+                      color: AppColors.secondary,
+                    ),
+                  ],
+                ),
               ),
-              PrimaryText(
-                text: '20xx/xx/xx',
-                size: 16.0,
-                color: AppColors.secondary,
+              Expanded(
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    DataTable(
+                      columnSpacing: defaultPadding,
+                      columns: [
+                        DataColumn(label: Text('排名')),
+                        DataColumn(label: Text('用户名')),
+                        DataColumn(label: Text('总时间')),
+                      ],
+                      rows: List.generate(
+                        demoRecentFiles.length,
+                        (index) => rankingListDataRow(demoRecentFiles[index]),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              SizedBox(
-                width: double.infinity,
-                child: DataTable(
-                    horizontalMargin: 0,
-                    columnSpacing: defaultPadding,
-                    columns: [
-                      DataColumn(label: Text('排名')),
-                      DataColumn(label: Text('用户名')),
-                      DataColumn(label: Text('总时间')),
-                    ],
-                    rows: List.generate(
-                      demoRecentFiles.length,
-                      (index) => rankingListDataRow(demoRecentFiles[index]),
-                    )),
-              )
             ],
           ),
         ),
-      ],
+      ),
     );
   }
 
@@ -72,16 +87,13 @@ class rankingListTable extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
-                child: (Text(fileInfo.rank ?? 'N/A')),
+                child: Text(fileInfo.rank ?? 'N/A'),
               )
             ],
           ),
         ),
-
-        //DataCell(Text(fileInfo.rank ?? 'N/A')),
         DataCell(Text(fileInfo.userName ?? 'N/A')),
         DataCell(Text(fileInfo.hour ?? 'N/A')),
-        //DataCell(Text(fileInfo.checkData ?? 'N/A')),
       ],
     );
   }
