@@ -185,7 +185,7 @@ class _StartToStudyDetailState extends State<StartToStudyDetail> {
           'Authorization': 'Bearer $access_token', // 在请求头中添加 accessToken
         }), // 将 accessToken 添加到请求头
       );
-      // print('Session Record: ${response.data}');
+      print('Session Record: ${response.data}');
       print(response.data.runtimeType);
       print('record count: ${response.data.length}');
       records = response.data;

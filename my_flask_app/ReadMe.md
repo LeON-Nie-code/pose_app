@@ -53,3 +53,39 @@ curl -X POST http://8.217.68.60/post \
      -F "title=My New Post" \
      -F "content=This is the content of my new post." \
      -F "photo1=@1.jpg"
+
+
+
+
+     .
+├── ReadMe.md
+├── SendCode
+│   ├── ReadMe.md
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-312.pyc
+│   │   └── send.cpython-312.pyc
+│   └── send.py
+├── __pycache__
+│   
+├── app.py
+├── config.py
+├── instance
+│   └── site.db
+├── migrations
+│   ├── README
+│   ├── __pycache__
+│   │   ├── env.cpython-310.pyc
+│   │   └── env.cpython-312.pyc
+│   ├── alembic.ini
+│   ├── env.py
+│   ├── script.py.mako
+│   └── versions
+│       
+├── models.py
+├── nohup.out
+├── requirements.txt
+├── routes.py
+├── temp.py
+└── venv
+    

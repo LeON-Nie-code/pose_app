@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:pose_app/homepage/homepage.dart' as homepage;
 import 'package:pose_app/style/colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pose_app/config/config.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -83,7 +84,7 @@ class _LoginPageState extends State<LoginPage> {
       };
 
       final response = await Dio().post(
-        'http://8.217.68.60$loginEndpoint',
+        '${Config.baseUrl}$loginEndpoint',
         data: {
           loginFieldMap[hintText]!: username,
           "password": password,
@@ -152,7 +153,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _fetchUsernameAndNavigate(String accessToken) async {
     try {
       final response = await Dio().get(
-        'http://8.217.68.60/user',
+        '${Config.baseUrl}/user',
         options: Options(headers: {
           "Authorization": "Bearer $accessToken",
         }),

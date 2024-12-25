@@ -5,8 +5,15 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/cupertino.dart';
 
-class AppBarActionItems extends StatelessWidget {
+class AppBarActionItems extends StatefulWidget {
   const AppBarActionItems({super.key});
+
+  @override
+  State<AppBarActionItems> createState() => _AppBarActionItemsState();
+}
+
+class _AppBarActionItemsState extends State<AppBarActionItems> {
+  bool isTimerRunning = false; // 标志变量，跟踪计时状态
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +24,12 @@ class AppBarActionItems extends StatelessWidget {
           builder: (context) {
             return IconButton(
               onPressed: () {
-                _showCountdownSetupDialog(context);
+                //只有当时计时没有运行时，才允许打开
+                if (!isTimerRunning) {
+                  _showCountdownSetupDialog(context);
+                } else {
+                  _showWarning(context);
+                }
               },
               icon: SvgPicture.asset(
                 'assets/icons/calendar.svg',
@@ -71,6 +83,16 @@ class AppBarActionItems extends StatelessWidget {
             onClose: () {
               overlayEntry.remove();
             },
+            onTimerStart: () {
+              setState(() {
+                isTimerRunning = true;
+              });
+            },
+            onTimerEnd: () {
+              setState(() {
+                isTimerRunning = false;
+              });
+            },
             iconOffset: offset,
             iconSize: size,
           ),
@@ -78,7 +100,21 @@ class AppBarActionItems extends StatelessWidget {
       ),
     );
 
-    Overlay.of(context).insert(overlayEntry);
+    Overlay.of(context, rootOverlay: true).insert(overlayEntry);
+  }
+
+  // 弹出提示
+  void _showWarning(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          '计时器正在运行，请等待倒计时结束。',
+          style: TextStyle(color: Colors.black),
+        ),
+        backgroundColor: AppColors.secondary,
+        duration: Duration(seconds: 1),
+      ),
+    );
   }
 }
 
@@ -87,12 +123,16 @@ class CountdownSetupDialog extends StatefulWidget {
   final VoidCallback onClose;
   final Offset iconOffset;
   final Size iconSize;
+  final VoidCallback onTimerStart;
+  final VoidCallback onTimerEnd;
 
   const CountdownSetupDialog({
     super.key,
     required this.onClose,
     required this.iconOffset,
     required this.iconSize,
+    required this.onTimerStart,
+    required this.onTimerEnd,
   });
 
   @override
@@ -180,8 +220,9 @@ class _CountdownSetupDialogState extends State<CountdownSetupDialog> {
 
               if (totalSeconds > 0) {
                 widget.onClose();
-                _startCountdown(
-                    context, totalSeconds, widget.iconOffset, widget.iconSize);
+                widget.onTimerStart();
+                //_startCountdown(context, totalSeconds, widget.iconOffset, widget.iconSize);
+                _startCountdown(context, totalSeconds);
               } else {
                 setState(() {
                   errorMessage = '请输入有效的时间';
@@ -233,21 +274,22 @@ class _CountdownSetupDialogState extends State<CountdownSetupDialog> {
     );
   }
 
-  void _startCountdown(BuildContext context, int totalSeconds,
-      Offset iconOffset, Size iconSize) {
+  void _startCountdown(BuildContext context, int totalSeconds) {
     late OverlayEntry overlayEntry;
 
     overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
-        top: iconOffset.dy + iconSize.height / 2 - 60,
-        left: iconOffset.dx - 210,
+        top: widget.iconOffset.dy + widget.iconSize.height / 2 - 60,
+        left: widget.iconOffset.dx - 210,
         child: Material(
           color: Colors.transparent,
           child: CountdownDialog(
             initialSeconds: totalSeconds,
             onClose: () {
               overlayEntry.remove();
+              widget.onTimerEnd(); // 计时器结束后重置 isTimerRunning
             },
+            onTimerEnd: widget.onTimerEnd, // 传递倒计时结束回调
           ),
         ),
       ),
@@ -260,9 +302,13 @@ class _CountdownSetupDialogState extends State<CountdownSetupDialog> {
 class CountdownDialog extends StatefulWidget {
   final int initialSeconds;
   final VoidCallback onClose;
+  final VoidCallback onTimerEnd;
 
   const CountdownDialog(
-      {super.key, required this.initialSeconds, required this.onClose});
+      {super.key,
+      required this.initialSeconds,
+      required this.onClose,
+      required this.onTimerEnd});
 
   @override
   _CountdownDialogState createState() => _CountdownDialogState();
@@ -290,6 +336,7 @@ class _CountdownDialogState extends State<CountdownDialog> {
         _timer.cancel();
         _playAlarm();
         widget.onClose();
+        widget.onTimerEnd(); // 倒计时结束后重置 isTimerRunning
       }
     });
   }
