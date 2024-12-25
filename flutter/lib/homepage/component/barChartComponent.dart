@@ -105,6 +105,14 @@ class _BarChartComponentState extends State<BarChartComponent> {
                 return '60min';
               } else if (value == 90) {
                 return '90min';
+              } else if (value == 120) {
+                return '120min';
+              } else if (value == 150) {
+                return '120min';
+              } else if (value == 180) {
+                return '120min';
+              } else if (value == 210) {
+                return '120min';
               } else {
                 return '';
               }
@@ -120,6 +128,18 @@ class _BarChartComponentState extends State<BarChartComponent> {
               } else {
                 return '';
               }
+            },
+          ),
+        ),
+        barTouchData: BarTouchData(
+          touchTooltipData: BarTouchTooltipData(
+            tooltipPadding: const EdgeInsets.all(8),
+            tooltipMargin: 10,
+            getTooltipItem: (group, groupIndex, rod, rodIndex) {
+              return BarTooltipItem(
+                '${rod.y.toStringAsFixed(1)} min',
+                TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+              );
             },
           ),
         ),
