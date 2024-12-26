@@ -15,7 +15,7 @@ services:
       - flask-db
 
   flask-db:
-    image: nouchka/sqlite:latest
+    image: nouchka/sqlite3:latest
     container_name: flask-db
     volumes:
       - ./instance:/app/instance  # 持久化数据库文件
