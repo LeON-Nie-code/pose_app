@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  flask-app:
+    build: .
+    container_name: flask-app
+    volumes:
+      - .:/app
+      - ./instance:/app/instance  # 保证 SQLite 数据库的持久化
+    ports:
+      - "8889:8889"
+    environment:
+      - FLASK_ENV=production
+    depends_on:
+      - flask-db
+
+  flask-db:
+    image: nouchka/sqlite:latest
+    container_name: flask-db
+    volumes:
+      - ./instance:/app/instance  # 持久化数据库文件

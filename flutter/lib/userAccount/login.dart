@@ -105,23 +105,7 @@ class _LoginPageState extends State<LoginPage> {
         await prefs.setString('accessToken', accessToken);
         print('Access Token stored: $accessToken');
 
-        // final rawCookie = response.headers.value('set-cookie') ?? '';
-        // print('Raw cookie: $rawCookie'); // 打印原始 cookie 值供调试（在终端中）
-
-        // // 提取 sessionid
-        // final sessionId =
-        //     RegExp(r'sessionid=([^;]+)').firstMatch(rawCookie)?.group(1);
-        // // 如果未能提取到有效的 sessionid，抛出异常
-        // if (sessionId == null || sessionId.isEmpty) {
-        //   throw Exception('未找到有效的 sessionid');
-        // }
-
-        // print('Extracted sessionId: $sessionId');
-
-        // // 将 sessionid 存储到 SharedPreferences 中，供后续请求使用
-        // final prefs = await SharedPreferences.getInstance();
-        // await prefs.setString('sessionId', sessionId);
-        // print('Session ID stored: $sessionId');
+        
 
         // 登录成功，显示弹框并跳转
 

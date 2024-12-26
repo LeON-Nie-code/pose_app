@@ -45,14 +45,14 @@ class _SettingPageState extends State<SettingPage> {
   Future<void> _initializeSessionId() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final storedSessionId = prefs.getString('sessionId');
-      if (storedSessionId == null || storedSessionId.isEmpty) {
-        throw Exception('Session ID not found');
-      }
-      // 更新本地状态
-      setState(() {
-        sessionId = storedSessionId;
-      });
+      // final storedSessionId = prefs.getString('sessionId');
+      // if (storedSessionId == null || storedSessionId.isEmpty) {
+      //   throw Exception('Session ID not found');
+      // }
+      // // 更新本地状态
+      // setState(() {
+      //   sessionId = storedSessionId;
+      // });
 
       final storedAccessToken = prefs.getString('accessToken');
       if (storedAccessToken == null || storedAccessToken.isEmpty) {
