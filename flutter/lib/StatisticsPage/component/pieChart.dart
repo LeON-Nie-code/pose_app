@@ -19,18 +19,18 @@ class MyPieChart extends StatelessWidget {
   Widget build(BuildContext context) {
     // 获取选中日期的时长
     double targetDateDuration = data['targetDateDuration'] ?? 0.0;
-    double totalDuration = data['totalDuration'] ?? 0.0;
+    double totalValue = 5400.0;
     double postureAbnormalDuration = data['postureAbnormalDuration'] ?? 0.0;
 
     // 如果 `totalDuration` 为 0，设置默认值，避免饼图报错
-    if (totalDuration == 0) {
-      totalDuration = 1;
+    if (totalValue == 0) {
+      totalValue = 1;
       targetDateDuration = 0; // 防止 0 的部分渲染
     }
 
     // 计算剩余时长
     double remainingDuration =
-        (totalDuration - targetDateDuration - postureAbnormalDuration)
+        (totalValue - targetDateDuration - postureAbnormalDuration)
             .clamp(0.0, double.infinity);
 
     // 构建饼图数据

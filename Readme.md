@@ -2,6 +2,11 @@
 
 这是一项使用media_pipe对坐姿进行检测的Windows桌面APP
 
+## 安装
+1. 使用源码构建，使用方法见下文
+2. 在官网 http://poseapp.top/ 来下载安装程序，执行即可自动安装
+3. 在https://cloud.tsinghua.edu.cn/f/8a321560f4384b19ae45/?dl=1获取安装程序
+
 ## 文件结构
 
 ```
@@ -192,6 +197,9 @@ docker-compose up
 ```
 
 即可提供后端api服务
+
+
+
 
 ## 理论指导
 
